@@ -50,22 +50,6 @@ void sea_w108config ( int argc, char * argv[] )
         {
             switch (opt) 
             {
-                case 'a': //new
-                {
-                    u8 temp[3];
-                    sscanf(argv[0x02],"%d",&num);    //argv 只有8位 根据空格划分
-                    temp[0] = num;                   //carid;
-                    sscanf(argv[0x03],"%d",&num);
-                    temp[1] = num;                   //index  
-                    sscanf(argv[0x04],"%d",&num);
-                    temp[2] = num;                   //len
-                    
-                    sea_printf("geting route carid%d index%d len%d", temp[0], temp[1], temp[2]);
-                    
-                    w108frm1.put(&w108frm1, ICHP_SV_GETROUTE, 0x03, 0x00, temp);
-
-                    break;
-                }
                 case '1':
                 {
                     sscanf(cmdhd1.optarg, "%d", &num);
@@ -123,13 +107,6 @@ void sea_w108config ( int argc, char * argv[] )
                         
                     break;
                 }
-                case '4':
-                {
-                    sea_printf("\nchecking buffer");
-                    w108frm1.put(&w108frm1, ICHP_SV_BUF, 0x01, 0x00, &tmp);
-                    break;
-                }
-                
                 case 'd':
                 {
                     sscanf(cmdhd1.optarg, "%d", &num);
@@ -176,19 +153,6 @@ void sea_w108config ( int argc, char * argv[] )
 
                     break;
                 }
-                case 'f':
-                {
-                    sscanf(cmdhd1.optarg, "%d", &num);
-                    tmp = num & 0xff;
-                    
-                    if(tmp > 0x00 && tmp <= 15)
-                    {
-                        sea_printf("\nchanging w108 index to %d", tmp);
-                        w108frm1.put(&w108frm1, ICHP_SV_INDEX, 0x01, 0x00, &tmp);
-                    }
-                    break;
-                }
-                
                 case 'o':
                     sscanf(cmdhd1.optarg, "%d", &num);
                     tmp = num & 0xff;
@@ -240,7 +204,7 @@ void sea_w108config ( int argc, char * argv[] )
                     if (dyn_info.addr[tmp - 0x01].logic) 
                     {
                         sea_printf("\nsend reboot vehicle %d, logic address %d", tmp, dyn_info.addr[tmp - 0x01].logic);
-                        frm.cmd        = ICHP_SV_W108RST;
+                        frm.cmd        = ICHP_SV_REBOOT;
                         frm.len        = 0x01;
                         frm.road       = dyn_info.addr[tmp - 0x01].logic;
                         frm.body[0x00] = tmp;

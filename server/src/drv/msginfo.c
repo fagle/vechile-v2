@@ -38,7 +38,7 @@ ptime_t  sea_getcurtime ( ptime_t tm )
 //*------------------------------------------------*/
 bool isCallDevice ( u8 type, u8 num )
 {
-    if (type == CALLAID || type == CALLBID &&
+    if (type >= CALLIDST && type < CALLIDST + CALLIDCNT &&
         num && num <= sys_info.ctrl.call)
         return (bool)TRUE;
     return (bool)FALSE;
@@ -55,7 +55,7 @@ bool isCallDevice ( u8 type, u8 num )
 //*------------------------------------------------*/
 bool isCarDevice ( u8 type, u8 num )
 {
-    if (type >= MOBILEAID && type <= MOBILEDID &&
+    if (type >= CARIDST && type < CARIDST + CARIDCNT &&
         num > sys_info.ctrl.base && num <= sys_info.ctrl.base + sys_info.ctrl.car)
         return (bool)TRUE;
     return (bool)FALSE;
@@ -72,7 +72,7 @@ bool isCarDevice ( u8 type, u8 num )
 //*------------------------------------------------*/
 bool isCarActive ( u8 num )
 {
-    if (isCarDevice(MOBILEAID, num))
+    if (isCarDevice(CARIDST, num))
     {
         time_t tm;
         if (rep_info.key[num - 0x01].vehicle.status == 0x00)
@@ -98,7 +98,7 @@ bool isCarActive ( u8 num )
 //*------------------------------------------------*/
 u8 sea_getcartype ( u8 num )
 {
-    if (isCarDevice(MOBILEAID, num))
+    if (isCarDevice(CARIDST, num))
         return rep_info.key[num - 0x01].vehicle.type;
     return 0x00;
 }
@@ -114,7 +114,7 @@ u8 sea_getcartype ( u8 num )
 //*------------------------------------------------*/
 u8 sea_getcurrentcard ( u8 num )
 {
-    if (isCarDevice(MOBILEAID, num))
+    if (isCarDevice(CARIDST, num))
         return rep_info.key[num - 0x01].vehicle.card;
     return 0x00;
 }

@@ -13,7 +13,7 @@
 #define RTSENDSIZE        (0x0a)
 #define GARAGESIZE        (0x0a)
 
-#define beepidx(n)        ((n - MOBILEAID) >> 0x01)
+#define beepidx(n)        ((n - CARIDST) >> 0x01)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // message body definition

@@ -84,8 +84,8 @@ static u8  sea_parseroutetable ( ppath_t ptr )
         return 0x00;
     
     sea_printf("\ntype %d, %dth vehicle's garage %d", sea_getcartype(ptr->num), ptr->num, card[idx - 0x01]);
-    if (msg_info.garage[sea_getcartype(ptr->num) - MOBILEAID] != card[idx - 0x01])
-        msg_info.garage[sea_getcartype(ptr->num) - MOBILEAID] = card[idx - 0x01];
+    if (msg_info.garage[sea_getcartype(ptr->num) - CARIDST] != card[idx - 0x01])
+        msg_info.garage[sea_getcartype(ptr->num) - CARIDST] = card[idx - 0x01];
        
     card[0x00] = sys_info.card.cnt;
     for (i = 0x00; i < ptr->cnt; i ++)
@@ -144,7 +144,7 @@ void ServerFrameCmdHandler ( frame_t fr )
 {
     ppath_t rut = NULL;
     
-    if (isCarDevice(MOBILEAID, fr.body[0x00]))
+    if (isCarDevice(CARIDST, fr.body[0x00]))
     {
         if ((rut = msg_info.find(fr.body[0x00])) == NULL)
             return;
@@ -217,16 +217,16 @@ void ServerFrameCmdHandler ( frame_t fr )
                 w108frm1.put(&w108frm1, ICHP_SV_DATE, sizeof(systime_t) - 0x04, sys_info.ctrl.road, (u8 *)sea_getsystime());
             }
             break;
-        case ICHP_SV_W108RST:
+        case ICHP_SV_REBOOT:
             if (dyn_info.addr[fr.body[0x00] - 0x01].logic) 
             {
                 dyn_info.buffer[0x00] = fr.body[0x00];
-                w108frm1.put(&w108frm1, ICHP_SV_W108RST, 0x01, dyn_info.addr[fr.body[0x00] - 0x01].logic, dyn_info.buffer);
+                w108frm1.put(&w108frm1, ICHP_SV_REBOOT, 0x01, dyn_info.addr[fr.body[0x00] - 0x01].logic, dyn_info.buffer);
             }
             break;
         case ICHP_SV_BEEPER_STATUS:
             sea_printf("\nsend ICHP_SV_BEEPER_STATUS to caller %d call status %d, len %d", fr.body[0x00], fr.body[0x02], fr.len);
-            if (isCallDevice(CALLAID, fr.body[0x00]))
+            if (isCallDevice(CALLIDST, fr.body[0x00]))
             {
                 pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];
                 if (cal->state != fr.body[0x02])
@@ -238,12 +238,6 @@ void ServerFrameCmdHandler ( frame_t fr )
                 }
             }
             break;
-        case ICHP_SV_CMD: 
-        {
-            sea_printf("\nsend to %d cmd%d",fr.body[0x00],fr.body[0x01]);
-            w108frm1.put(&w108frm1, ICHP_SV_CMD, fr.len, 0x00, fr.body);
-            break;
-        }
         case 0x01: //write table
         {
               //fr.body[0x00] car id
@@ -307,17 +301,6 @@ void ServerFrameCmdHandler ( frame_t fr )
               }
               break;
           }
-        case 0x04: //return table
-          {
-              //fr.body[0x00] carid 
-              //fr.body[0x01] index
-              //fr.body[0x02] len
-              consfrm1.print(&consfrm1,"\ngeting route carid%d index%d len%d",fr.body[0x00], fr.body[0x01], fr.body[0x02]);
-              w108frm1.put(&w108frm1, ICHP_SV_GETROUTE, 0x03, 0x00, fr.body);
-              
-              
-              break;
-          }
         case 0x05: //open
           {
               consfrm1.print(&consfrm1,"\nsending ICHP_SV_OPEN%d",fr.body[0x00]);
@@ -368,7 +351,7 @@ void sea_parsereport ( plamp_t ptr, u16 road )
     {
         if (ptr->vehicle.number > 0x00 && ptr->vehicle.number <= sys_info.ctrl.maxdev)
         {
-            if (ptr->vehicle.type != CENTERID)   
+            if (ptr->vehicle.type != CENTERIDST)   
             {
                 time_t  tm;
                 
@@ -480,17 +463,11 @@ void CoordFrameCmdHandler ( frame_t fr )
     ppath_t rut = NULL;
     u8    num = sea_lookuplogic(fr.road);  
     
-    if (isCarDevice(MOBILEAID, num))
+    if (isCarDevice(CARIDST, num))
         rut = msg_info.find(num);
     
     switch (fr.cmd)
     {
-        case ICHP_SV_RECV:
-            sea_printf("\nsend %02x command to uart ok", fr.body[0x00]);  
-            break;
-        case ICHP_SV_ERROR:
-            sea_printf("\nsend %02x command to uart error", fr.body[0x00]);
-            break;
         case ICHP_SV_RPT:
             sea_parsereport((plamp_t)fr.body, fr.road);
             break;
@@ -506,7 +483,7 @@ void CoordFrameCmdHandler ( frame_t fr )
         {
             device_t dev;
             sea_memcpy(&dev, fr.body, sizeof(device_t));
-            if (dev.type == CENTERID)
+            if (dev.type == CENTERIDST)
             {
                 if (sea_memcomp(&sys_info.dev, &dev, sizeof(device_t)) != 0x00)
                 {
@@ -543,14 +520,14 @@ void CoordFrameCmdHandler ( frame_t fr )
             if (dyn_info.ready & KEYBIT)
                 dyn_info.ready &= ~KEYBIT;
             break;
-        case ICHP_CO_JOIN:                           // logic and physic address 
+        case ICHP_SV_JOIN:                           // logic and physic address 
         {
             u16 no;
             if (no = sea_lookuphysical((EmberEUI64 *)&fr.body[0x02]))
             {
                 sea_printf("\n[co_join]change logic address %d to %d", dyn_info.addr[no - 0x01].logic, *((u16 *)fr.body));
                 dyn_info.addr[no - 0x01].logic = *((u16 *)fr.body);
-                if (isCarDevice(MOBILEAID, no))
+                if (isCarDevice(CARIDST, no))
                 {
                     rut = msg_info.find(no);
                     rut->reboot = 0x01;
@@ -596,17 +573,6 @@ void CoordFrameCmdHandler ( frame_t fr )
             }
             sea_sendacknowledge(ICHP_SV_CLOSE_ACK, fr.road, num, ACK_OK);
             break;
-        case ICHP_SV_INDEX:
-        {
-            sea_printf("\nindex has been changed to %d", fr.body[0x00]);
-            break;
-        }
-        case ICHP_SV_BUF:
-        {
-            sea_printf("\nserial.in %d,serial.out %d,uartfrm.in %d,uartfrm.out %d,msg.in %d,msg.out %d",
-                       fr.body[0x00],fr.body[0x01],fr.body[0x02],fr.body[0x03],fr.body[0x04],fr.body[0x05]);
-            break;
-        }
         case ICHP_CAR_ROUTE:
         {
             u8 i;
@@ -623,31 +589,10 @@ void CoordFrameCmdHandler ( frame_t fr )
             }           
             break;
         }
-        case ICHP_SV_ACTSTOP:
-        {
-            sea_printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            sea_printf("\nrec ICHP_SV_ACTSTOP, stop%d",fr.body[0x00]);
-            break;
-        }
-        case ICHP_SV_GETCARD:
-        {
-            u16 delay_time = fr.body[0x01] + (fr.body[0x02] << 0x08);
-            if(delay_time == 0x00)
-            {
-                sea_printf("\n@@@@@@");
-                sea_printf("\n[CARD]%d,delay%d",fr.body[0x00], delay_time);
-            }
-            else
-            {
-                sea_printf("\n@@@@@@error card");
-                sea_printf("\n[CARD]%d,delay%d",fr.body[0x00], delay_time);
-            }
-            break;
-        }
         case ICHP_SV_BEEPER_STATUS:
         {
             sea_printf("\nrec ICHP_SV_BEEPER_STATUS, len%d, body%d", fr.len, fr.body[0x00]);
-            if (isCallDevice(CALLAID, fr.body[0x00]))
+            if (isCallDevice(CALLIDST, fr.body[0x00]))
             {
                 pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];
                 if (cal->cnt)

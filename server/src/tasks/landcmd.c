@@ -189,7 +189,7 @@ void sea_landconfig  ( int argc, char * argv[] )
                     break;
                 case 'p':
                     sscanf(cmdhd1.optarg, "%d", &num);
-                    if (isCarDevice(MOBILEAID, num))
+                    if (isCarDevice(CARIDST, num))
                         msg_info.print(num);
                     else if (!num)
                     {
