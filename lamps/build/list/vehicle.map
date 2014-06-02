@@ -1,0 +1,2766 @@
+###############################################################################
+#                                                                             #
+# IAR ELF Linker V5.41.0.51741/W32 for ARM              02/Jun/2014  11:35:12 #
+# Copyright (C) 2007-2009 IAR Systems AB.                                     #
+#                                                                             #
+#    Output file  =  G:\Workshops\renovate\lamps\build\exe\vehicle.out        #
+#    Map file     =  G:\Workshops\renovate\lamps\build\list\vehicle.map       #
+#    Command line =  G:\Workshops\renovate\lamps\build\obj\adc.o              #
+#                    G:\Workshops\renovate\lamps\build\obj\callback.o         #
+#                    G:\Workshops\renovate\lamps\build\obj\command.o          #
+#                    G:\Workshops\renovate\lamps\build\obj\common.o           #
+#                    G:\Workshops\renovate\lamps\build\obj\exception.o        #
+#                    G:\Workshops\renovate\lamps\build\obj\incoming.o         #
+#                    G:\Workshops\renovate\lamps\build\obj\ledlamp.o          #
+#                    G:\Workshops\renovate\lamps\build\obj\micro.o            #
+#                    G:\Workshops\renovate\lamps\build\obj\mobile.o           #
+#                    G:\Workshops\renovate\lamps\build\obj\network.o          #
+#                    G:\Workshops\renovate\lamps\build\obj\pwm.o              #
+#                    G:\Workshops\renovate\lamps\build\obj\sensor.o           #
+#                    G:\Workshops\renovate\lamps\build\obj\sink.o             #
+#                    G:\Workshops\renovate\lamps\build\obj\sysinfo.o          #
+#                    G:\Workshops\renovate\lamps\build\obj\timevent.o         #
+#                    G:\Workshops\renovate\lamps\build\obj\vehicle.o          #
+#                    G:\Workshops\renovate\lamps\lib\alarm-library.a          #
+#                    G:\Workshops\renovate\lamps\lib\binding-table-library.a  #
+#                    G:\Workshops\renovate\lamps\lib\cbke-stub-library.a      #
+#                    G:\Workshops\renovate\lamps\lib\end-device-bind-stub-lib #
+#                    rary.a G:\Workshops\renovate\lamps\lib\hal-library.a     #
+#                    G:\Workshops\renovate\lamps\lib\sealib.a                 #
+#                    G:\Workshops\renovate\lamps\lib\security-library-core.a  #
+#                    G:\Workshops\renovate\lamps\lib\security-library-link-ke #
+#                    ys.a G:\Workshops\renovate\lamps\lib\zigbee-pro-stack.a  #
+#                    -o G:\Workshops\renovate\lamps\build\exe\vehicle.out     #
+#                    --config_def NULL_BTL=1 --map                            #
+#                    G:\Workshops\renovate\lamps\build\list\vehicle.map       #
+#                    --log initialization,modules,sections,veneers            #
+#                    --log_file G:\Workshops\renovate\lamps\build\list\vehicl #
+#                    e.log --config G:\Workshops\renovate\lamps\build/icf/iar #
+#                    -cfg.icf --diag_suppress Lp012 --entry halEntryPoint     #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+*******************************************************************************
+*** RUNTIME MODEL ATTRIBUTES
+***
+
+__endian      = little
+__thumb_aware = enabled
+
+
+*******************************************************************************
+*** PLACEMENT SUMMARY
+***
+
+"HEADERS":
+       place at start of [0x08000000-0x080000ff] { block HEADER_block };
+"APP ro":
+       place at start of [0x08000100-0x0801ffff] { block APPRO_block };
+"SIMEE":
+       place at end of [0x08000100-0x0801ffff] { zi section SIMEE };
+"FAT": place at 0x08040000 { section FAT };
+"DEBUGCHAN":
+       place at start of [0x20001fe0-0x20001fff] { rw section DEBUG_CHANNEL };
+"APP rw":
+       place at start of [0x20000000-0x20001fdf] { block APPRW_block };
+
+  Section                Kind        Address     Size  Object
+  -------                ----        -------     ----  ------
+"HEADERS":                                       0xd8
+  HEADER_block                    0x08000000     0xd8  <Block>
+    BAT                  const    0x08000000     0x3c  cstartup-iar-common.o [10]
+    AAT                  const    0x0800003c     0x9c  cstartup-iar-common.o [10]
+                                - 0x080000d8     0xd8
+
+"APP ro":                                     0x197d9
+  APPRO_block                     0x08000100  0x197d9  <Block>
+    .intvec              const    0x08000100     0x84  cstartup-iar-common.o [10]
+    .text                         0x08000184  0x17c0e  <Block>
+      .text              ro code  0x08000184    0x2c0  adc.o [1]
+      .text              ro code  0x08000444    0x142  callback.o [1]
+      .text              ro code  0x08000588    0x978  command.o [1]
+      .text              ro code  0x08000f00    0x14c  common.o [1]
+      .text              ro code  0x0800104c    0x178  exception.o [1]
+      .text              ro code  0x080011c4    0x680  incoming.o [1]
+      .text              ro code  0x08001844    0x1cc  ledlamp.o [1]
+      .text              ro code  0x08001a10    0x228  micro.o [1]
+      .text              ro code  0x08001c38     0x10  mobile.o [1]
+      .text              ro code  0x08001c48    0x21c  network.o [1]
+      .text              ro code  0x08001e64    0x114  pwm.o [1]
+      .text              ro code  0x08001f78    0x7b4  sensor.o [1]
+      .text              ro code  0x0800272c    0x818  sysinfo.o [1]
+      .text              ro code  0x08002f44   0x11ec  vehicle.o [1]
+      .text              ro code  0x08004130    0x154  cstartup-iar.o [8]
+      .text              ro code  0x08004284      0x6  spmr.o [8]
+      .text              ro code  0x0800428c      0xc  spmr.o [8]
+      .text              ro code  0x08004298      0xe  spmr.o [8]
+      .text              ro code  0x080042a8      0x8  spmr.o [8]
+      .text              ro code  0x080042b0    0x9fc  analogue.o [13]
+      .text              ro code  0x08004cac    0x228  diagnostic.o [10]
+      .text              ro code  0x08004ed4    0x310  fragment.o [10]
+      .text              ro code  0x080051e4    0x672  packet-buffer.o [13]
+      .text              ro code  0x08005858   0x1098  association.o [13]
+      .text              ro code  0x080068f0    0x172  mem.o [10]
+      .text              ro code  0x08006a64    0x2dc  table.o [10]
+      .text              ro code  0x08006d40     0xfc  console.o [10]
+      .text              ro code  0x08006e3c    0x128  serial.o [10]
+      .text              ro code  0x08006f64     0x9c  msg.o [10]
+      .text              ro code  0x08007000    0x150  lamp.o [10]
+      .text              ro code  0x08007150     0x28  eui64.o [13]
+      .text              ro code  0x08007178    0x110  ember-configuration.o [10]
+      .text              ro code  0x08007288    0x6c8  child.o [13]
+      .text              ro code  0x08007950     0x40  child-table.o [13]
+      .text              ro code  0x08007990    0x248  jit.o [13]
+      .text              ro code  0x08007bd8    0x3dc  aps-keys.o [11]
+      .text              ro code  0x08007fb4    0x10c  ember-stack-common.o [13]
+      .text              ro code  0x080080c0    0x8c0  application-support.o [13]
+      .text              ro code  0x08008980    0x2da  leave.o [13]
+      .text              ro code  0x08008c5c     0xac  zigbee-dispatch.o [13]
+      .text              ro code  0x08008d08     0xe8  ticker.o [10]
+      .text              ro code  0x08008df0    0x1c0  zigbee-stack.o [13]
+      .text              ro code  0x08008fb0    0x204  mac-header.o [13]
+      .text              ro code  0x080091b4    0x174  token.o [10]
+      .text              ro code  0x08009328    0x2bc  micro-internal.o [8]
+      .text              ro code  0x080095e4     0x64  cstartup-iar-common.o [10]
+      .text              ro code  0x08009648    0x12e  button.o [10]
+      .text              ro code  0x08009778     0xe6  uart.o [10]
+      .text              ro code  0x08009860    0x3c2  form-and-join.o [10]
+      .text              ro code  0x08009c24     0x44  form-and-join-node-adapter.o [10]
+      .text              ro code  0x08009c68    0x3a0  mac-arbiter.o [13]
+      .text              ro code  0x0800a008    0x26c  frame.o [10]
+      .text              ro code  0x0800a274     0x84  flash.o [10]
+      .text              ro code  0x0800a2f8     0x1c  nodeid.o [13]
+      .text              ro code  0x0800a314     0x28  trust-center.o [10]
+      .text              ro code  0x0800a33c     0x48  random.o [10]
+      .text              ro code  0x0800a384     0x40  mpu.o [10]
+      .text              ro code  0x0800a3c4     0x38  context-switch.o [8]
+      .text              ro code  0x0800a3fc     0x10  context-switch.o [8]
+      .text              ro code  0x0800a40c    0x4c0  phy.o [13]
+      .text              ro code  0x0800a8cc    0x264  analogue-cell-bias.o [13]
+      .text              ro code  0x0800ab30    0x154  analogue-mod-dac.o [13]
+      .text              ro code  0x0800ac84    0x4a8  phy-common.o [13]
+      .text              ro code  0x0800b12c    0x5e0  neighbor.o [13]
+      .text              ro code  0x0800b70c    0x798  aps-retry.o [13]
+      .text              ro code  0x0800bea4   0x116c  network.o [13]
+      .text              ro code  0x0800d010    0x478  trust-center-util.o [11]
+      .text              ro code  0x0800d488    0x564  zigbee-packet-header.o [13]
+      .text              ro code  0x0800d9ec    0x324  management.o [13]
+      .text              ro code  0x0800dd10    0x21e  retry.o [13]
+      .text              ro code  0x0800df30    0x21c  packet-header.o [13]
+      .text              ro code  0x0800e14c    0x2d8  random-id.o [13]
+      .text              ro code  0x0800e424    0xa44  aps-security.o [11]
+      .text              ro code  0x0800ee68    0x344  command.o [13]
+      .text              ro code  0x0800f1ac    0x360  mac.o [13]
+      .text              ro code  0x0800f50c    0x348  scan.o [13]
+      .text              ro code  0x0800f854    0x54c  mac-indirect.o [13]
+      .text              ro code  0x0800fda0    0x144  child-aging.o [13]
+      .text              ro code  0x0800fee4    0x488  zigbee-device-util.o [13]
+      .text              ro code  0x0801036c    0x350  zdo-channel.o [13]
+      .text              ro code  0x080106bc    0xaa0  sim-eeprom-internal.o [8]
+      .text              ro code  0x0801115c    0x210  alarm.o [3]
+      .text              ro code  0x0801136c    0x33c  address-table.o [13]
+      .text              ro code  0x080116a8    0x15c  route-error.o [13]
+      .text              ro code  0x08011804    0x5c4  crypto.o [13]
+      .text              ro code  0x08011dc8    0x2a4  aps-keys-full.o [12]
+      .text              ro code  0x0801206c    0x1d8  mac-receive.o [13]
+      .text              ro code  0x08012244    0x344  neighbor-exchange.o [13]
+      .text              ro code  0x08012588    0x20c  aps-encryption.o [11]
+      .text              ro code  0x08012794    0x350  binding-table.o [4]
+      .text              ro code  0x08012ae4    0x154  broadcast.o [13]
+      .text              ro code  0x08012c38    0x38e  route-table.o [13]
+      .text              ro code  0x08012fc8     0x18  cal-pads.o [13]
+      .text              ro code  0x08012fe0    0x150  mac-em250.o [13]
+      .text              ro code  0x08013130    0x294  debug-jtag.o [13]
+      .text              ro code  0x080133c4    0x224  debug.o [13]
+      .text              ro code  0x080135e8    0x1ec  zigbee-neighbor.o [13]
+      .text              ro code  0x080137d4     0x40  system-timer.o [8]
+      .text              ro code  0x08013814    0x344  flash.o [8]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58      0x0  isr-stubs.o [10]
+      .text              ro code  0x08013b58     0x60  symbol-timer.o [13]
+      .text              ro code  0x08013bb8     0xec  aes.o [13]
+      .text              ro code  0x08013ca4     0x64  unicast-table.o [13]
+      .text              ro code  0x08013d08    0x77e  route-discovery.o [13]
+      .text              ro code  0x08014488     0xf4  source-route.o [10]
+      .text              ro code  0x0801457c     0x48  led.o [10]
+      .text              ro code  0x080145c4    0x714  zigbee-device.o [13]
+      .text              ro code  0x08014cd8     0x24  crc.o [10]
+      .text              ro code  0x08014cfc     0x80  faults.o [10]
+      .text              ro code  0x08014d7c     0x70  security-address-cache.o [10]
+      .text              ro code  0x08014dec     0xb4  source-route-common.o [10]
+      .text              ro code  0x08014ea0    0x1bc  zdo-binding-table.o [4]
+      .text              ro code  0x0801505c     0x20  sscanf.o [6]
+      .text              ro code  0x0801507c     0x36  strlen.o [9]
+      .text              ro code  0x080150b4     0x16  strchr.o [9]
+      .text              ro code  0x080150cc      0x6  ABImemclr4.o [9]
+      .text              ro code  0x080150d4     0x28  vsprintf.o [6]
+      .text              ro code  0x080150fc     0x70  ABImemcpy.o [9]
+      .text              ro code  0x0801516c    0x9e0  xscanffull.o [6]
+      .text              ro code  0x08015b4c     0x38  ABImemset48.o [9]
+      .text              ro code  0x08015b84    0xcc2  xprintffull.o [6]
+      .text              ro code  0x08016848     0x90  DblToFlt.o [9]
+      .text              ro code  0x080168d8    0x108  xdscale.o [6]
+      .text              ro code  0x080169e0     0x58  memchr.o [9]
+      .text              ro code  0x08016a38     0xbc  xstold.o [6]
+      .text              ro code  0x08016af4    0x164  xstoull.o [6]
+      .text              ro code  0x08016c58     0x2e  DblCmpLe.o [9]
+      .text              ro code  0x08016c88     0x2e  DblCmpGe.o [9]
+      .text              ro code  0x08016cb8     0x56  DblToI32.o [9]
+      .text              ro code  0x08016d10    0x246  DblDiv.o [9]
+      .text              ro code  0x08016f58    0x1a2  DblMul.o [9]
+      .text              ro code  0x080170fc    0x17e  DblSub.o [9]
+      .text              ro code  0x0801727c     0x2e  I32ToDbl.o [9]
+      .text              ro code  0x080172ac    0x12e  I64DivMod.o [9]
+      .text              ro code  0x080173dc    0x1b0  xstoflt.o [6]
+      .text              ro code  0x0801758c     0xe6  DblAdd.o [9]
+      .text              ro code  0x08017674    0x160  xdtento.o [6]
+      .text              ro code  0x080177d4     0x14  errno.o [6]
+      .text              ro code  0x080177e8      0x2  I64DivZer.o [9]
+      .text              ro code  0x080177ec     0x20  DblCmpEq.o [9]
+      .text              ro code  0x0801780c     0x3c  node.o [10]
+      .text              ro code  0x08017848     0x80  event-control.o [13]
+      .text              ro code  0x080178c8      0x8  high-security-stub.o [11]
+      .text              ro code  0x080178d0      0x8  aps-skke-stub.o [11]
+      .text              ro code  0x080178d8     0x2c  form-and-join-node-callbacks.o [10]
+      .text              ro code  0x08017904      0xe  sim-eeprom.o [10]
+      .text              ro code  0x08017912     0xf6  hashing.o [11]
+      .text              ro code  0x08017a08     0x14  cbke-crypto-engine-stub.o [5]
+      .text              ro code  0x08017a1c     0x12  phy-util.o [13]
+      .text              ro code  0x08017a2e      0x8  end-device-bind-stub.o [7]
+      .text              ro code  0x08017a36     0x44  misc.o [13]
+      .text              ro code  0x08017a7a     0x2a  strncmp.o [6]
+      .text              ro code  0x08017aa4      0x8  abs.o [6]
+      .text              ro code  0x08017aac     0x20  xsscin.o [6]
+      .text              ro code  0x08017acc      0xa  xsprout.o [6]
+      .text              ro code  0x08017ad6     0x8e  xstoll.o [6]
+      .text              ro code  0x08017b64     0xc6  xdnorm.o [6]
+      .text              ro code  0x08017c2a      0xe  div.o [6]
+      .text              ro code  0x08017c38     0xf6  xstopfx.o [6]
+      .text              ro code  0x08017d2e     0x64  xdtento.o [6]
+    .rodata              const    0x08017d98     0x10  xstold.o [6]
+    .rodata              const    0x08017da8     0x48  xdtento.o [6]
+    .rodata              const    0x08017df0      0x8  command.o [1]
+    .rodata              const    0x08017df8     0x18  command.o [1]
+    .rodata              const    0x08017e10     0x2c  command.o [1]
+    .rodata              const    0x08017e3c     0x24  command.o [1]
+    .rodata              const    0x08017e60     0x24  command.o [1]
+    .rodata              const    0x08017e84     0x24  command.o [1]
+    .rodata              const    0x08017ea8     0x30  command.o [1]
+    .rodata              const    0x08017ed8     0x2c  command.o [1]
+    .rodata              const    0x08017f04     0x38  command.o [1]
+    .rodata              const    0x08017f3c     0x20  command.o [1]
+    .rodata              const    0x08017f5c     0x24  command.o [1]
+    .rodata              const    0x08017f80     0x40  command.o [1]
+    .rodata              const    0x08017fc0      0x8  command.o [1]
+    .rodata              const    0x08017fc8      0x8  command.o [1]
+    .rodata              const    0x08017fd0      0x8  command.o [1]
+    .rodata              const    0x08017fd8      0xc  command.o [1]
+    .rodata              const    0x08017fe4      0xc  command.o [1]
+    .rodata              const    0x08017ff0     0x10  command.o [1]
+    .rodata              const    0x08018000     0x20  command.o [1]
+    .rodata              const    0x08018020     0x28  command.o [1]
+    .rodata              const    0x08018048     0x18  command.o [1]
+    .rodata              const    0x08018060     0x14  command.o [1]
+    .rodata              const    0x08018074     0x18  command.o [1]
+    .rodata              const    0x0801808c     0x1c  command.o [1]
+    .rodata              const    0x080180a8      0x8  command.o [1]
+    .rodata              const    0x080180b0     0x14  command.o [1]
+    .rodata              const    0x080180c4     0x34  command.o [1]
+    .rodata              const    0x080180f8     0x14  command.o [1]
+    .rodata              const    0x0801810c     0x4c  command.o [1]
+    .rodata              const    0x08018158     0x18  command.o [1]
+    .rodata              const    0x08018170      0xc  command.o [1]
+    .rodata              const    0x0801817c     0x18  command.o [1]
+    .rodata              const    0x08018194      0x8  common.o [1]
+    .rodata              const    0x0801819c     0x1c  exception.o [1]
+    .rodata              const    0x080181b8     0x20  exception.o [1]
+    .rodata              const    0x080181d8     0x20  exception.o [1]
+    .rodata              const    0x080181f8     0x20  exception.o [1]
+    .rodata              const    0x08018218     0x3c  incoming.o [1]
+    .rodata              const    0x08018254     0x2c  incoming.o [1]
+    .rodata              const    0x08018280     0x24  incoming.o [1]
+    .rodata              const    0x080182a4     0x24  incoming.o [1]
+    .rodata              const    0x080182c8     0x28  incoming.o [1]
+    .rodata              const    0x080182f0     0x20  incoming.o [1]
+    .rodata              const    0x08018310     0x30  incoming.o [1]
+    .rodata              const    0x08018340     0x34  incoming.o [1]
+    .rodata              const    0x08018374     0x34  incoming.o [1]
+    .rodata              const    0x080183a8     0x3c  incoming.o [1]
+    .rodata              const    0x080183e4     0x40  incoming.o [1]
+    .rodata              const    0x08018424     0x2c  incoming.o [1]
+    .rodata              const    0x08018450     0x10  ledlamp.o [1]
+    .rodata              const    0x08018460      0x8  ledlamp.o [1]
+    .rodata              const    0x08018468     0x10  ledlamp.o [1]
+    .rodata              const    0x08018478      0xc  ledlamp.o [1]
+    .rodata              const    0x08018484      0x8  ledlamp.o [1]
+    .rodata              const    0x0801848c     0x18  ledlamp.o [1]
+    .rodata              const    0x080184a4     0x18  micro.o [1]
+    .rodata              const    0x080184bc     0x30  sensor.o [1]
+    .rodata              const    0x080184ec     0x40  sensor.o [1]
+    .rodata              const    0x0801852c     0x18  sensor.o [1]
+    .rodata              const    0x08018544     0x2c  sensor.o [1]
+    .rodata              const    0x08018570     0x20  sensor.o [1]
+    .rodata              const    0x08018590     0x28  sensor.o [1]
+    .rodata              const    0x080185b8     0x20  sensor.o [1]
+    .rodata              const    0x080185d8     0x18  sensor.o [1]
+    .rodata              const    0x080185f0     0x28  sensor.o [1]
+    .rodata              const    0x08018618     0x20  sensor.o [1]
+    .rodata              const    0x08018638     0x3c  sensor.o [1]
+    .rodata              const    0x08018674     0x2c  sensor.o [1]
+    .rodata              const    0x080186a0     0x2c  sensor.o [1]
+    .rodata              const    0x080186cc     0x2c  sensor.o [1]
+    .rodata              const    0x080186f8      0x8  sensor.o [1]
+    .rodata              const    0x08018700     0x28  sysinfo.o [1]
+    .rodata              const    0x08018728     0x10  sysinfo.o [1]
+    .rodata              const    0x08018738     0x14  sysinfo.o [1]
+    .rodata              const    0x0801874c     0x14  sysinfo.o [1]
+    .rodata              const    0x08018760     0x14  sysinfo.o [1]
+    .rodata              const    0x08018774     0x18  sysinfo.o [1]
+    .rodata              const    0x0801878c     0x18  sysinfo.o [1]
+    .rodata              const    0x080187a4     0x18  sysinfo.o [1]
+    .rodata              const    0x080187bc     0x14  sysinfo.o [1]
+    .rodata              const    0x080187d0     0x18  sysinfo.o [1]
+    .rodata              const    0x080187e8     0x18  sysinfo.o [1]
+    .rodata              const    0x08018800     0x14  sysinfo.o [1]
+    .rodata              const    0x08018814     0x20  sysinfo.o [1]
+    .rodata              const    0x08018834      0x8  sysinfo.o [1]
+    .rodata              const    0x0801883c      0x8  sysinfo.o [1]
+    .rodata              const    0x08018844     0x2c  sysinfo.o [1]
+    .rodata              const    0x08018870     0x2c  sysinfo.o [1]
+    .rodata              const    0x0801889c     0x34  sysinfo.o [1]
+    .rodata              const    0x080188d0     0x20  sysinfo.o [1]
+    .rodata              const    0x080188f0     0x18  sysinfo.o [1]
+    .rodata              const    0x08018908     0x20  sysinfo.o [1]
+    .rodata              const    0x08018928     0x18  sysinfo.o [1]
+    .rodata              const    0x08018940     0x18  sysinfo.o [1]
+    .rodata              const    0x08018958     0x20  sysinfo.o [1]
+    .rodata              const    0x08018978     0x20  sysinfo.o [1]
+    .rodata              const    0x08018998     0x20  sysinfo.o [1]
+    .rodata              const    0x080189b8     0x18  sysinfo.o [1]
+    .rodata              const    0x080189d0     0x1c  sysinfo.o [1]
+    .rodata              const    0x080189ec     0x30  sysinfo.o [1]
+    .rodata              const    0x08018a1c     0x10  sysinfo.o [1]
+    .rodata              const    0x08018a2c     0x14  sysinfo.o [1]
+    .rodata              const    0x08018a40     0x14  sysinfo.o [1]
+    .rodata              const    0x08018a54      0x8  sysinfo.o [1]
+    .rodata              const    0x08018a5c      0x8  sysinfo.o [1]
+    .rodata              const    0x08018a64     0x24  sysinfo.o [1]
+    .rodata              const    0x08018a88      0x8  sysinfo.o [1]
+    .rodata              const    0x08018a90     0x18  sysinfo.o [1]
+    .rodata              const    0x08018aa8     0x14  sysinfo.o [1]
+    .rodata              const    0x08018abc     0x1c  sysinfo.o [1]
+    .rodata              const    0x08018ad8     0x20  sysinfo.o [1]
+    .rodata              const    0x08018af8     0x20  sysinfo.o [1]
+    .rodata              const    0x08018b18     0x14  sysinfo.o [1]
+    .rodata              const    0x08018b2c     0x18  sysinfo.o [1]
+    .rodata              const    0x08018b44     0x14  sysinfo.o [1]
+    .rodata              const    0x08018b58     0x14  sysinfo.o [1]
+    .rodata              const    0x08018b6c     0x14  sysinfo.o [1]
+    .rodata              const    0x08018b80     0x14  sysinfo.o [1]
+    .rodata              const    0x08018b94     0x40  sysinfo.o [1]
+    .rodata              const    0x08018bd4     0x38  sysinfo.o [1]
+    .rodata              const    0x08018c0c     0x10  vehicle.o [1]
+    .rodata              const    0x08018c1c     0x10  vehicle.o [1]
+    .rodata              const    0x08018c2c     0x14  vehicle.o [1]
+    .rodata              const    0x08018c40     0x10  vehicle.o [1]
+    .rodata              const    0x08018c50     0x18  vehicle.o [1]
+    .rodata              const    0x08018c68     0x18  vehicle.o [1]
+    .rodata              const    0x08018c80     0x10  vehicle.o [1]
+    .rodata              const    0x08018c90     0x18  vehicle.o [1]
+    .rodata              const    0x08018ca8     0x18  vehicle.o [1]
+    .rodata              const    0x08018cc0     0x28  vehicle.o [1]
+    .rodata              const    0x08018ce8     0x14  vehicle.o [1]
+    .rodata              const    0x08018cfc     0x24  vehicle.o [1]
+    .rodata              const    0x08018d20     0x28  vehicle.o [1]
+    .rodata              const    0x08018d48     0x30  vehicle.o [1]
+    .rodata              const    0x08018d78     0x24  vehicle.o [1]
+    .rodata              const    0x08018d9c     0x20  vehicle.o [1]
+    .rodata              const    0x08018dbc     0x28  vehicle.o [1]
+    .rodata              const    0x08018de4     0x28  vehicle.o [1]
+    .rodata              const    0x08018e0c      0xc  vehicle.o [1]
+    .rodata              const    0x08018e18     0x20  vehicle.o [1]
+    .rodata              const    0x08018e38     0x10  cstartup-iar.o [8]
+    .rodata              const    0x08018e48     0x4c  analogue.o [13]
+    .rodata              const    0x08018e94     0x20  analogue.o [13]
+    .rodata              const    0x08018eb4      0x8  analogue.o [13]
+    .rodata              const    0x08018ebc     0x14  diagnostic.o [10]
+    .rodata              const    0x08018ed0     0x10  fragment.o [10]
+    .rodata              const    0x08018ee0     0x10  packet-buffer.o [13]
+    .rodata              const    0x08018ef0     0x10  association.o [13]
+    .rodata              const    0x08018f00      0x8  association.o [13]
+    .rodata              const    0x08018f08     0x78  table.o [10]
+    .rodata              const    0x08018f80      0xc  lamp.o [10]
+    .rodata              const    0x08018f8c     0x10  ember-configuration.o [10]
+    .rodata              const    0x08018f9c      0x8  child.o [13]
+    .rodata              const    0x08018fa4     0xa8  zigbee-stack.o [13]
+    .rodata              const    0x0801904c     0x10  token.o [10]
+    .rodata              const    0x0801905c     0x10  cstartup-iar-common.o [10]
+    .rodata              const    0x0801906c     0x4c  uart.o [10]
+    .rodata              const    0x080190b8      0x8  form-and-join.o [10]
+    .rodata              const    0x080190c0     0x18  form-and-join-node-adapter.o [10]
+    .rodata              const    0x080190d8     0x10  mac-arbiter.o [13]
+    .rodata              const    0x080190e8     0x40  mpu.o [10]
+    .rodata              const    0x08019128      0x8  phy.o [13]
+    .rodata              const    0x08019130     0x9c  analogue-cell-bias.o [13]
+    .rodata              const    0x080191cc     0x58  analogue-cell-bias.o [13]
+    .rodata              const    0x08019224     0x10  phy-common.o [13]
+    .rodata              const    0x08019234      0x8  phy-common.o [13]
+    .rodata              const    0x0801923c      0xc  neighbor.o [13]
+    .rodata              const    0x08019248      0x8  network.o [13]
+    .rodata              const    0x08019250     0x10  packet-header.o [13]
+    .rodata              const    0x08019260     0x10  packet-header.o [13]
+    .rodata              const    0x08019270      0x8  aps-security.o [11]
+    .rodata              const    0x08019278      0x8  mac.o [13]
+    .rodata              const    0x08019280      0x8  scan.o [13]
+    .rodata              const    0x08019288      0x4  mac-indirect.o [13]
+    .rodata              const    0x0801928c      0x8  zigbee-device-util.o [13]
+    .rodata              const    0x08019294      0x8  zdo-channel.o [13]
+    .rodata              const    0x0801929c      0x8  zdo-channel.o [13]
+    .rodata              const    0x080192a4     0x10  sim-eeprom.o [10]
+    .rodata              const    0x080192b4     0x18  sim-eeprom-internal.o [8]
+    .rodata              const    0x080192cc     0x10  route-table.o [13]
+    .rodata              const    0x080192dc      0xc  mac-em250.o [13]
+    .rodata              const    0x080192e8      0xc  debug.o [13]
+    .rodata              const    0x080192f4      0xc  debug.o [13]
+    .rodata              const    0x08019300      0x8  flash.o [8]
+    .rodata              const    0x08019308     0x14  route-discovery.o [13]
+    .rodata              const    0x0801931c      0xc  led.o [10]
+    .rodata              const    0x08019328      0xc  led.o [10]
+    .rodata              const    0x08019334     0x24  zigbee-device.o [13]
+    .rodata              const    0x08019358     0x20  token-def.o [10]
+    .rodata              const    0x08019378     0x10  token-def.o [10]
+    .rodata              const    0x08019388     0x10  token-def.o [10]
+    .rodata              const    0x08019398     0x10  token-def.o [10]
+    .rodata              const    0x080193a8      0x4  token-def.o [10]
+    .rodata              const    0x080193ac      0x4  token-def.o [10]
+    .rodata              const    0x080193b0     0x14  token-def.o [10]
+    .rodata              const    0x080193c4      0x4  token-def.o [10]
+    .rodata              const    0x080193c8     0x14  token-def.o [10]
+    .rodata              const    0x080193dc     0x10  token-def.o [10]
+    .rodata              const    0x080193ec     0x1c  token-def.o [10]
+    .rodata              const    0x08019408     0x1c  token-def.o [10]
+    .rodata              const    0x08019424      0x8  token-def.o [10]
+    .rodata              const    0x0801942c     0x10  token-def.o [10]
+    .rodata              const    0x0801943c      0xc  token-def.o [10]
+    .rodata              const    0x08019448     0x1c  token-def.o [10]
+    .rodata              const    0x08019464     0x5c  token-def.o [10]
+    .rodata              const    0x080194c0      0x8  zdo-binding-table.o [4]
+    .rodata              const    0x080194c8     0x10  xscanffull.o [6]
+    .rodata              const    0x080194d8      0x8  xprintffull.o [6]
+    .rodata              const    0x080194e0     0x50  xstoull.o [6]
+    .rodata              const    0x08019530     0x20  xstoflt.o [6]
+    .rodata              const    0x08019550      0x2  association.o [13]
+    .rodata              const    0x08019552      0x2  token.o [10]
+    .rodata              const    0x08019554      0x2  token.o [10]
+    .rodata              const    0x08019556      0x2  token.o [10]
+    .rodata              const    0x08019558      0x2  token.o [10]
+    .rodata              const    0x0801955a      0x2  token.o [10]
+    .rodata              const    0x0801955c      0x2  token.o [10]
+    .rodata              const    0x0801955e      0x2  token.o [10]
+    .rodata              const    0x08019560      0x2  token.o [10]
+    .rodata              const    0x08019562      0x2  sim-eeprom.o [10]
+    .rodata              const    0x08019564      0x2  sim-eeprom.o [10]
+    .rodata              const    0x08019566      0x2  sim-eeprom.o [10]
+    .rodata              const    0x08019568      0x2  sim-eeprom.o [10]
+    .rodata              const    0x0801956a      0x2  sim-eeprom.o [10]
+    .rodata              const    0x0801956c      0x2  sim-eeprom.o [10]
+    .rodata              const    0x0801956e      0x2  sim-eeprom.o [10]
+    .rodata              const    0x08019570      0x2  token-def.o [10]
+    .rodata              const    0x08019572      0x2  token-def.o [10]
+    .rodata              const    0x08019574      0x2  token-def.o [10]
+    .rodata              const    0x08019576      0x1  aps-skke-stub.o [11]
+    .rodata              const    0x08019577      0x1  sim-eeprom.o [10]
+    .data_init                    0x08019578    0x361  <Block>
+      Initializer bytes  ro data  0x08019578    0x361  <for .data-1>
+                                - 0x080198d9  0x197d9
+
+"SIMEE":                                       0x2000
+  SIMEE                           0x0801e000   0x2000  <Block>
+    SIMEE                uninit   0x0801e000   0x2000  sim-eeprom.o [10]
+                                - 0x08020000   0x2000
+
+"FAT":                                           0x2c
+  FAT                    uninit   0x08040000     0x2c  cstartup-iar-common.o [10]
+                                - 0x0804002c     0x2c
+
+"APP rw":                                      0x1ec0
+  APPRW_block                     0x20000000   0x1ec0  <Block>
+    CSTACK_overlay                0x20000000    0x758  <Overlay>
+      part 1:
+        CSTACK                    0x20000000    0x758  <Block>
+          CSTACK         uninit   0x20000000    0x758  cstartup-iar-common.o [10]
+          CSTACK         const    0x20000758      0x0  spmr.o [8]
+          CSTACK         const    0x20000758      0x0  context-switch.o [8]
+          CSTACK         const    0x20000758      0x0  isr-stubs.o [10]
+          CSTACK         const    0x20000758      0x0  faults.o [10]
+      part 2:
+        RESETINFO                 0x20000000     0x94  <Block>
+          RESETINFO      uninit   0x20000000     0x94  cstartup-iar-common.o [10]
+          RESETINFO      const    0x20000094      0x0  spmr.o [8]
+          RESETINFO      const    0x20000094      0x0  context-switch.o [8]
+          RESETINFO      const    0x20000094      0x0  isr-stubs.o [10]
+          RESETINFO      const    0x20000094      0x0  faults.o [10]
+    .data                         0x20000758    0x364  <Block>
+      .data-1                     0x20000758    0x361  <Init block>
+        .data            inited   0x20000758    0x130  command.o [1]
+        .data            inited   0x20000888     0x10  ledlamp.o [1]
+        .data            inited   0x20000898      0xe  analogue.o [13]
+        .data            inited   0x200008a8     0x1a  fragment.o [10]
+        .data            inited   0x200008c4     0x1e  fragment.o [10]
+        .data            inited   0x200008e4     0x30  association.o [13]
+        .data            inited   0x20000914      0x4  ember-configuration.o [10]
+        .data            inited   0x20000918      0x4  ember-configuration.o [10]
+        .data            inited   0x2000091c      0x4  ember-configuration.o [10]
+        .data            inited   0x20000920      0x4  ember-configuration.o [10]
+        .data            inited   0x20000924      0x4  ember-configuration.o [10]
+        .data            inited   0x20000928      0x4  ember-configuration.o [10]
+        .data            inited   0x2000092c      0x4  ember-configuration.o [10]
+        .data            inited   0x20000930      0x4  ember-configuration.o [10]
+        .data            inited   0x20000934      0x4  ember-configuration.o [10]
+        .data            inited   0x20000938      0x4  ember-configuration.o [10]
+        .data            inited   0x2000093c      0x4  ember-configuration.o [10]
+        .data            inited   0x20000940      0x4  ember-configuration.o [10]
+        .data            inited   0x20000944      0x4  ember-configuration.o [10]
+        .data            inited   0x20000948      0x4  ember-configuration.o [10]
+        .data            inited   0x2000094c      0x4  ember-configuration.o [10]
+        .data            inited   0x20000950      0x4  ember-configuration.o [10]
+        .data            inited   0x20000954      0x4  ember-configuration.o [10]
+        .data            inited   0x20000958      0x4  ember-configuration.o [10]
+        .data            inited   0x2000095c      0x4  ember-configuration.o [10]
+        .data            inited   0x20000960      0x4  ember-configuration.o [10]
+        .data            inited   0x20000964      0xa  jit.o [13]
+        .data            inited   0x20000970      0x8  zigbee-stack.o [13]
+        .data            inited   0x20000978     0x30  form-and-join.o [10]
+        .data            inited   0x200009a8     0x14  mac-arbiter.o [13]
+        .data            inited   0x200009bc      0x4  mac-arbiter.o [13]
+        .data            inited   0x200009c0      0x4  network.o [13]
+        .data            inited   0x200009c4      0xa  management.o [13]
+        .data            inited   0x200009d0     0x20  scan.o [13]
+        .data            inited   0x200009f0      0xe  mac-indirect.o [13]
+        .data            inited   0x20000a00     0x10  zdo-channel.o [13]
+        .data            inited   0x20000a10      0x8  mac-receive.o [13]
+        .data            inited   0x20000a18      0x4  cal-pads.o [13]
+        .data            inited   0x20000a1c      0x4  mac-em250.o [13]
+        .data            inited   0x20000a20      0x4  debug-jtag.o [13]
+        .data            inited   0x20000a24      0x4  source-route.o [10]
+        .data            inited   0x20000a28     0x40  token-def.o [10]
+        .data            inited   0x20000a68      0xa  analogue.o [13]
+        .data            inited   0x20000a72      0x2  ember-configuration.o [10]
+        .data            inited   0x20000a74      0x2  ember-configuration.o [10]
+        .data            inited   0x20000a76      0x6  child.o [13]
+        .data            inited   0x20000a7c      0x2  application-support.o [13]
+        .data            inited   0x20000a7e      0x2  micro-internal.o [8]
+        .data            inited   0x20000a80      0x4  nodeid.o [13]
+        .data            inited   0x20000a84      0x4  random.o [10]
+        .data            inited   0x20000a88      0x4  zigbee-device.o [13]
+        .data            inited   0x20000a8c      0x1  common.o [1]
+        .data            inited   0x20000a8d      0x1  exception.o [1]
+        .data            inited   0x20000a8e      0x1  ledlamp.o [1]
+        .data            inited   0x20000a8f      0x1  sensor.o [1]
+        .data            inited   0x20000a90      0x1  packet-buffer.o [13]
+        .data            inited   0x20000a91      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a92      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a93      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a94      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a95      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a96      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a97      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a98      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a99      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a9a      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a9b      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a9c      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a9d      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a9e      0x1  ember-configuration.o [10]
+        .data            inited   0x20000a9f      0x1  ember-configuration.o [10]
+        .data            inited   0x20000aa0      0x1  ember-configuration.o [10]
+        .data            inited   0x20000aa1      0x1  ember-configuration.o [10]
+        .data            inited   0x20000aa2      0x1  ember-configuration.o [10]
+        .data            inited   0x20000aa3      0x1  ember-configuration.o [10]
+        .data            inited   0x20000aa4      0x1  ember-configuration.o [10]
+        .data            inited   0x20000aa5      0x1  ember-configuration.o [10]
+        .data            inited   0x20000aa6      0x1  application-support.o [13]
+        .data            inited   0x20000aa7      0x1  zigbee-stack.o [13]
+        .data            inited   0x20000aa8      0x2  trust-center.o [10]
+        .data            inited   0x20000aaa      0x1  phy-common.o [13]
+        .data            inited   0x20000aab      0x6  phy-common.o [13]
+        .data            inited   0x20000ab1      0x2  trust-center-util.o [11]
+        .data            inited   0x20000ab3      0x2  random-id.o [13]
+        .data            inited   0x20000ab5      0x1  zigbee-device-util.o [13]
+        .data            inited   0x20000ab6      0x1  source-route.o [10]
+        .data            inited   0x20000ab7      0x2  source-route-common.o [10]
+    .bss                          0x20000abc    0xa0d  <Block>
+      .bss               uninit   0x20000abc      0x4  adc.o [1]
+      .bss               uninit   0x20000ac0      0x4  adc.o [1]
+      .bss               uninit   0x20000ac4    0x1b4  command.o [1]
+      .bss               uninit   0x20000c78      0xc  common.o [1]
+      .bss               uninit   0x20000c84      0x4  incoming.o [1]
+      .bss               uninit   0x20000c88      0x4  ledlamp.o [1]
+      .bss               uninit   0x20000c8c      0x4  ledlamp.o [1]
+      .bss               uninit   0x20000c90     0x54  ledlamp.o [1]
+      .bss               uninit   0x20000ce4      0x4  mobile.o [1]
+      .bss               uninit   0x20000ce8     0xa4  network.o [1]
+      .bss               uninit   0x20000d8c     0x58  network.o [1]
+      .bss               uninit   0x20000de4     0x70  network.o [1]
+      .bss               uninit   0x20000e54     0xe8  vehicle.o [1]
+      .bss               uninit   0x20000f3c     0xc4  vehicle.o [1]
+      .bss               uninit   0x20001000      0xc  vehicle.o [1]
+      .bss               uninit   0x2000100c     0x20  vehicle.o [1]
+      .bss               uninit   0x2000102c     0x44  vehicle.o [1]
+      .bss               uninit   0x20001070      0x8  vehicle.o [1]
+      .bss               uninit   0x20001078      0x4  vehicle.o [1]
+      .bss               uninit   0x2000107c      0x4  association.o [13]
+      .bss               uninit   0x20001080     0x1c  table.o [10]
+      .bss               uninit   0x2000109c     0x44  lamp.o [10]
+      .bss               uninit   0x200010e0      0x8  eui64.o [13]
+      .bss               uninit   0x200010e8      0x4  aps-keys.o [11]
+      .bss               uninit   0x200010ec      0x4  aps-keys.o [11]
+      .bss               uninit   0x200010f0      0xc  zigbee-dispatch.o [13]
+      .bss               uninit   0x200010fc      0x4  ticker.o [10]
+      .bss               uninit   0x20001100     0x30  form-and-join.o [10]
+      .bss               uninit   0x20001130      0x4  form-and-join-node-adapter.o [10]
+      .bss               uninit   0x20001134      0x4  form-and-join-node-adapter.o [10]
+      .bss               uninit   0x20001138      0x8  context-switch.o [8]
+      .bss               uninit   0x20001140    0x118  phy.o [13]
+      .bss               uninit   0x20001258      0x8  phy-common.o [13]
+      .bss               uninit   0x20001260      0x8  neighbor.o [13]
+      .bss               uninit   0x20001268      0xa  aps-retry.o [13]
+      .bss               uninit   0x20001274      0x4  high-security-stub.o [11]
+      .bss               uninit   0x20001278      0xa  retry.o [13]
+      .bss               uninit   0x20001284     0x30  retry.o [13]
+      .bss               uninit   0x200012b4      0x4  aps-skke-stub.o [11]
+      .bss               uninit   0x200012b8      0x4  aps-security.o [11]
+      .bss               uninit   0x200012bc      0x8  mac.o [13]
+      .bss               uninit   0x200012c4     0x80  mac.o [13]
+      .bss               uninit   0x20001344      0x8  mac-indirect.o [13]
+      .bss               uninit   0x2000134c     0x10  child-aging.o [13]
+      .bss               uninit   0x2000135c      0x8  zigbee-device-util.o [13]
+      .bss               uninit   0x20001364     0x4c  sim-eeprom.o [10]
+      .bss               uninit   0x200013b0      0x8  crypto.o [13]
+      .bss               uninit   0x200013b8      0x4  neighbor-exchange.o [13]
+      .bss               uninit   0x200013bc     0x64  broadcast.o [13]
+      .bss               uninit   0x20001420      0x4  end-device-bind-stub.o [7]
+      .bss               uninit   0x20001424     0x14  unicast-table.o [13]
+      .bss               uninit   0x20001438     0x3c  source-route.o [10]
+      .bss               uninit   0x20001474      0x8  errno.o [6]
+      .bss               uninit   0x2000147c      0x2  adc.o [1]
+      .bss               uninit   0x2000147e      0x2  adc.o [1]
+      .bss               uninit   0x20001480      0x2  common.o [1]
+      .bss               uninit   0x20001482      0x2  vehicle.o [1]
+      .bss               uninit   0x20001484      0x2  mac-header.o [13]
+      .bss               uninit   0x20001486      0x2  cstartup-iar-common.o [10]
+      .bss               uninit   0x20001488      0x2  phy.o [13]
+      .bss               uninit   0x2000148a      0x2  analogue-mod-dac.o [13]
+      .bss               uninit   0x2000148c      0x4  network.o [13]
+      .bss               uninit   0x20001490      0x4  sim-eeprom-internal.o [8]
+      .bss               uninit   0x20001494      0x4  route-table.o [13]
+      .bss               uninit   0x20001498      0x1  adc.o [1]
+      .bss               uninit   0x20001499      0x1  adc.o [1]
+      .bss               uninit   0x2000149a      0x1  adc.o [1]
+      .bss               uninit   0x2000149b      0x1  adc.o [1]
+      .bss               uninit   0x2000149c      0x1  common.o [1]
+      .bss               uninit   0x2000149d      0x1  common.o [1]
+      .bss               uninit   0x2000149e      0x1  sensor.o [1]
+      .bss               uninit   0x2000149f      0x1  sensor.o [1]
+      .bss               uninit   0x200014a0      0x1  vehicle.o [1]
+      .bss               uninit   0x200014a1      0x1  association.o [13]
+      .bss               uninit   0x200014a2      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014a3      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014a4      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014a5      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014a6      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014a7      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014a8      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014a9      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014aa      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014ab      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014ac      0x1  ember-configuration.o [10]
+      .bss               uninit   0x200014ad      0x1  application-support.o [13]
+      .bss               uninit   0x200014ae      0x1  zigbee-dispatch.o [13]
+      .bss               uninit   0x200014af      0x1  mac-header.o [13]
+      .bss               uninit   0x200014b0      0x2  token.o [10]
+      .bss               uninit   0x200014b2      0x2  button.o [10]
+      .bss               uninit   0x200014b4      0x1  frame.o [10]
+      .bss               uninit   0x200014b5      0x1  phy.o [13]
+      .bss               uninit   0x200014b6      0x2  network.o [13]
+      .bss               uninit   0x200014b8      0x1  high-security-stub.o [11]
+      .bss               uninit   0x200014b9      0x1  zigbee-packet-header.o [13]
+      .bss               uninit   0x200014ba      0x1  zigbee-packet-header.o [13]
+      .bss               uninit   0x200014bb      0x1  random-id.o [13]
+      .bss               uninit   0x200014bc      0x1  command.o [13]
+      .bss               uninit   0x200014bd      0x1  mac.o [13]
+      .bss               uninit   0x200014be      0x1  alarm.o [3]
+      .bss               uninit   0x200014bf      0x1  crypto.o [13]
+      .bss               uninit   0x200014c0      0x2  mac-em250.o [13]
+      .bss               uninit   0x200014c2      0x1  debug-jtag.o [13]
+      .bss               uninit   0x200014c3      0x1  system-timer.o [8]
+      .bss               uninit   0x200014c4      0x1  flash.o [8]
+      .bss               uninit   0x200014c5      0x1  route-discovery.o [13]
+      .bss               uninit   0x200014c6      0x3  security-address-cache.o [10]
+    APP_RAM                       0x200014cc    0x9f4  <Block>
+      APP_RAM            uninit   0x200014cc    0x9f4  ember-configuration.o [10]
+                                - 0x20001ec0   0x1ec0
+
+"DEBUGCHAN":                                     0x10
+  DEBUG_CHANNEL                   0x20001fe0     0x10  <Block>
+    DEBUG_CHANNEL        uninit   0x20001fe0     0x10  debug-jtag.o [13]
+                                - 0x20001ff0     0x10
+
+
+*******************************************************************************
+*** MODULE SUMMARY
+***
+
+    Module                          ro code  ro data  rw data
+    ------                          -------  -------  -------
+G:\Workshops\renovate\lamps\build\obj: [1]
+    adc.o                               704                16
+    callback.o                          322
+    command.o                         2 424    1 236      740
+    common.o                            332        9       17
+    exception.o                         376      125        1
+    incoming.o                        1 664      568        4
+    ledlamp.o                           460      101      109
+    micro.o                             552       24
+    mobile.o                             16                 4
+    network.o                           540               364
+    pwm.o                               276
+    sensor.o                          1 972      581        3
+    sysinfo.o                         2 072    1 292
+    vehicle.o                         4 588      556      555
+    ---------------------------------------------------------
+    Total:                           16 298    4 492    1 813
+
+command line: [2]
+    ---------------------------------------------------------
+    Total:
+
+alarm-library.a: [3]
+    alarm.o                             528                 1
+    ---------------------------------------------------------
+    Total:                              528                 1
+
+binding-table-library.a: [4]
+    binding-table.o                     848
+    zdo-binding-table.o                 444        8
+    ---------------------------------------------------------
+    Total:                            1 292        8
+
+cbke-stub-library.a: [5]
+    cbke-crypto-engine-stub.o            20
+    ---------------------------------------------------------
+    Total:                               20
+
+dl7M_tl_in.a: [6]
+    abs.o                                 8
+    div.o                                14
+    errno.o                              20                 8
+    sscanf.o                             32
+    strncmp.o                            42
+    vsprintf.o                           40
+    xdnorm.o                            198
+    xdscale.o                           264
+    xdtento.o                           452       72
+    xprintffull.o                     3 266        8
+    xscanffull.o                      2 528       16
+    xsprout.o                            10
+    xsscin.o                             32
+    xstoflt.o                           432       32
+    xstold.o                            188       16
+    xstoll.o                            142
+    xstopfx.o                           246
+    xstoull.o                           356       80
+    ---------------------------------------------------------
+    Total:                            8 270      224        8
+
+end-device-bind-stub-library.a: [7]
+    end-device-bind-stub.o                8                 4
+    ---------------------------------------------------------
+    Total:                                8                 4
+
+hal-library.a: [8]
+    context-switch.o                     72                 8
+    cstartup-iar.o                      340       16
+    flash.o                             836        8        1
+    micro-internal.o                    700        2        2
+    sim-eeprom-internal.o             2 720       24        4
+    spmr.o                               40
+    system-timer.o                       64                 1
+    ---------------------------------------------------------
+    Total:                            4 772       50       16
+
+rt7M_tl.a: [9]
+    ABImemclr4.o                          6
+    ABImemcpy.o                         112
+    ABImemset48.o                        56
+    DblAdd.o                            230
+    DblCmpEq.o                           32
+    DblCmpGe.o                           46
+    DblCmpLe.o                           46
+    DblDiv.o                            582
+    DblMul.o                            418
+    DblSub.o                            382
+    DblToFlt.o                          144
+    DblToI32.o                           86
+    I32ToDbl.o                           46
+    I64DivMod.o                         302
+    I64DivZer.o                           2
+    memchr.o                             88
+    strchr.o                             22
+    strlen.o                             54
+    ---------------------------------------------------------
+    Total:                            2 654
+
+sealib.a: [10]
+    button.o                            302                 2
+    console.o                           252
+    crc.o                                36
+    cstartup-iar-common.o               100      364       46
+    diagnostic.o                        552       20
+    ember-configuration.o               272      121    2 664
+    faults.o                            128
+    flash.o                             132
+    form-and-join-node-adapter.o         68       24        8
+    form-and-join-node-callbacks.o       44
+    form-and-join.o                     962       56       96
+    fragment.o                          784       76       56
+    frame.o                             620                 1
+    isr-stubs.o
+    lamp.o                              336       12       68
+    led.o                                72       24
+    mem.o                               370
+    mpu.o                                64       64
+    msg.o                               156
+    node.o                               60
+    random.o                             72        4        4
+    security-address-cache.o            112                 3
+    serial.o                            296
+    sim-eeprom.o                         14       31    8 268
+    source-route-common.o               180        2        2
+    source-route.o                      244        5       65
+    table.o                             732      120       28
+    ticker.o                            232                 4
+    token-def.o                                  430       64
+    token.o                             372       32        2
+    trust-center.o                       40        2        2
+    uart.o                              230       76
+    ---------------------------------------------------------
+    Total:                            7 834    1 463   11 383
+
+security-library-core.a: [11]
+    aps-encryption.o                    524
+    aps-keys.o                          988                 8
+    aps-security.o                    2 628        8        4
+    aps-skke-stub.o                       8        1        4
+    hashing.o                           246
+    high-security-stub.o                  8                 5
+    trust-center-util.o               1 144        2        2
+    ---------------------------------------------------------
+    Total:                            5 546       11       23
+
+security-library-link-keys.a: [12]
+    aps-keys-full.o                     676
+    ---------------------------------------------------------
+    Total:                              676
+
+zigbee-pro-stack.a: [13]
+    address-table.o                     828
+    aes.o                               236
+    analogue-cell-bias.o                612      244
+    analogue-mod-dac.o                  340                 2
+    analogue.o                        2 556      140       24
+    application-support.o             2 240        3        4
+    aps-retry.o                       1 944                10
+    association.o                     4 248       76       53
+    broadcast.o                         340               100
+    cal-pads.o                           24        4        4
+    child-aging.o                       324                16
+    child-table.o                        64
+    child.o                           1 736       14        6
+    command.o                           836                 1
+    crypto.o                          1 476                 9
+    debug-jtag.o                        660        4       21
+    debug.o                             548       24
+    ember-stack-common.o                268
+    eui64.o                              40                 8
+    event-control.o                     128
+    jit.o                               584       10       10
+    leave.o                             730
+    mac-arbiter.o                       928       40       24
+    mac-em250.o                         336       16        6
+    mac-header.o                        516                 3
+    mac-indirect.o                    1 356       18       22
+    mac-receive.o                       472        8        8
+    mac.o                               864        8      137
+    management.o                        804       10       10
+    misc.o                               68
+    neighbor-exchange.o                 836                 4
+    neighbor.o                        1 504       12        8
+    network.o                         4 460       12       10
+    nodeid.o                             28        4        4
+    packet-buffer.o                   1 650       17        1
+    packet-header.o                     540       32
+    phy-common.o                      1 192       31       15
+    phy-util.o                           18
+    phy.o                             1 216        8      283
+    random-id.o                         728        2        3
+    retry.o                             542                58
+    route-discovery.o                 1 918       20        1
+    route-error.o                       348
+    route-table.o                       910       16        4
+    scan.o                              840       42       32
+    symbol-timer.o                       96
+    unicast-table.o                     100                20
+    zdo-channel.o                       848       34       16
+    zigbee-device-util.o              1 160        9        9
+    zigbee-device.o                   1 812       40        4
+    zigbee-dispatch.o                   172                13
+    zigbee-neighbor.o                   492
+    zigbee-packet-header.o            1 380                 2
+    zigbee-stack.o                      448      179        9
+    ---------------------------------------------------------
+    Total:                           49 344    1 077      974
+
+    Gaps                                 52        6       22
+    Linker created                                      1 880
+-------------------------------------------------------------
+    Grand Total:                     97 294    7 331   16 124
+
+
+*******************************************************************************
+*** ENTRY LIST
+***
+
+Entry                      Address    Size  Type      Object
+-----                      -------    ----  ----      ------
+.bss$$Base              0x20000abc           --   Gb  - Linker created -
+.bss$$Limit             0x200014c9           --   Gb  - Linker created -
+.data$$Base             0x20000758           --   Gb  - Linker created -
+.data$$Limit            0x20000abc           --   Gb  - Linker created -
+.data_init$$Base        0x08019578           --   Gb  - Linker created -
+.data_init$$Limit       0x080198d9           --   Gb  - Linker created -
+.noinit$$Base           0x00000000           --   Gb  - Linker created -
+.text$$Base             0x08000184           --   Gb  - Linker created -
+.text$$Limit            0x08017d92           --   Gb  - Linker created -
+.textrw$$Base           0x00000000           --   Gb  - Linker created -
+.textrw$$Limit          0x00000000           --   Gb  - Linker created -
+.textrw_init$$Base      0x00000000           --   Gb  - Linker created -
+ADC_Configuration       0x080003e1    0x20  Code  Gb  adc.o [1]
+APPRO_block$$Base       0x08000100           --   Gb  - Linker created -
+APPRO_block$$Limit      0x080198d9           --   Gb  - Linker created -
+APPRW_block$$Base       0x20000000           --   Gb  - Linker created -
+APPRW_block$$Limit      0x20001ec0           --   Gb  - Linker created -
+APP_RAM$$Base           0x200014cc           --   Gb  - Linker created -
+APP_RAM$$Limit          0x20001ec0           --   Gb  - Linker created -
+ApplicationHandler      0x080018f3    0x24  Code  Gb  ledlamp.o [1]
+Bootloader_Configuration
+                        0x0800197f     0x2  Code  Gb  ledlamp.o [1]
+CSTACK$$Base            0x20000000           --   Gb  - Linker created -
+CSTACK$$Limit           0x20000758           --   Gb  - Linker created -
+CSTACK_overlay$$Base    0x20000000           --   Gb  - Linker created -
+CSTACK_overlay$$Limit   0x20000758           --   Gb  - Linker created -
+DEBUG_CHANNEL$$Base     0x20001fe0           --   Gb  - Linker created -
+DEBUG_CHANNEL$$Limit    0x20001ff0           --   Gb  - Linker created -
+DEV_Configuration       0x08001969    0x14  Code  Gb  ledlamp.o [1]
+ERASE_CRITICAL_THRESHOLD
+                        0x0801956a     0x2  Data  Gb  sim-eeprom.o [10]
+EZSP_Configuration      0x08001845    0x54  Code  Gb  ledlamp.o [1]
+HAL_Configuration       0x08001aef    0xa0  Code  Gb  micro.o [1]
+HEADER_block$$Base      0x08000000           --   Gb  - Linker created -
+HEADER_block$$Limit     0x080000d8           --   Gb  - Linker created -
+ID_COUNT                0x0801956c     0x2  Data  Gb  sim-eeprom.o [10]
+LED_Configuration       0x08001937     0x2  Code  Gb  ledlamp.o [1]
+LEFT_BASE               0x08019562     0x2  Data  Gb  sim-eeprom.o [10]
+LEFT_TOP                0x08019564     0x2  Data  Gb  sim-eeprom.o [10]
+MiscellaneaHandler      0x080018e5     0xe  Code  Gb  ledlamp.o [1]
+NET_Configuration       0x08001c49    0xb0  Code  Gb  network.o [1]
+PAM_Configuration       0x08001aed     0x2  Code  Gb  micro.o [1]
+PTR_CACHE_SIZE          0x0801956e     0x2  Data  Gb  sim-eeprom.o [10]
+PWM_Configuration       0x08001e65    0x70  Code  Gb  pwm.o [1]
+PowerSupply_SW_on       0x08001f2d    0x1a  Code  Gb  pwm.o [1]
+PowerSupply_SW_port_init
+                        0x08001f19    0x14  Code  Gb  pwm.o [1]
+RESETINFO$$Base         0x20000000           --   Gb  - Linker created -
+RESETINFO$$Limit        0x20000094           --   Gb  - Linker created -
+RIGHT_BASE              0x08019566     0x2  Data  Gb  sim-eeprom.o [10]
+RIGHT_TOP               0x08019568     0x2  Data  Gb  sim-eeprom.o [10]
+Region$$Table$$Base     0x00000000           --   Gb  - Linker created -
+Region$$Table$$Limit    0x00000000           --   Gb  - Linker created -
+SIMEE$$Base             0x0801e000           --   Gb  - Linker created -
+SIMEE$$Limit            0x08020000           --   Gb  - Linker created -
+SYS_Configuration       0x0800276d    0x76  Code  Gb  sysinfo.o [1]
+Security_Configuration  0x0800197d     0x2  Code  Gb  ledlamp.o [1]
+SerialInit              0x08006f05    0x40  Code  Gb  serial.o [10]
+ShowCopyrights          0x08001939    0x30  Code  Lc  ledlamp.o [1]
+SysTickIsr              0x08013b58          Code  Wk  isr-stubs.o [10]
+TICK_Configuration      0x08008d09    0x20  Code  Gb  ticker.o [10]
+TOKEN_MFG_1V8_REG_VOLTAGE
+                        0x0801955a     0x2  Data  Gb  token.o [10]
+TOKEN_MFG_ANALOG_TRIM_BOOST
+                        0x08019554     0x2  Data  Gb  token.o [10]
+TOKEN_MFG_ANALOG_TRIM_BOTH
+                        0x08019556     0x2  Data  Gb  token.o [10]
+TOKEN_MFG_ANALOG_TRIM_NORMAL
+                        0x08019552     0x2  Data  Gb  token.o [10]
+TOKEN_MFG_EUI_64        0x08019560     0x2  Data  Gb  token.o [10]
+TOKEN_MFG_OSC24M_BIAS_TRIM
+                        0x0801955e     0x2  Data  Gb  token.o [10]
+TOKEN_MFG_PHY_CONFIG    0x0801955c     0x2  Data  Gb  token.o [10]
+TOKEN_MFG_REG_TRIM      0x08019558     0x2  Data  Gb  token.o [10]
+TOKEN_STACK_ALTERNATE_KEY_DEFAULTS
+                        0x080193b0    0x14  Data  Gb  token-def.o [10]
+TOKEN_STACK_ANALYSIS_REBOOT_DEFAULTS
+                        0x08019574     0x2  Data  Gb  token-def.o [10]
+TOKEN_STACK_APS_FRAME_COUNTER_DEFAULTS
+                        0x080193ac     0x4  Data  Gb  token-def.o [10]
+TOKEN_STACK_BINDING_TABLE_DEFAULTS
+                        0x0801942c    0x10  Data  Gb  token-def.o [10]
+TOKEN_STACK_BOOT_COUNTER_DEFAULTS
+                        0x08019572     0x2  Data  Gb  token-def.o [10]
+TOKEN_STACK_CAL_DATA_DEFAULTS
+                        0x080193a8     0x4  Data  Gb  token-def.o [10]
+TOKEN_STACK_CERTIFICATE_TABLE_DEFAULTS
+                        0x08019464    0x5c  Data  Gb  token-def.o [10]
+TOKEN_STACK_CHILD_TABLE_DEFAULTS
+                        0x0801943c     0xc  Data  Gb  token-def.o [10]
+TOKEN_STACK_CLASSIC_DATA_DEFAULTS
+                        0x080193ec    0x1c  Data  Gb  token-def.o [10]
+TOKEN_STACK_KEYS_DEFAULTS
+                        0x080193c8    0x14  Data  Gb  token-def.o [10]
+TOKEN_STACK_KEY_TABLE_DEFAULTS
+                        0x08019448    0x1c  Data  Gb  token-def.o [10]
+TOKEN_STACK_NETWORK_MANAGEMENT_DEFAULTS
+                        0x08019424     0x8  Data  Gb  token-def.o [10]
+TOKEN_STACK_NODE_DATA_DEFAULTS
+                        0x080193dc    0x10  Data  Gb  token-def.o [10]
+TOKEN_STACK_NONCE_COUNTER_DEFAULTS
+                        0x080193c4     0x4  Data  Gb  token-def.o [10]
+TOKEN_STACK_NVDATA_VERSION_DEFAULTS
+                        0x08019570     0x2  Data  Gb  token-def.o [10]
+TOKEN_STACK_TRUST_CENTER_DEFAULTS
+                        0x08019408    0x1c  Data  Gb  token-def.o [10]
+UART_Configuration      0x08001917    0x20  Code  Gb  ledlamp.o [1]
+VIRTUAL_PAGES           0x08019577     0x1  Data  Gb  sim-eeprom.o [10]
+_GenldDefault           0x080165ad   0x24e  Code  Lc  xprintffull.o [6]
+_GetN                   0x0801516d    0x22  Code  Lc  xscanffull.o [6]
+_GetfldDefault          0x0801530d   0x106  Code  Lc  xscanffull.o [6]
+_GetfloatDefault        0x08015787   0x3c6  Code  Lc  xscanffull.o [6]
+_GetintDefault          0x080155bd   0x1c4  Code  Lc  xscanffull.o [6]
+_GetstrDefault          0x08015413   0x1aa  Code  Lc  xscanffull.o [6]
+_LdtobDefault           0x08016199   0x40e  Code  Lc  xprintffull.o [6]
+_LitobDefault           0x0801608b   0x10e  Code  Lc  xprintffull.o [6]
+_Printf                 0x08015b85   0x506  Code  Gb  xprintffull.o [6]
+_PutcharsDefault        0x08016815    0x32  Code  Lc  xprintffull.o [6]
+_SProut                 0x08017acd     0xa  Code  Gb  xsprout.o [6]
+_SScin                  0x08017aad    0x20  Code  Gb  xsscin.o [6]
+_Scanf                  0x0801518f   0x17a  Code  Gb  xscanffull.o [6]
+_Stoflt                 0x080173dd   0x1b0  Code  Gb  xstoflt.o [6]
+_Stopfx                 0x08017c39    0xf6  Code  Gb  xstopfx.o [6]
+__aeabi_cdcmpeq         0x080177ed          Code  Gb  DblCmpEq.o [9]
+__aeabi_cdcmple         0x08016c59          Code  Gb  DblCmpLe.o [9]
+__aeabi_cdrcmple        0x08016c89          Code  Gb  DblCmpGe.o [9]
+__aeabi_d2f             0x08016849          Code  Gb  DblToFlt.o [9]
+__aeabi_d2iz            0x08016cb9          Code  Gb  DblToI32.o [9]
+__aeabi_d2uiz           0x08016ce5          Code  Gb  DblToI32.o [9]
+__aeabi_dadd            0x0801758d          Code  Gb  DblAdd.o [9]
+__aeabi_ddiv            0x08016d11          Code  Gb  DblDiv.o [9]
+__aeabi_dmul            0x08016f59          Code  Gb  DblMul.o [9]
+__aeabi_dsub            0x080170fd          Code  Gb  DblSub.o [9]
+__aeabi_errno_addr      0x080177d5    0x14  Code  Gb  errno.o [6]
+__aeabi_i2d             0x0801727d          Code  Gb  I32ToDbl.o [9]
+__aeabi_ldiv0           0x080177e9          Code  Gb  I64DivZer.o [9]
+__aeabi_ldivmod         0x080172ad          Code  Gb  I64DivMod.o [9]
+__aeabi_memclr4         0x080150cd          Code  Gb  ABImemclr4.o [9]
+__aeabi_memcpy          0x080150fd          Code  Gb  ABImemcpy.o [9]
+__aeabi_memcpy4         0x08015117          Code  Gb  ABImemcpy.o [9]
+__aeabi_memcpy8         0x08015117          Code  Gb  ABImemcpy.o [9]
+__aeabi_memset4         0x08015b4d          Code  Gb  ABImemset48.o [9]
+__aeabi_memset8         0x08015b4d          Code  Gb  ABImemset48.o [9]
+__aeabi_ui2d            0x08017291          Code  Gb  I32ToDbl.o [9]
+__aeabi_uldivmod        0x080172c1          Code  Gb  I64DivMod.o [9]
+__iar_Dnorm             0x08017b65    0xc6  Code  Gb  xdnorm.o [6]
+__iar_Dscale            0x080168d9   0x108  Code  Gb  xdscale.o [6]
+__iar_Dtento            0x08017675   0x160  Code  Gb  xdtento.o [6]
+__iar_Dunscale          0x08017d2f    0x64  Code  Gb  xdtento.o [6]
+__iar_Errno             0x20001478     0x4  Data  Gb  errno.o [6]
+__iar_Memchr            0x080169e1          Code  Gb  memchr.o [9]
+__iar_Memset4_word      0x08015b55          Code  Gb  ABImemset48.o [9]
+__iar_Memset8_word      0x08015b55          Code  Gb  ABImemset48.o [9]
+__iar_Stold             0x08016a39    0xbc  Code  Gb  xstold.o [6]
+__iar_Stoll             0x08017ad7    0x8e  Code  Gb  xstoll.o [6]
+__iar_Stoull            0x08016af5   0x164  Code  Gb  xstoull.o [6]
+__iar_Strchr            0x080150b5          Code  Gb  strchr.o [9]
+__iar_Tls_setup___iar_Errno
+                        0x20001474     0x4  Data  Gb  errno.o [6]
+__iar_d2uiz             0x08016cef          Code  Gb  DblToI32.o [9]
+__iar_dadd              0x0801759f          Code  Gb  DblAdd.o [9]
+__iar_dsub              0x0801710f          Code  Gb  DblSub.o [9]
+__iar_dsubStart         0x08017121          Code  Gb  DblSub.o [9]
+__iar_ui2d              0x08017293          Code  Gb  I32ToDbl.o [9]
+__vector_table          0x08000100    0x84  Data  Gb  cstartup-iar-common.o [10]
+_basePriIsDisabled      0x08004299          Code  Gb  spmr.o [8]
+_disableBasePri         0x0800428d          Code  Gb  spmr.o [8]
+_enableBasePri          0x080042a9          Code  Gb  spmr.o [8]
+_macTransmitBuffer      0x200012c4    0x80  Data  Gb  mac.o [13]
+_writeBasePri           0x08004285          Code  Gb  spmr.o [8]
+abortReception          0x080051a7    0x1e  Code  Lc  fragment.o [10]
+abortReceptionEvent     0x200008bc     0x4  Data  Lc  fragment.o [10]
+abortTransmission       0x08004f9f    0x20  Code  Lc  fragment.o [10]
+abs                     0x08017aa5     0x8  Code  Gb  abs.o [6]
+adcCalibrated           0x2000149b     0x1  Data  Lc  adc.o [1]
+adcConfig               0x20000ac0     0x4  Data  Lc  adc.o [1]
+adcData                 0x2000147c     0x2  Data  Lc  adc.o [1]
+adcPendingConversion    0x20001499     0x1  Data  Lc  adc.o [1]
+adcPendingRequests      0x20001498     0x1  Data  Lc  adc.o [1]
+adcReadingValid         0x2000149a     0x1  Data  Lc  adc.o [1]
+adcReadings             0x20000abc     0x4  Data  Lc  adc.o [1]
+adcStaticConfig         0x2000147e     0x2  Data  Lc  adc.o [1]
+addMobileChild          0x080077bd    0x8e  Code  Lc  child.o [13]
+addToApplicationQueue   0x0800cfe1    0x30  Code  Lc  network.o [13]
+addressCacheSize        0x200014c6     0x1  Data  Gb  security-address-cache.o [10]
+addressCacheStartIndex  0x200014c7     0x1  Data  Lc  security-address-cache.o [10]
+addressIndexIsActive    0x0800be6d    0x2c  Code  Lc  aps-retry.o [13]
+addressMatchingEnabled  0x20000aad     0x1  Data  Lc  phy-common.o [13]
+adjustChannelFilter     0x080043b5    0x1e  Code  Lc  analogue.o [13]
+adjustLna               0x080044dd     0xa  Code  Lc  analogue.o [13]
+adjustModulationDac     0x0800ab31     0xe  Code  Gb  analogue-mod-dac.o [13]
+adjustPWM               0x08001ed5    0x16  Code  Gb  pwm.o [1]
+adjustVco               0x08004301    0x24  Code  Lc  analogue.o [13]
+aesHashNextBlock        0x08017913    0x2e  Code  Lc  hashing.o [11]
+age                     0x200013bd     0x1  Data  Lc  broadcast.o [13]
+appSendJitToChild       0x08000f75    0x60  Code  Gb  common.o [1]
+applicationProcessIncomingData
+                        0x08008621   0x184  Code  Lc  application-support.o [13]
+arePageCountersOkay     0x080107b7    0x3c  Code  Lc  sim-eeprom-internal.o [8]
+autoAckEnabled          0x20000aae     0x1  Data  Lc  phy-common.o [13]
+baseHeaderLength        0x08019260    0x10  Data  Lc  packet-header.o [13]
+baudSettings            0x0801906c    0x4c  Data  Gb  uart.o [10]
+biasTrim                0x20000a7e     0x2  Data  Gb  micro-internal.o [8]
+blacklistedIdBytes      0x20000ab3     0x1  Data  Lc  random-id.o [13]
+blacklistedIds          0x20000ab4     0x1  Data  Lc  random-id.o [13]
+blockMask               0x200008ab     0x1  Data  Lc  fragment.o [10]
+blocksInTransit         0x200008c7     0x1  Data  Lc  fragment.o [10]
+blocksReceived          0x200008ad     0x1  Data  Lc  fragment.o [10]
+boostTxPowerMax         0x2000089c     0x8  Data  Gb  analogue.o [13]
+broadcastMessageSent    0x0800bdb9    0xac  Code  Lc  aps-retry.o [13]
+button0State            0x200014b2     0x1  Data  Gb  button.o [10]
+button1State            0x200014b3     0x1  Data  Gb  button.o [10]
+buttonOnePress          0x2000149d     0x1  Data  Gb  common.o [1]
+buttonZeroPress         0x2000149c     0x1  Data  Gb  common.o [1]
+calDisableAdc           0x0800a7f9     0xc  Code  Gb  phy.o [13]
+calReadAdcBlocking      0x0800a7d9    0x16  Code  Gb  phy.o [13]
+calStartAdcConversion   0x0800a7a5    0x34  Code  Gb  phy.o [13]
+calculateModDacTuneValue
+                        0x0800ab99    0xb4  Code  Lc  analogue-mod-dac.o [13]
+carClearRouteTable      0x0800371d    0x68  Code  Gb  vehicle.o [1]
+carFindCardInTable      0x080035a7    0x34  Code  Lc  vehicle.o [1]
+carInfo                 0x20000e54    0xe8  Data  Gb  vehicle.o [1]
+carReportHandler        0x080035db   0x142  Code  Lc  vehicle.o [1]
+carRouteEventHandler    0x08003785   0x2e8  Code  Gb  vehicle.o [1]
+carScanKey              0x08003d5f    0x50  Code  Lc  vehicle.o [1]
+card_state              0x2000100c    0x20  Data  Lc  vehicle.o [1]
+ccaAttempt              0x2000125b     0x1  Data  Lc  phy-common.o [13]
+cellBiasRegI            0x080191cc    0x58  Data  Gb  analogue-cell-bias.o [13]
+cellBiasRegV            0x08019130    0x30  Data  Gb  analogue-cell-bias.o [13]
+changeToChannel         0x20000a00     0x1  Data  Lc  zdo-channel.o [13]
+channelCache            0x20000982     0x1  Data  Lc  form-and-join.o [10]
+channelIn               0x20000980     0x1  Data  Lc  form-and-join.o [10]
+channelOut              0x2000097f     0x1  Data  Lc  form-and-join.o [10]
+checkForMovedChild      0x0800c985    0x1c  Code  Lc  network.o [13]
+childIsExpectingMessageBitField
+                        0x20001348     0x4  Data  Lc  mac-indirect.o [13]
+childJitMessage         0x08007a9d    0xb4  Code  Lc  jit.o [13]
+childPolledBitField     0x20001344     0x4  Data  Lc  mac-indirect.o [13]
+cleanupEvent            0x20001130     0x4  Data  Lc  form-and-join-node-adapter.o [10]
+cleanupEventHandler     0x08009c3b     0xc  Code  Lc  form-and-join-node-adapter.o [10]
+clearNetworkSecurityFromMessage
+                        0x08005b81    0x28  Code  Lc  association.o [13]
+cmdhd1                  0x20000758   0x130  Data  Gb  command.o [1]
+continueScanRequest     0x080104b5    0x5c  Code  Lc  zdo-channel.o [13]
+copyPayload             0x08011221    0x44  Code  Lc  alarm.o [3]
+copyTokensToOtherPage   0x08010c55   0x1c8  Code  Lc  sim-eeprom-internal.o [8]
+countIncremarks         0x08010fb9    0x3e  Code  Lc  sim-eeprom-internal.o [8]
+cstackMemory            0x20000000   0x758  Data  Gb  cstartup-iar-common.o [10]
+curDeviceInfoListIndex  0x20000ce4     0x4  Data  Lc  mobile.o [1]
+currentBroadcastLength  0x200014be     0x1  Data  Lc  alarm.o [3]
+currentChannel          0x2000097c     0x1  Data  Lc  form-and-join.o [10]
+currentJitFlag          0x2000096c     0x2  Data  Lc  jit.o [13]
+currentReceiveChannel   0x20001140     0x1  Data  Lc  phy.o [13]
+dataContents            0x2000099c     0x4  Data  Lc  form-and-join.o [10]
+debugChannel            0x20001fe0    0x10  Data  Lc  debug-jtag.o [13]
+decodeShortDestination  0x08008fb1    0x46  Code  Lc  mac-header.o [13]
+def_time                0x08018f80     0xc  Data  Gb  lamp.o [10]
+deferredPanChange       0x0800dc83    0x32  Code  Lc  management.o [13]
+delayCount              0x20001278     0x1  Data  Lc  retry.o [13]
+deviceIsCoordinator     0x20000aac     0x1  Data  Lc  phy-common.o [13]
+digits                  0x08019508    0x28  Data  Lc  xstoull.o [6]
+disableFlitf            0x08013851    0x18  Code  Lc  flash.o [8]
+div                     0x08017c2b     0xe  Code  Gb  div.o [6]
+dropJoinBeacon          0x080058bf    0x1a  Code  Lc  association.o [13]
+edCcaThreshold          0x20000aaf     0x1  Data  Lc  phy-common.o [13]
+emActiveScanDuration    0x200008ff     0x1  Data  Gb  association.o [13]
+emAddApsFrame           0x0800d90d    0xdc  Code  Gb  zigbee-packet-header.o [13]
+emAddBeaconPayload      0x080065f1    0x9c  Code  Gb  association.o [13]
+emAddBlacklistedId      0x0800e35d    0x74  Code  Gb  random-id.o [13]
+emAddBroadcastTableEntry
+                        0x08012bc9    0x4c  Code  Gb  broadcast.o [13]
+emAddNeighborGuaranteed
+                        0x0800b475    0x60  Code  Gb  neighbor.o [13]
+emAddPendingAckedMessage
+                        0x0800b79d    0x58  Code  Gb  aps-retry.o [13]
+emAddRejoinedChild      0x0800746d    0xda  Code  Gb  child.o [13]
+emAddTrustCenterRoute   0x08013f17    0x24  Code  Gb  route-discovery.o [13]
+emAddTunnelledApsHeader
+                        0x0800d449    0x40  Code  Gb  trust-center-util.o [11]
+emAddUnicastTableEntry  0x08013ccd    0x28  Code  Gb  unicast-table.o [13]
+emAddressTable          0x20000958     0x4  Data  Gb  ember-configuration.o [10]
+emAddressTableSize      0x20000a99     0x1  Data  Gb  ember-configuration.o [10]
+emAesEncrypt            0x08013c79    0x2c  Code  Gb  aes.o [13]
+emAesHashInternal       0x08017941    0x78  Code  Gb  hashing.o [11]
+emAgeBlacklistedIds     0x0800e405    0x1c  Code  Gb  random-id.o [13]
+emAgeBroadcastTable     0x08012b6d    0x3e  Code  Gb  broadcast.o [13]
+emAgeChildren           0x0800fda1   0x114  Code  Gb  child-aging.o [13]
+emAgeRouteTables        0x08012d37    0xdc  Code  Gb  route-table.o [13]
+emAllowRelay            0x20000a93     0x1  Data  Gb  ember-configuration.o [10]
+emAmMulticastMember     0x08011669    0x40  Code  Gb  address-table.o [13]
+emAmNetworkManager      0x0800dce9    0x28  Code  Gb  management.o [13]
+emAnyChildHasFlagsSet   0x0800734f    0x28  Code  Gb  child.o [13]
+emAppHandlesEndpointZdoRequests
+                        0x200014a8     0x1  Data  Gb  ember-configuration.o [10]
+emAppHandlesUnsupportedZdoRequests
+                        0x200014a7     0x1  Data  Gb  ember-configuration.o [10]
+emAppReceivesSupportedZdoRequests
+                        0x200014a6     0x1  Data  Gb  ember-configuration.o [10]
+emAppendToLinkedBuffers
+                        0x080054ad    0x3a  Code  Gb  packet-buffer.o [13]
+emApplicationCheckIncomingQueue
+                        0x080084cd    0x20  Code  Gb  application-support.o [13]
+emApplicationProcessIncoming
+                        0x080084ed   0x130  Code  Gb  application-support.o [13]
+emApplicationProcessIncomingAck
+                        0x0800b7f5    0xd8  Code  Gb  aps-retry.o [13]
+emApplicationSecurityMessageHandler
+                        0x0800e549   0x16a  Code  Gb  aps-security.o [11]
+emApsBaseFrameSize      0x0800d73b    0x48  Code  Gb  zigbee-packet-header.o [13]
+emApsCrypt              0x08012589   0x1ec  Code  Gb  aps-encryption.o [11]
+emApsFrameSize          0x0800d783    0x3e  Code  Gb  zigbee-packet-header.o [13]
+emApsFrameToApsStruct   0x0800d7d9   0x130  Code  Gb  zigbee-packet-header.o [13]
+emApsPurge              0x0800b755    0x2e  Code  Gb  aps-retry.o [13]
+emApsSequenceNumber     0x200014ba     0x1  Data  Gb  zigbee-packet-header.o [13]
+emApsUnicastMessageData
+                        0x2000095c     0x4  Data  Gb  ember-configuration.o [10]
+emAreKeysAuthorizedByDefault
+                        0x08017a11     0x4  Code  Gb  cbke-crypto-engine-stub.o [5]
+emAssociationHandler    0x08005fc9   0x1f8  Code  Gb  association.o [13]
+emAssociationRequestNotSent
+                        0x08006255     0x8  Code  Gb  association.o [13]
+emAssumeSymmetricLink   0x0800b4d5    0x24  Code  Gb  neighbor.o [13]
+emAuthenticatedRoutingOnly
+                        0x200014b8     0x1  Data  Gb  high-security-stub.o [11]
+emAuxiliaryZdoRequestHandler
+                        0x080145c5   0x6fc  Code  Gb  zigbee-device.o [13]
+emAvailableMemory       0x200014cc   0x9f4  Data  Gb  ember-configuration.o [10]
+emAvailableStackBuffer  0x20000aa7     0x1  Data  Gb  zigbee-stack.o [13]
+emBindingFlags          0x20000954     0x4  Data  Gb  ember-configuration.o [10]
+emBindingRemoteNode     0x20000950     0x4  Data  Gb  ember-configuration.o [10]
+emBroadcastAgeCutoffIndexes
+                        0x200013c0     0x2  Data  Gb  broadcast.o [13]
+emBroadcastAlarmData    0x20000938     0x4  Data  Gb  ember-configuration.o [10]
+emBroadcastAlarmDataSize
+                        0x200014a3     0x1  Data  Gb  ember-configuration.o [10]
+emBroadcastHead         0x200013bc     0x1  Data  Gb  broadcast.o [13]
+emBroadcastTable        0x200013c4    0x5c  Data  Gb  broadcast.o [13]
+emBroadcastTableIsFull  0x08012bab    0x1e  Code  Gb  broadcast.o [13]
+emCalPadsEvent          0x20000a18     0x4  Data  Gb  cal-pads.o [13]
+emCalPadsEventHandler   0x08012fc9    0x18  Code  Gb  cal-pads.o [13]
+emCalculateMic          0x08011979   0x106  Code  Gb  crypto.o [13]
+emCallIncomingMessageHandler
+                        0x08008c5d    0x80  Code  Gb  zigbee-dispatch.o [13]
+emCapabilityBytes       0x08018f9c     0x8  Data  Gb  child.o [13]
+emCbkeGetKeyFromInstallCode
+                        0x08017a19     0x4  Code  Gb  cbke-crypto-engine-stub.o [5]
+emCbkeTick              0x08017a0b     0x2  Code  Gb  cbke-crypto-engine-stub.o [5]
+emChannelChangeEvent    0x20000a0c     0x4  Data  Gb  zdo-channel.o [13]
+emChannelChangeEventHandler
+                        0x08010681    0x36  Code  Gb  zdo-channel.o [13]
+emChannelSettings       0x08018e48    0x40  Data  Gb  analogue.o [13]
+emCheckAdditionalPendingDataIsr
+                        0x0800f9c5    0x50  Code  Gb  mac-indirect.o [13]
+emCheckAvailableMemory  0x08007179     0x2  Code  Gb  ember-configuration.o [10]
+emCheckChannelStatus    0x0801036d    0x80  Code  Gb  zdo-channel.o [13]
+emCheckIncomingFrameCounter
+                        0x0801366d    0x1e  Code  Gb  zigbee-neighbor.o [13]
+emCheckOrSetTrustCenterEui64
+                        0x08007d1d    0x42  Code  Gb  aps-keys.o [11]
+emCheckRadioEvent       0x20000a1c     0x4  Data  Gb  mac-em250.o [13]
+emCheckRadioEventHandler
+                        0x080130e1    0x18  Code  Gb  mac-em250.o [13]
+emChildExtendedTimeout  0x080115d1    0x28  Code  Gb  address-table.o [13]
+emChildIdTable          0x20000928     0x4  Data  Gb  ember-configuration.o [10]
+emChildInit             0x08007289    0x64  Code  Gb  child.o [13]
+emChildStatus           0x2000092c     0x4  Data  Gb  ember-configuration.o [10]
+emChildTimers           0x20000930     0x4  Data  Gb  ember-configuration.o [10]
+emChooseRandomNeighbor  0x0800b69f    0x66  Code  Gb  neighbor.o [13]
+emClearSecurityData     0x0800edfd    0x1a  Code  Gb  aps-security.o [11]
+emClearUnicastTable     0x08013cf9    0x10  Code  Gb  unicast-table.o [13]
+emCopyToNormalizedBuffers
+                        0x08005445    0x68  Code  Gb  packet-buffer.o [13]
+emCostDivision          0x0800aca9     0xc  Code  Gb  phy-common.o [13]
+emCostDivisions         0x08019234     0x8  Data  Gb  phy-common.o [13]
+emCsmaTransmit          0x08012fe1    0x3c  Code  Gb  mac-em250.o [13]
+emCurrentApsStruct      0x200010f4     0x4  Data  Gb  zigbee-dispatch.o [13]
+emCurrentBindingIndex   0x200014ae     0x1  Data  Gb  zigbee-dispatch.o [13]
+emCurrentLqi            0x200014b6     0x1  Data  Gb  network.o [13]
+emCurrentMessageStatus  0x200010f0     0x1  Data  Gb  zigbee-dispatch.o [13]
+emCurrentRssi           0x200014b7     0x1  Data  Gb  network.o [13]
+emCurrentSender         0x200010f2     0x2  Data  Gb  zigbee-dispatch.o [13]
+emCurrentSenderEui64    0x200010f8     0x4  Data  Gb  zigbee-dispatch.o [13]
+emCurrentZdoRequestStatus
+                        0x200014ad     0x1  Data  Gb  application-support.o [13]
+emDebugAddInitialFraming
+                        0x080131b9    0x1c  Code  Gb  debug-jtag.o [13]
+emDebugBinaryFormat     0x080133c5    0x10  Code  Gb  debug.o [13]
+emDebugInit             0x08013131    0x18  Code  Gb  debug-jtag.o [13]
+emDebugInternalBinaryPrintf
+                        0x08013405   0x13e  Code  Lc  debug.o [13]
+emDebugPowerUp          0x08013149    0x68  Code  Gb  debug-jtag.o [13]
+emDebugProcessIncoming  0x0801354d    0x94  Code  Gb  debug.o [13]
+emDebugReceiveTick      0x08013381    0x2c  Code  Gb  debug-jtag.o [13]
+emDebugResetInfo        0x080133d5    0x30  Code  Gb  debug.o [13]
+emDecrementPanConflictMeter
+                        0x0800db91     0xc  Code  Gb  management.o [13]
+emDecryptPacket         0x08011d27    0x9e  Code  Gb  crypto.o [13]
+emDelayDeviceAnnouncement
+                        0x080178cd     0x4  Code  Gb  high-security-stub.o [11]
+emDeleteRouteTableEntry
+                        0x08012e4b     0xe  Code  Gb  route-table.o [13]
+emDetectIdConflict      0x0800e249    0xa0  Code  Gb  random-id.o [13]
+emDeviceJoiningSecurityHandler
+                        0x0800d011    0xb4  Code  Gb  trust-center-util.o [11]
+emDiscoveryTable        0x20000940     0x4  Data  Gb  ember-configuration.o [10]
+emDiscoveryTableSize    0x20000a96     0x1  Data  Gb  ember-configuration.o [10]
+emDoesSecurityPolicyAllowAppKeyRequests
+                        0x08017a15     0x4  Code  Gb  cbke-crypto-engine-stub.o [5]
+emDroppedAckStallWorkaround
+                        0x0800ac85    0x24  Code  Gb  phy-common.o [13]
+emDsaSignAndSendMessage
+                        0x08017a0d     0x4  Code  Gb  cbke-crypto-engine-stub.o [5]
+emEncryptPacket         0x08011c45    0x6c  Code  Gb  crypto.o [13]
+emEndDeviceChildCount   0x20000a76     0x1  Data  Gb  child.o [13]
+emEntityAuthenticationEvent
+                        0x20001274     0x4  Data  Gb  high-security-stub.o [11]
+emEntityAuthenticationEventHandler
+                        0x080178c9     0x2  Code  Gb  high-security-stub.o [11]
+emEraseChild            0x08007709    0x26  Code  Gb  child.o [13]
+emEraseChildTable       0x08007735    0x3e  Code  Gb  child.o [13]
+emEventControlSetDelayMS
+                        0x08017849    0x14  Code  Gb  event-control.o [13]
+emEventControlSetDelayMinutes
+                        0x08017871    0x16  Code  Gb  event-control.o [13]
+emEventControlSetDelayQS
+                        0x0801785d    0x14  Code  Gb  event-control.o [13]
+emExtendJoinTimeout     0x080058a3    0x1c  Code  Gb  association.o [13]
+emFastLinkStatusCount   0x20001261     0x1  Data  Gb  neighbor.o [13]
+emFetchInt32u           0x08017a53    0x28  Code  Gb  misc.o [13]
+emFillRouteCommandData  0x08013e9d    0x72  Code  Gb  route-discovery.o [13]
+emFindAddressByEui64    0x080114bd    0x70  Code  Gb  address-table.o [13]
+emFindAddressByNodeId   0x0801152d    0x92  Code  Gb  address-table.o [13]
+emFindBroadcastTableEntry
+                        0x08012b2d     0x4  Code  Gb  broadcast.o [13]
+emFindChild             0x0800756b    0x18  Code  Gb  child.o [13]
+emFindChildIndex        0x080073d3     0xa  Code  Gb  child.o [13]
+emFindEmptyDiscoveryTableEntry
+                        0x08012ead     0xa  Code  Gb  route-table.o [13]
+emFindMulticastBinding  0x08012925    0x44  Code  Gb  binding-table.o [4]
+emFindNeighborByEui64   0x0800b197    0x18  Code  Gb  neighbor.o [13]
+emFindNeighborIndexByEui64
+                        0x0800b1bd    0x36  Code  Gb  neighbor.o [13]
+emFindOrAddNeighbor     0x0800b3c9    0x6c  Code  Gb  neighbor.o [13]
+emFindOrCreateRouteTableEntry
+                        0x08012eb7    0x74  Code  Gb  route-table.o [13]
+emFindRouteTableEntry   0x08012e41     0xa  Code  Gb  route-table.o [13]
+emFindUnicastBinding    0x08012977    0x7a  Code  Gb  binding-table.o [4]
+emFindZdoPayload        0x08010189    0x28  Code  Gb  zigbee-device-util.o [13]
+emFinishJoinFailure     0x0800597b    0x18  Code  Gb  association.o [13]
+emForgetBindingShortId  0x080127b5    0x42  Code  Gb  binding-table.o [4]
+emForgetShortId         0x0801145d    0x2e  Code  Gb  address-table.o [13]
+emFragmentDelayMs       0x20000a9b     0x1  Data  Gb  ember-configuration.o [10]
+emFrameCounterIndex     0x080135e9    0x20  Code  Gb  zigbee-neighbor.o [13]
+emFrameCounterIndexFromEui64
+                        0x0801369d    0xc8  Code  Gb  zigbee-neighbor.o [13]
+emFrameCounters         0x2000094c     0x4  Data  Gb  ember-configuration.o [10]
+emGetApplicationPayload
+                        0x0800d489    0x9c  Code  Gb  zigbee-packet-header.o [13]
+emGetApsFrameCounter    0x0801185b     0x6  Code  Gb  crypto.o [13]
+emGetChildCapabilities  0x0800762b     0xe  Code  Gb  child.o [13]
+emGetKeyFromCore        0x08013be5    0x30  Code  Gb  aes.o [13]
+emGetLinkKey            0x08007d61    0xfc  Code  Gb  aps-keys.o [11]
+emGetLocalCapabilities  0x080068b1    0x20  Code  Gb  association.o [13]
+emGetMacDataAddress     0x0800dfbf    0x22  Code  Gb  packet-header.o [13]
+emGetMacTimer           0x0800a799     0xc  Code  Gb  phy.o [13]
+emGetNetworkKeys        0x0800eddf    0x1e  Code  Gb  aps-security.o [11]
+emGetNetworkManagementState
+                        0x0800d9fb    0x28  Code  Gb  management.o [13]
+emGetNwkUpdateId        0x0800da23    0x10  Code  Gb  management.o [13]
+emGetRandomBytes        0x0800807b    0x34  Code  Gb  ember-stack-common.o [13]
+emGetTrustCenterEui64   0x08007cc5    0x3a  Code  Gb  aps-keys.o [11]
+emGetZigbeeBinding      0x080129f5    0x16  Code  Gb  binding-table.o [4]
+emHandleBindUnbindRequests
+                        0x08014ea1    0xa4  Code  Gb  zdo-binding-table.o [4]
+emHandleBindingTableRequest
+                        0x08014f51   0x10c  Code  Gb  zdo-binding-table.o [4]
+emHandleChildIdConflict
+                        0x0800e319    0x3e  Code  Gb  random-id.o [13]
+emHandleEndDeviceBindRequest
+                        0x08017a2f     0x4  Code  Gb  end-device-bind-stub.o [7]
+emHandleLeaveCommand    0x08008a9d    0xbc  Code  Gb  leave.o [13]
+emHandleNwkUpdateRequest
+                        0x080103ed    0xc8  Code  Gb  zdo-channel.o [13]
+emHandleRouteCommand    0x080140b5   0x330  Code  Gb  route-discovery.o [13]
+emHandleRouteError      0x0801171d    0x9c  Code  Gb  route-error.o [13]
+emHandleSleepyRequest   0x08008875    0xf6  Code  Gb  application-support.o [13]
+emHaveFullZdo           0x20000ab5     0x1  Data  Gb  zigbee-device-util.o [13]
+emHavePendingRetryMessages
+                        0x0800de1b     0xa  Code  Gb  retry.o [13]
+emHaveTrustCenterLinkKey
+                        0x08007e75    0x18  Code  Gb  aps-keys.o [11]
+emHaveUnicastAlarmAck   0x080111e5    0x3c  Code  Gb  alarm.o [3]
+emHeaderApsPayloadIndex
+                        0x0800d7c1    0x18  Code  Gb  zigbee-packet-header.o [13]
+emHeaderGetInt16u       0x0800df31    0x12  Code  Gb  packet-header.o [13]
+emHeaderGetInt8u        0x0800df67     0xc  Code  Gb  packet-header.o [13]
+emHeaderMacInfoField    0x0800df9b     0x4  Code  Gb  packet-header.o [13]
+emHeaderNetworkPayloadIndex
+                        0x0800d6db    0x2a  Code  Gb  zigbee-packet-header.o [13]
+emHeaderSetInt16u       0x0800df43    0x16  Code  Gb  packet-header.o [13]
+emHeaderSetInt8u        0x0800df59     0xe  Code  Gb  packet-header.o [13]
+emHeaderSetMacInfoField
+                        0x0800df9f     0x6  Code  Gb  packet-header.o [13]
+emHeaderSetStackPrivate
+                        0x0800dfaf    0x10  Code  Gb  packet-header.o [13]
+emHighSecurityModeSupported
+                        0x08019576     0x1  Data  Gb  aps-skke-stub.o [11]
+emHmacAesHash           0x080179c3    0x46  Code  Gb  hashing.o [11]
+emHoldMessageBuffer     0x080052ad    0x1a  Code  Gb  packet-buffer.o [13]
+emInInitialBroadcastTimeout
+                        0x200013be     0x1  Data  Gb  broadcast.o [13]
+emInInitialRouteRequestTimeout
+                        0x20001495     0x1  Data  Gb  route-table.o [13]
+emInUseAsNextHop        0x08012d09    0x2e  Code  Gb  route-table.o [13]
+emIncomingApsFrameCounters
+                        0x20000960     0x4  Data  Gb  ember-configuration.o [10]
+emIncomingTcLinkKeyFrameCounter
+                        0x200010e8     0x4  Data  Gb  aps-keys.o [11]
+emInitEui64             0x08007151    0x28  Code  Gb  eui64.o [13]
+emInitializeAddressTable
+                        0x0801136d    0x14  Code  Gb  address-table.o [13]
+emInitializeAlarms      0x0801115d    0x38  Code  Gb  alarm.o [3]
+emInitializeBindingTable
+                        0x08012aa5    0x3c  Code  Gb  binding-table.o [4]
+emInitializeBroadcast   0x08012c15    0x20  Code  Gb  broadcast.o [13]
+emInitializeCbke        0x08017a09     0x2  Code  Gb  cbke-crypto-engine-stub.o [5]
+emInitializeChild       0x080073dd    0x90  Code  Gb  child.o [13]
+emInitializeIdAssignment
+                        0x0800e14d    0x5c  Code  Gb  random-id.o [13]
+emInitializeRouteTableEntry
+                        0x08012c49     0xa  Code  Gb  route-table.o [13]
+emInitializeTableRouting
+                        0x08012c53    0x48  Code  Gb  route-table.o [13]
+emInitializeTrustCenterSecurity
+                        0x0800ee1f    0x18  Code  Gb  aps-security.o [11]
+emInitiateSkkeProtocol  0x080178d1     0x4  Code  Gb  aps-skke-stub.o [11]
+emIsBlacklistedId       0x0800e3d1    0x34  Code  Gb  random-id.o [13]
+emIsConcentrator        0x08012f9d    0x2a  Code  Gb  route-table.o [13]
+emIsEndDeviceChild      0x0800760f    0x12  Code  Gb  child.o [13]
+emIsInUnicastTable      0x08013ca5    0x26  Code  Gb  unicast-table.o [13]
+emIsMobileJoinRequest   0x0800cef1    0x58  Code  Lc  network.o [13]
+emIsNodeInBroadcastTable
+                        0x08012b31    0x10  Code  Gb  broadcast.o [13]
+emIsNodeInRoutingTables
+                        0x08012f2b    0x1a  Code  Gb  route-table.o [13]
+emIsNullKey             0x0800ee17     0x8  Code  Gb  aps-security.o [11]
+emIsSleepyChild         0x080075f3    0x1c  Code  Gb  child.o [13]
+emIsTokenDataInitialized
+                        0x08007c95    0x26  Code  Gb  aps-keys.o [11]
+emIsZigbeeStateUnauthenticated
+                        0x0800bef1    0x16  Code  Gb  network.o [13]
+emJitTransmitComplete   0x08007b51    0x80  Code  Gb  jit.o [13]
+emLeaveCommandSent      0x08008c3d    0x1e  Code  Gb  leave.o [13]
+emLeaveNetworkQuietly   0x08008a05    0x34  Code  Gb  leave.o [13]
+emLinkQualityToCost     0x0800b58f    0x20  Code  Gb  neighbor.o [13]
+emLoadKeyIntoCore       0x08013bb9    0x2c  Code  Gb  aes.o [13]
+emLoadNetworkKey        0x0800edb1    0x2e  Code  Gb  aps-security.o [11]
+emLocalEui64            0x200010e0     0x8  Data  Gb  eui64.o [13]
+emLocalNodeId           0x20000a80     0x2  Data  Lc  nodeid.o [13]
+emLocalPanId            0x20000a82     0x2  Data  Lc  nodeid.o [13]
+emLongIdDataPendingForDevice
+                        0x0800f8f5    0x3c  Code  Gb  mac-indirect.o [13]
+emLookupChildEui64ById  0x08007639    0x28  Code  Gb  child.o [13]
+emMacAckNeeded          0x20001258     0x1  Data  Gb  phy-common.o [13]
+emMacAssociateRequest   0x0800f093    0x2e  Code  Gb  command.o [13]
+emMacAssociateRespond   0x0800f0c9    0x36  Code  Gb  command.o [13]
+emMacBeaconSequenceNumber
+                        0x200009ac     0x1  Data  Gb  mac-arbiter.o [13]
+emMacBuffer             0x200009a9     0x1  Data  Gb  mac-arbiter.o [13]
+emMacCancelPoll         0x08009ce5     0x8  Code  Gb  mac-arbiter.o [13]
+emMacCheckIncomingQueue
+                        0x080120a1   0x164  Code  Gb  mac-receive.o [13]
+emMacCheckRadio         0x080130b9    0x24  Code  Gb  mac-em250.o [13]
+emMacCurrentOutgoingCommand
+                        0x200009a8     0x1  Data  Gb  mac-arbiter.o [13]
+emMacDataSequenceNumber
+                        0x200009ab     0x1  Data  Gb  mac-arbiter.o [13]
+emMacDequeue            0x08009ced    0x6e  Code  Gb  mac-arbiter.o [13]
+emMacDestinationMode    0x0800e04d    0x22  Code  Gb  packet-header.o [13]
+emMacDestinationPointer
+                        0x0800e077    0x1e  Code  Gb  packet-header.o [13]
+emMacHeaderLength       0x0800e00d    0x40  Code  Gb  packet-header.o [13]
+emMacIncomingQueueIsEmpty
+                        0x08012239     0x6  Code  Gb  mac-receive.o [13]
+emMacIndirectCheckPollFlags
+                        0x0800fb0d   0x104  Code  Gb  mac-indirect.o [13]
+emMacIndirectEvent      0x200009f0     0x4  Data  Gb  mac-indirect.o [13]
+emMacIndirectEventHandler
+                        0x0800facb    0x38  Code  Gb  mac-indirect.o [13]
+emMacIndirectInit       0x0800f855    0x10  Code  Gb  mac-indirect.o [13]
+emMacIndirectProcessPollIsr
+                        0x0800f931    0x94  Code  Gb  mac-indirect.o [13]
+emMacIndirectPurge      0x0800fb03     0x8  Code  Gb  mac-indirect.o [13]
+emMacIndirectTransmitComplete
+                        0x0800fa15    0xb6  Code  Gb  mac-indirect.o [13]
+emMacInfoLowByte        0x0800dfa5     0xa  Code  Gb  packet-header.o [13]
+emMacInit               0x08009de1    0x34  Code  Gb  mac-arbiter.o [13]
+emMacIsEmpty            0x08009db3    0x2c  Code  Gb  mac-arbiter.o [13]
+emMacKickStart          0x0800f1ad    0x44  Code  Gb  mac.o [13]
+emMacMakePollCommand    0x0800efe9    0x48  Code  Gb  command.o [13]
+emMacOkToIdle           0x0800f1f1    0x24  Code  Gb  mac.o [13]
+emMacPassthroughMessageType
+                        0x08008ff9    0x60  Code  Gb  mac-header.o [13]
+emMacPermitAssn         0x200014bc     0x1  Data  Gb  command.o [13]
+emMacPrepareTransmitBuffer
+                        0x0800f3a9   0x164  Code  Gb  mac.o [13]
+emMacReallySuspendTransmission
+                        0x08009d61    0x52  Code  Gb  mac-arbiter.o [13]
+emMacRequestPoll        0x08009cd3    0x12  Code  Gb  mac-arbiter.o [13]
+emMacRetries            0x200014c0     0x1  Data  Gb  mac-em250.o [13]
+emMacScanDwell          0x0800f361    0x42  Code  Gb  mac.o [13]
+emMacScanEnd            0x0800f319    0x36  Code  Gb  mac.o [13]
+emMacScanType           0x200009d0     0x1  Data  Gb  scan.o [13]
+emMacSendBeacon         0x0800f111    0x9c  Code  Gb  command.o [13]
+emMacSendBeaconRequest  0x0800efb9    0x16  Code  Gb  command.o [13]
+emMacSendCommand        0x0800ee69   0x138  Code  Gb  command.o [13]
+emMacSendCoordinatorRealignment
+                        0x0800f031    0x62  Code  Gb  command.o [13]
+emMacSendOrphanNotification
+                        0x0800efa1    0x18  Code  Gb  command.o [13]
+emMacSetIdleMode        0x0800f215    0x1a  Code  Gb  mac.o [13]
+emMacShortDestination   0x0800e095     0x8  Code  Gb  packet-header.o [13]
+emMacShortSource        0x0800e0fb     0x6  Code  Gb  packet-header.o [13]
+emMacShutdownCallback   0x200009b8     0x4  Data  Gb  mac-arbiter.o [13]
+emMacSourceMode         0x0800e09d    0x22  Code  Gb  packet-header.o [13]
+emMacSourcePointer      0x0800e0bf    0x3c  Code  Gb  packet-header.o [13]
+emMacState              0x200012bc     0x1  Data  Gb  mac.o [13]
+emMacSubmit             0x08009c69    0x6a  Code  Gb  mac-arbiter.o [13]
+emMacSubmitIndirect     0x0800f865    0x90  Code  Gb  mac-indirect.o [13]
+emMacTimerEvent         0x200012c0     0x4  Data  Gb  mac.o [13]
+emMacTimerEventHandler  0x0800f235    0x8c  Code  Gb  mac.o [13]
+emMacToNetworkQueue     0x200009bc     0x4  Data  Gb  mac-arbiter.o [13]
+emMacTransmitCompleteCallback
+                        0x0800c9a5    0xa0  Code  Gb  network.o [13]
+emMacTransmitCompleteHandler
+                        0x08009e81    0x18  Code  Gb  mac-arbiter.o [13]
+emMacTransmitCompleteIsr
+                        0x08009e15    0x68  Code  Gb  mac-arbiter.o [13]
+emMakeApsUnicast        0x0800830d    0x60  Code  Gb  application-support.o [13]
+emMakeBroadcastBitmask  0x0800b519    0x4e  Code  Gb  neighbor.o [13]
+emMakeChildAlarmJitMessage
+                        0x08011325    0x38  Code  Gb  alarm.o [3]
+emMakeHeader            0x0800e109    0x44  Code  Gb  packet-header.o [13]
+emMakeMessage           0x08005683    0x10  Code  Gb  packet-buffer.o [13]
+emMakeMessageUsingVaList
+                        0x08005651    0x32  Code  Gb  packet-buffer.o [13]
+emMakeNetworkStatusMessage
+                        0x080116f1    0x2c  Code  Gb  route-error.o [13]
+emMakeStackJitMessage   0x08007a39    0x64  Code  Gb  jit.o [13]
+emMakeZigbeeCommandHeader
+                        0x0800d69d    0x3e  Code  Gb  zigbee-packet-header.o [13]
+emMakeZigbeeHeader      0x0800d599   0x104  Code  Gb  zigbee-packet-header.o [13]
+emManufacturerCode      0x20000a88     0x2  Data  Gb  zigbee-device.o [13]
+emMaxApsUnicastMessages
+                        0x20000a9a     0x1  Data  Gb  ember-configuration.o [10]
+emMaxEndDeviceChildren  0x20000aa0     0x1  Data  Gb  ember-configuration.o [10]
+emMaxHops               0x20000aa1     0x1  Data  Gb  ember-configuration.o [10]
+emMaximumApsPayloadWithOptions
+                        0x080087a5    0x1a  Code  Gb  application-support.o [13]
+emMaybeWakeupApsRetry   0x0800b8d1    0x1e  Code  Gb  aps-retry.o [13]
+emMemoryByteCompare     0x0800805f    0x1c  Code  Gb  ember-stack-common.o [13]
+emMessageBufferLengths  0x20000918     0x4  Data  Gb  ember-configuration.o [10]
+emMessageBufferQueueAdd
+                        0x080057a9    0x2a  Code  Gb  packet-buffer.o [13]
+emMessageBufferQueueIsEmpty
+                        0x08005849     0xe  Code  Gb  packet-buffer.o [13]
+emMessageBufferQueueRemove
+                        0x080057ff    0x44  Code  Gb  packet-buffer.o [13]
+emMessageBufferQueueRemoveHead
+                        0x080057d3    0x2c  Code  Gb  packet-buffer.o [13]
+emMessageBufferReferenceCounts
+                        0x2000091c     0x4  Data  Gb  ember-configuration.o [10]
+emMfglibMode            0x20001259     0x1  Data  Gb  phy-common.o [13]
+emMfglibRxCallback      0x20000a10     0x4  Data  Gb  mac-receive.o [13]
+emMfglibTransmitComplete
+                        0x2000125a     0x1  Data  Gb  phy-common.o [13]
+emMissedBlocks          0x200008a8     0x1  Data  Gb  fragment.o [10]
+emMobileChildCount      0x20000a78     0x1  Data  Gb  child.o [13]
+emModifySecurityState   0x08007c47     0x6  Code  Gb  aps-keys.o [11]
+emMsSinceLastSuccessfulPoll
+                        0x0800fed9     0x6  Code  Gb  child-aging.o [13]
+emNeedsFurtherTransmissions
+                        0x0800ceb9    0x36  Code  Gb  network.o [13]
+emNegotiationProtocolEvent
+                        0x200012b4     0x4  Data  Gb  aps-skke-stub.o [11]
+emNeighborCost          0x0800b567    0x28  Code  Gb  neighbor.o [13]
+emNeighborCount         0x20001260     0x1  Data  Gb  neighbor.o [13]
+emNeighborData          0x20000948     0x4  Data  Gb  ember-configuration.o [10]
+emNeighborEntryIncomingCost
+                        0x0800b5af     0x6  Code  Gb  neighbor.o [13]
+emNeighborEntryIndex    0x0800b1f3    0x16  Code  Gb  neighbor.o [13]
+emNeighborEntrySetAge   0x0800b66d     0xe  Code  Gb  neighbor.o [13]
+emNeighborEntrySetOutgoingCost
+                        0x0800b5f1     0xc  Code  Gb  neighbor.o [13]
+emNeighborEvent         0x20001264     0x4  Data  Gb  neighbor.o [13]
+emNeighborEventHandler  0x0800b5fd    0x6c  Code  Gb  neighbor.o [13]
+emNeighborExchangeEvent
+                        0x200013b8     0x4  Data  Gb  neighbor-exchange.o [13]
+emNeighborExchangeEventHandler
+                        0x08012555    0x30  Code  Gb  neighbor-exchange.o [13]
+emNeighborFindEntry     0x0800b209    0x14  Code  Gb  neighbor.o [13]
+emNeighborFirstCurrentKeyUse
+                        0x08013781    0x46  Code  Gb  zigbee-neighbor.o [13]
+emNeighborIdConflict    0x0800e2f5    0x24  Code  Gb  random-id.o [13]
+emNeighborInit          0x0800b155     0xe  Code  Gb  neighbor.o [13]
+emNeighborProcessQuality
+                        0x0800b12d    0x28  Code  Gb  neighbor.o [13]
+emNeighborTableSize     0x20000a98     0x1  Data  Gb  ember-configuration.o [10]
+emNetworkAddressRequest
+                        0x08010281    0x24  Code  Gb  zigbee-device-util.o [13]
+emNetworkCheckIncomingQueue
+                        0x0800c34d    0x44  Code  Gb  network.o [13]
+emNetworkEncrypt        0x0800c179    0x6a  Code  Gb  network.o [13]
+emNetworkEncryptFlatPacket
+                        0x08011cb1    0x50  Code  Gb  crypto.o [13]
+emNetworkInit           0x0800bea5    0x44  Code  Gb  network.o [13]
+emNetworkManagementEvent
+                        0x200009c8     0x4  Data  Gb  management.o [13]
+emNetworkManagementEventHandler
+                        0x0800db9d    0x4c  Code  Gb  management.o [13]
+emNetworkManagementInit
+                        0x0800d9ed     0xe  Code  Gb  management.o [13]
+emNetworkProcessIncoming
+                        0x0800c391    0xda  Code  Gb  network.o [13]
+emNetworkSendBroadcast  0x0800bf07    0x78  Code  Gb  network.o [13]
+emNetworkSendUnicast    0x0800bf7f   0x18c  Code  Gb  network.o [13]
+emNetworkSubmitUnicast  0x0800c10b     0x2  Code  Gb  network.o [13]
+emNetworkToApplicationQueue
+                        0x200009c0     0x4  Data  Gb  network.o [13]
+emNetworkTransmitComplete
+                        0x0800ca59   0x1f4  Code  Gb  network.o [13]
+emNetworkTransmitCompleteCallback
+                        0x0800bbad    0x86  Code  Gb  aps-retry.o [13]
+emNextApsFrameCounter   0x08011861    0x18  Code  Gb  crypto.o [13]
+emNodeType              0x200008fe     0x1  Data  Gb  association.o [13]
+emNormalizeBufferIndex  0x080055dd    0x18  Code  Gb  packet-buffer.o [13]
+emNoteChildChange       0x08007661    0x30  Code  Gb  child.o [13]
+emNoteIncomingFrameCounter
+                        0x0801368b     0xc  Code  Gb  zigbee-neighbor.o [13]
+emNoteJoinAuthenticated
+                        0x080058d9    0x44  Code  Gb  association.o [13]
+emNoteJoinFailureForTimeout
+                        0x0800589b     0x8  Code  Gb  association.o [13]
+emNoteJoiningChange     0x08006279    0x24  Code  Gb  association.o [13]
+emNoteSuccessfulPoll    0x0800feb5    0x20  Code  Gb  child-aging.o [13]
+emNoteUnicastRetryEvent
+                        0x0800b783    0x1a  Code  Gb  aps-retry.o [13]
+emPacketBufferCount     0x20000a91     0x1  Data  Gb  ember-configuration.o [10]
+emPacketBufferData      0x20000914     0x4  Data  Gb  ember-configuration.o [10]
+emPacketBufferFreeCount
+                        0x20000a92     0x1  Data  Gb  ember-configuration.o [10]
+emPacketBufferLinks     0x20000920     0x4  Data  Gb  ember-configuration.o [10]
+emPacketBufferQueueLinks
+                        0x20000924     0x4  Data  Gb  ember-configuration.o [10]
+emPacketHeaderContents  0x0800df87    0x14  Code  Gb  packet-header.o [13]
+emPacketHeaderOverhead  0x0800df73    0x14  Code  Gb  packet-header.o [13]
+emPacketHeaderPayload   0x08005331    0x18  Code  Gb  packet-buffer.o [13]
+emPacketReceivedInternalIsrCallback
+                        0x0801206d    0x34  Code  Gb  mac-receive.o [13]
+emPanIdConflictReportThreshold
+                        0x20000aa5     0x1  Data  Gb  ember-configuration.o [10]
+emParentEui64           0x2000090c     0x8  Data  Gb  association.o [13]
+emParentId              0x20000908     0x2  Data  Gb  association.o [13]
+emPhyDiscardNextAck     0x200014b5     0x1  Data  Gb  phy.o [13]
+emPhyRefreshIds         0x0800b083     0x8  Code  Gb  phy-common.o [13]
+emPhySetCoordinator     0x0800b0c9    0x18  Code  Gb  phy-common.o [13]
+emPhySetEui64           0x0800b091    0x38  Code  Gb  phy-common.o [13]
+emPhyToMacQueue         0x20000a14     0x4  Data  Gb  mac-receive.o [13]
+emPickNewId             0x0800e1fb    0x4e  Code  Gb  random-id.o [13]
+emPickRandomId          0x0800e1a9    0x52  Code  Gb  random-id.o [13]
+emPowerDescriptor       0x20000a8a     0x2  Data  Gb  zigbee-device.o [13]
+emPowerLevel            0x08018e94    0x20  Data  Gb  analogue.o [13]
+emPrepareRetryEntryForSubmission
+                        0x0800cc65   0x234  Code  Gb  network.o [13]
+emProcessAlarmMessage   0x08011195    0x50  Code  Gb  alarm.o [3]
+emProcessApplicationKey
+                        0x08012009    0x64  Code  Gb  aps-keys-full.o [12]
+emProcessChildAlarmMessage
+                        0x08011265    0xbc  Code  Gb  alarm.o [3]
+emProcessIncomingBeacon
+                        0x080062a1   0x1ec  Code  Gb  association.o [13]
+emProcessIncomingBroadcast
+                        0x0800c7f9    0xf8  Code  Gb  network.o [13]
+emProcessJoinRequest    0x08005ced   0x1ac  Code  Gb  association.o [13]
+emProcessJoinResponse   0x08005e99   0x130  Code  Gb  association.o [13]
+emProcessManagementCommand
+                        0x0800da6d   0x124  Code  Gb  management.o [13]
+emProcessNegotiationMessage
+                        0x080178d5     0x2  Code  Gb  aps-skke-stub.o [11]
+emProcessNeighborExchange
+                        0x08012361   0x1ec  Code  Gb  neighbor-exchange.o [13]
+emProcessNetworkHeaderIsr
+                        0x0800cf49    0x98  Code  Gb  network.o [13]
+emProcessRequestKey     0x0800d169    0xcc  Code  Gb  trust-center-util.o [11]
+emProcessTransmitState  0x080130f9     0x4  Code  Gb  mac-em250.o [13]
+emRadioAutoAckEnabled   0x0800b07d     0x6  Code  Gb  phy-common.o [13]
+emRadioBootPhySpecific  0x0800a455    0xbc  Code  Gb  phy.o [13]
+emRadioCalculateLinkQuality
+                        0x0800acb5    0x24  Code  Gb  phy-common.o [13]
+emRadioCalibrateCellBias
+                        0x0800a8cd   0x238  Code  Gb  analogue-cell-bias.o [13]
+emRadioCalibrateChannelFilter
+                        0x080043d5    0xfc  Code  Lc  analogue.o [13]
+emRadioCalibrateLna     0x080044e7   0x1f0  Code  Lc  analogue.o [13]
+emRadioCalibrateModulationDac
+                        0x0800ac4d    0x38  Code  Gb  analogue-mod-dac.o [13]
+emRadioCalibrateVco     0x08004325    0x8c  Code  Lc  analogue.o [13]
+emRadioChannel          0x20000a68     0x1  Data  Gb  analogue.o [13]
+emRadioCheckRadio       0x0800a8a5    0x24  Code  Gb  phy.o [13]
+emRadioEnableAddressMatching
+                        0x0800b04d    0x18  Code  Gb  phy-common.o [13]
+emRadioEnableAutoAck    0x0800b065    0x18  Code  Gb  phy-common.o [13]
+emRadioEnablePacketTrace
+                        0x0800b0f5    0x18  Code  Gb  phy-common.o [13]
+emRadioEnergyDetection  0x0800b031    0x1c  Code  Gb  phy-common.o [13]
+emRadioGetPowerStatus   0x0800b029     0x6  Code  Gb  phy-common.o [13]
+emRadioGetRandomNumbers
+                        0x0800a805    0x66  Code  Gb  phy.o [13]
+emRadioInit             0x0800aea9    0xac  Code  Gb  phy-common.o [13]
+emRadioPower            0x20000898     0x1  Data  Gb  analogue.o [13]
+emRadioReadSerialReg    0x080042b1     0xc  Code  Gb  analogue.o [13]
+emRadioReceiveCompleteCallback
+                        0x08009e9d   0x160  Code  Gb  mac-arbiter.o [13]
+emRadioReceiveCrcEnabled
+                        0x0800b0e5     0x6  Code  Gb  phy-common.o [13]
+emRadioReceiveIsr       0x0800a6ed    0xa8  Code  Gb  phy.o [13]
+emRadioReceiveMacHeaderCallback
+                        0x08009059   0x15c  Code  Gb  mac-header.o [13]
+emRadioResetAndEnableReceive
+                        0x0800a40d    0x48  Code  Gb  phy.o [13]
+emRadioSeedRandom       0x08017a1d    0x12  Code  Gb  phy-util.o [13]
+emRadioSetChannel       0x080049fd   0x194  Code  Gb  analogue.o [13]
+emRadioSetEdCcaThreshold
+                        0x0800b111    0x18  Code  Gb  phy-common.o [13]
+emRadioSleep            0x0800af59    0x60  Code  Gb  phy-common.o [13]
+emRadioTransmit         0x0800ad09    0x9c  Code  Gb  phy-common.o [13]
+emRadioTransmitCompleteCallback
+                        0x0801301d    0x98  Code  Gb  mac-em250.o [13]
+emRadioTransmitIsr      0x0800ada5    0xf8  Code  Gb  phy-common.o [13]
+emRadioTxPowerMode      0x200008a4     0x2  Data  Gb  analogue.o [13]
+emRadioWakeUp           0x0800afb9    0x4c  Code  Gb  phy-common.o [13]
+emRadioWriteSerialReg   0x080042bd    0x22  Code  Gb  analogue.o [13]
+emReadSecurityToken     0x08007c61    0x34  Code  Gb  aps-keys.o [11]
+emReallyCopyToLinkedBuffers
+                        0x080053ff    0x40  Code  Gb  packet-buffer.o [13]
+emReallySendRouteRequest
+                        0x08013d1d   0x180  Code  Gb  route-discovery.o [13]
+emReallyStopScan        0x0800f615    0x46  Code  Lc  scan.o [13]
+emReconstructDecryptedHeader
+                        0x0800d525    0x38  Code  Gb  zigbee-packet-header.o [13]
+emReleaseMessageBuffer  0x080052c7    0x66  Code  Gb  packet-buffer.o [13]
+emRemoteModifyBinding   0x08012a51    0x46  Code  Gb  binding-table.o [4]
+emRemoveApsMic          0x08012775    0x20  Code  Gb  aps-encryption.o [11]
+emRemoveNeighbor        0x0800b315    0x8e  Code  Gb  neighbor.o [13]
+emRemoveNeighborEui     0x0800b435    0x40  Code  Gb  neighbor.o [13]
+emReplaceNeighbor       0x0800b3b9    0x10  Code  Gb  neighbor.o [13]
+emRequestKeyEvent       0x200010ec     0x4  Data  Gb  aps-keys.o [11]
+emRequestKeyEventHandler
+                        0x08007f89    0x2c  Code  Gb  aps-keys.o [11]
+emRequestKeyTimeout     0x200014ab     0x1  Data  Gb  ember-configuration.o [10]
+emRequestKeyTimeoutControl
+                        0x08007f65    0x24  Code  Gb  aps-keys.o [11]
+emResetApsFrameCounter  0x08011879    0x10  Code  Gb  crypto.o [13]
+emResetNwkFrameCounter  0x08011849    0x12  Code  Gb  crypto.o [13]
+emResetNwkFrameCounters
+                        0x08013609    0x1c  Code  Gb  zigbee-neighbor.o [13]
+emRetryDelayEvent       0x2000127c     0x4  Data  Gb  retry.o [13]
+emRetryDelayEventHandler
+                        0x0800df29     0x6  Code  Gb  retry.o [13]
+emRetryInit             0x0800de4d     0xc  Code  Gb  retry.o [13]
+emRetryIsEmpty          0x0800de09    0x12  Code  Gb  retry.o [13]
+emRetryPurge            0x0800de25    0x28  Code  Gb  retry.o [13]
+emRetrySubmit           0x0800ddd1    0x38  Code  Gb  retry.o [13]
+emRetryTransmit         0x0800de59    0x24  Code  Gb  retry.o [13]
+emRetryTransmitComplete
+                        0x0800de7d    0x36  Code  Gb  retry.o [13]
+emRouteData             0x2000093c     0x4  Data  Gb  ember-configuration.o [10]
+emRouteTableNextHop     0x08012f45    0x4e  Code  Gb  route-table.o [13]
+emRouteTableSize        0x20000a95     0x1  Data  Gb  ember-configuration.o [10]
+emScanCommandTransmitCompleteIsr
+                        0x0800f7f5    0x5a  Code  Gb  scan.o [13]
+emScanCompleteHandler   0x08006495   0x154  Code  Gb  association.o [13]
+emScanEvent             0x200009d8     0x4  Data  Gb  scan.o [13]
+emScanEventHandler      0x0800f65b    0xc8  Code  Gb  scan.o [13]
+emScanTimerIsr          0x0800f731    0x66  Code  Gb  scan.o [13]
+emSearchDiscoveryTable  0x08012e59    0x4c  Code  Gb  route-table.o [13]
+emSecurityEui64         0x08013625    0x48  Code  Gb  zigbee-neighbor.o [13]
+emSecurityHardwareInit  0x08013c19     0x2  Code  Gb  aes.o [13]
+emSecurityIncrementOutgoingFrameCounter
+                        0x08011831    0x18  Code  Gb  crypto.o [13]
+emSecurityInit          0x080118a1    0x34  Code  Gb  crypto.o [13]
+emSecurityKeySequenceNumber
+                        0x200014bf     0x1  Data  Gb  crypto.o [13]
+emSecurityOkayToStartNetworkOperation
+                        0x0800e501    0x48  Code  Gb  aps-security.o [11]
+emSecurityReadFrameCounterToken
+                        0x08011805    0x2c  Code  Gb  crypto.o [13]
+emSecurityStateBitmask  0x200012b8     0x4  Data  Gb  aps-security.o [11]
+emSendApplicationMasterKey
+                        0x20000ab1     0x1  Data  Gb  trust-center-util.o [11]
+emSendApsCommand        0x0800e755   0x12c  Code  Gb  aps-security.o [11]
+emSendApsMessage        0x080080c1   0x24c  Code  Gb  application-support.o [13]
+emSendKey               0x0800e941   0x128  Code  Gb  aps-security.o [11]
+emSendNetworkKey        0x0800d13d    0x2c  Code  Gb  trust-center-util.o [11]
+emSendOurEndDeviceAnnouncement
+                        0x0801024d    0x30  Code  Gb  zigbee-device-util.o [13]
+emSendPanIdConflictReport
+                        0x0800dcb5    0x2e  Code  Gb  management.o [13]
+emSendRejoinResponse    0x08005c63    0x8a  Code  Gb  association.o [13]
+emSendReply             0x080087dd    0x4a  Code  Gb  application-support.o [13]
+emSendReportOrUpdate    0x0800dbe9    0x9a  Code  Gb  management.o [13]
+emSendRouteError        0x080116a9    0x48  Code  Gb  route-error.o [13]
+emSendRouteRecord       0x080143fd    0x8a  Code  Gb  route-discovery.o [13]
+emSendRouteReply        0x08013f3b    0xdc  Code  Gb  route-discovery.o [13]
+emSendRouteRequest      0x08013d09    0x14  Code  Gb  route-discovery.o [13]
+emSendUpdateDevice      0x0800e8f1    0x50  Code  Gb  aps-security.o [11]
+emSendZigDevMessage     0x080102d7    0x92  Code  Gb  zigbee-device-util.o [13]
+emSetAllChildrenToAlternateKey
+                        0x08007547    0x24  Code  Gb  child.o [13]
+emSetAllNeighborsUsingAlternateKey
+                        0x0800b67b    0x24  Code  Gb  neighbor.o [13]
+emSetAllSleepyChildFlags
+                        0x08007315    0x3a  Code  Gb  child.o [13]
+emSetChildId            0x08007691    0x36  Code  Gb  child.o [13]
+emSetKeyTableEntry      0x08011ee5    0xc0  Code  Gb  aps-keys-full.o [12]
+emSetLinkedBuffersLength
+                        0x080054ff    0x68  Code  Gb  packet-buffer.o [13]
+emSetMacDataAddress     0x0800dfe1    0x26  Code  Gb  packet-header.o [13]
+emSetNeighborEui64      0x0800b5b5    0x32  Code  Gb  neighbor.o [13]
+emSetNeighboringDevicesUsingAlternateKey
+                        0x08013765    0x1c  Code  Gb  zigbee-neighbor.o [13]
+emSetNetworkKey         0x0800eacf    0x9a  Code  Gb  aps-security.o [11]
+emSetNetworkManagementState
+                        0x0800da4f    0x1c  Code  Gb  management.o [13]
+emSetNetworkState       0x08007fb5    0x48  Code  Gb  ember-stack-common.o [13]
+emSetNodeAndPanIds      0x0800a305     0xa  Code  Gb  nodeid.o [13]
+emSetNodeType           0x0800668d    0x28  Code  Gb  association.o [13]
+emSetNwkUpdateId        0x0800da33    0x1c  Code  Gb  management.o [13]
+emSetPacketHeaderPayload
+                        0x08005349    0x3c  Code  Gb  packet-buffer.o [13]
+emSetParent             0x080068d1    0x20  Code  Gb  association.o [13]
+emSetRouteStatusAndZeroAge
+                        0x08012c39    0x10  Code  Gb  route-table.o [13]
+emSetSleepyBroadcast    0x080079e1    0x34  Code  Gb  jit.o [13]
+emSetTrustCenterData    0x08007bd9    0x6e  Code  Gb  aps-keys.o [11]
+emSetTrustCenterEui64   0x08007cff    0x1e  Code  Gb  aps-keys.o [11]
+emSleepyBroadcastEvent  0x20000968     0x4  Data  Gb  jit.o [13]
+emSleepyBroadcastEventHandler
+                        0x08007a15    0x24  Code  Gb  jit.o [13]
+emSourceRouteSubframeIndex
+                        0x0800d55d    0x30  Code  Gb  zigbee-packet-header.o [13]
+emStackEnergyScanHandler
+                        0x0801053b    0x10  Code  Gb  zdo-channel.o [13]
+emStackProfile          0x200014a9     0x1  Data  Gb  ember-configuration.o [10]
+emStandAloneEncryptBlock
+                        0x08013c1d    0x50  Code  Gb  aes.o [13]
+emStartEntityAuthenticationTimer
+                        0x080178cb     0x2  Code  Gb  high-security-stub.o [11]
+emStartScan             0x0800f595    0x36  Code  Lc  scan.o [13]
+emStopScan              0x0800f5cd    0x48  Code  Gb  scan.o [13]
+emStoreInt32u           0x08017a37    0x1c  Code  Gb  misc.o [13]
+emSwitchNetworkKeys     0x0800ea69    0x66  Code  Gb  aps-security.o [11]
+emTransmitState         0x200014c1     0x1  Data  Gb  mac-em250.o [13]
+emTreeDepth             0x200014bb     0x1  Data  Gb  random-id.o [13]
+emTrustCenterRequestKeyCleanup
+                        0x0800d421    0x1c  Code  Gb  trust-center-util.o [11]
+emTxStepTimeAltRfPath   0x20000899     0x1  Data  Gb  analogue.o [13]
+emUnicastAlarmData      0x20000934     0x4  Data  Gb  ember-configuration.o [10]
+emUnicastAlarmDataSize  0x200014a2     0x1  Data  Gb  ember-configuration.o [10]
+emUnicastTable          0x20001428    0x10  Data  Gb  unicast-table.o [13]
+emUnicastTxAttempts     0x2000148c     0x2  Data  Gb  network.o [13]
+emUnicastTxFailures     0x2000148e     0x2  Data  Gb  network.o [13]
+emUpdateAddressTable    0x0801148b    0x32  Code  Gb  address-table.o [13]
+emUpdateBindingFlags    0x0801287d    0x4a  Code  Gb  binding-table.o [4]
+emUpdateBindingRemoteNode
+                        0x080127f7    0x7c  Code  Gb  binding-table.o [4]
+emUpdateBroadcastTable  0x08012b41    0x2c  Code  Gb  broadcast.o [13]
+emUpdateKeyAuthorization
+                        0x08011fa9    0x44  Code  Gb  aps-keys-full.o [12]
+emUpdateNeighborTable   0x0800b4f9    0x20  Code  Gb  neighbor.o [13]
+emUpdateRouteReplyForRelaying
+                        0x08014017    0x9a  Code  Gb  route-discovery.o [13]
+emUseApsMulticast       0x20000aa6     0x1  Data  Gb  application-support.o [13]
+emVcoAutoTuneEnabled    0x20000a6c     0x1  Data  Gb  analogue.o [13]
+emWeakestNeighborIndex  0x0801230b    0x4a  Code  Gb  neighbor-exchange.o [13]
+emWriteNodeData         0x080067b1    0x28  Code  Gb  association.o [13]
+emWriteRadioAndNetworkTokens
+                        0x08006745    0x6c  Code  Gb  association.o [13]
+emWriteSecurityToken    0x08007c4d    0x14  Code  Gb  aps-keys.o [11]
+emZigDevPrepareZdoMessage
+                        0x080102c1    0x16  Code  Gb  zigbee-device-util.o [13]
+emZigbeeApplicationEvent
+                        0x2000126c     0x4  Data  Gb  aps-retry.o [13]
+emZigbeeApplicationEventHandler
+                        0x0800b8cd     0x4  Code  Gb  aps-retry.o [13]
+emZigbeeAssociationEvent
+                        0x20000900     0x4  Data  Gb  association.o [13]
+emZigbeeAssociationEventHandler
+                        0x080061ef    0x60  Code  Gb  association.o [13]
+emZigbeeBeaconEvent     0x20000904     0x4  Data  Gb  association.o [13]
+emZigbeeBeaconEventHandler
+                        0x0800625d    0x1c  Code  Gb  association.o [13]
+emZigbeeChildJoinNotify
+                        0x0800e881    0x6c  Code  Gb  aps-security.o [11]
+emZigbeeDestinationIeeeAddress
+                        0x0800d705    0x18  Code  Gb  zigbee-packet-header.o [13]
+emZigbeeDeviceBindUnbindResponse
+                        0x08017a35     0x2  Code  Gb  end-device-bind-stub.o [7]
+emZigbeeDeviceEvent     0x20001420     0x4  Data  Gb  end-device-bind-stub.o [7]
+emZigbeeDeviceEventHandler
+                        0x08017a33     0x2  Code  Gb  end-device-bind-stub.o [7]
+emZigbeeDeviceRequestHandler
+                        0x0800fee5   0x144  Code  Gb  zigbee-device-util.o [13]
+emZigbeeDeviceResponseHandler
+                        0x080101b1    0x98  Code  Gb  zigbee-device-util.o [13]
+emZigbeeNegotiationProtocolEventHandler
+                        0x080178d7     0x2  Code  Gb  aps-skke-stub.o [11]
+emZigbeeNetworkSecurityLevel
+                        0x20000a9f     0x1  Data  Gb  ember-configuration.o [10]
+emZigbeePermitJoiningEvent
+                        0x2000107c     0x4  Data  Gb  association.o [13]
+emZigbeePermitJoiningEventHandler
+                        0x080059db    0x1c  Code  Gb  association.o [13]
+emZigbeeSequenceNumber  0x200014b9     0x1  Data  Gb  zigbee-packet-header.o [13]
+emZigbeeSourceIeeeAddress
+                        0x0800d71d    0x1e  Code  Gb  zigbee-packet-header.o [13]
+emZigbeeState           0x200008fd     0x1  Data  Gb  association.o [13]
+emberAddOrUpdateKeyTableEntry
+                        0x08011e45    0x32  Code  Gb  aps-keys-full.o [12]
+emberAddressTableEntryIsActive
+                        0x0800be99     0x4  Code  Gb  aps-retry.o [13]
+emberAllocateLinkedBuffers
+                        0x08005201    0xac  Code  Gb  packet-buffer.o [13]
+emberAppLinkKeyRequestPolicy
+                        0x20000a9e     0x1  Data  Gb  ember-configuration.o [10]
+emberAppendPgmStringToLinkedBuffers
+                        0x080054eb    0x14  Code  Gb  packet-buffer.o [13]
+emberAppendSourceRouteHandler
+                        0x080144d5    0x8e  Code  Gb  source-route.o [10]
+emberAppendToLinkedBuffers
+                        0x080054e7     0x4  Code  Gb  packet-buffer.o [13]
+emberApsAckTimeoutMs    0x20000a72     0x2  Data  Gb  ember-configuration.o [10]
+emberBindingTableSize   0x200014a4     0x1  Data  Gb  ember-configuration.o [10]
+emberBootloadTransmitCompleteHandler
+                        0x08007181     0x2  Code  Gb  ember-configuration.o [10]
+emberCalibrateCurrentChannel
+                        0x080049df    0x1c  Code  Gb  analogue.o [13]
+emberCalibrateVref      0x08004761   0x114  Code  Gb  analogue.o [13]
+emberChildId            0x08007583    0x1c  Code  Gb  child.o [13]
+emberChildIndex         0x08007951    0x40  Code  Gb  child-table.o [13]
+emberChildJoinHandler   0x08001011    0x3a  Code  Gb  common.o [1]
+emberChildTableSize     0x20000a94     0x1  Data  Gb  ember-configuration.o [10]
+emberClearMessageFlag   0x080079af    0x1e  Code  Gb  jit.o [13]
+emberCopyBufferBytes    0x08005747    0x62  Code  Gb  packet-buffer.o [13]
+emberCopyLinkedBuffers  0x0800560b    0x40  Code  Gb  packet-buffer.o [13]
+emberCounterHandler     0x080004f5    0x92  Code  Gb  callback.o [1]
+emberCurrentStackTasks  0x08008ec9    0x6c  Code  Gb  zigbee-stack.o [13]
+emberDebugHandler       0x08007183     0x2  Code  Gb  ember-configuration.o [10]
+emberEmbernetPassthroughSourceAddress
+                        0x20001484     0x2  Data  Gb  mac-header.o [13]
+emberEndDevicePollTimeout
+                        0x20000aa3     0x1  Data  Gb  ember-configuration.o [10]
+emberEndDevicePollTimeoutShift
+                        0x20000aa4     0x1  Data  Gb  ember-configuration.o [10]
+emberEndpointCount      0x20000a8e     0x1  Data  Gb  ledlamp.o [1]
+emberEndpoints          0x20000888    0x10  Data  Gb  ledlamp.o [1]
+emberEnergyScanResultHandler
+                        0x08017901     0x4  Code  Gb  form-and-join-node-callbacks.o [10]
+emberFetchLowHighInt16u
+                        0x080056f1     0xc  Code  Gb  packet-buffer.o [13]
+emberFillLinkedBuffers  0x080053c7    0x38  Code  Gb  packet-buffer.o [13]
+emberFillStackBuffer    0x08005389    0x3e  Code  Gb  packet-buffer.o [13]
+emberFindAndRejoinNetwork
+                        0x08005b2f    0x52  Code  Gb  association.o [13]
+emberFindKeyTableEntry  0x08011e77    0x6e  Code  Gb  aps-keys-full.o [12]
+emberFormAndJoinCleanup
+                        0x08009c19     0xa  Code  Gb  form-and-join.o [10]
+emberFormAndJoinEnergyScanResultHandler
+                        0x08009b69    0x1a  Code  Gb  form-and-join.o [10]
+emberFormAndJoinIsScanning
+                        0x08009bf3     0xe  Code  Gb  form-and-join.o [10]
+emberFormAndJoinNetworkFoundHandler
+                        0x08009ae7    0x82  Code  Gb  form-and-join.o [10]
+emberFormAndJoinScanCompleteHandler
+                        0x08009a77    0x70  Code  Gb  form-and-join.o [10]
+emberFormAndJoinTick    0x08009c51     0x6  Code  Gb  form-and-join-node-adapter.o [10]
+emberFragmentIncomingMessage
+                        0x08004fe7   0x1b0  Code  Gb  fragment.o [10]
+emberFragmentMessageSent
+                        0x08004ed5    0x56  Code  Gb  fragment.o [10]
+emberFragmentMessageSentHandler
+                        0x080004d7     0x2  Code  Gb  callback.o [1]
+emberFragmentTick       0x080051c5     0x6  Code  Gb  fragment.o [10]
+emberFragmentWindowSize
+                        0x20000a9c     0x1  Data  Gb  ember-configuration.o [10]
+emberGenerateRandomKey  0x080080af    0x12  Code  Gb  ember-stack-common.o [13]
+emberGetAddressTableRemoteEui64
+                        0x080113f5    0x1c  Code  Gb  address-table.o [13]
+emberGetAddressTableRemoteNodeId
+                        0x08011411     0xe  Code  Gb  address-table.o [13]
+emberGetBinding         0x080128cd    0x16  Code  Gb  binding-table.o [4]
+emberGetChildData       0x0800759f    0x54  Code  Gb  child.o [13]
+emberGetEndpoint        0x08007191     0x8  Code  Gb  ember-configuration.o [10]
+emberGetEndpointCluster
+                        0x080071d1    0x34  Code  Gb  ember-configuration.o [10]
+emberGetEndpointDescription
+                        0x08007199    0x38  Code  Gb  ember-configuration.o [10]
+emberGetExtendedPanId   0x08006899    0x16  Code  Gb  association.o [13]
+emberGetExtendedTimeout
+                        0x080115f9    0x3c  Code  Gb  address-table.o [13]
+emberGetKeyTableEntry   0x08011dc9    0x7c  Code  Gb  aps-keys-full.o [12]
+emberGetLastHopLqi      0x08008cdd     0x8  Code  Gb  zigbee-dispatch.o [13]
+emberGetLastHopRssi     0x08008ce5     0x4  Code  Gb  zigbee-dispatch.o [13]
+emberGetLinkedBuffersByte
+                        0x080055f5     0xa  Code  Gb  packet-buffer.o [13]
+emberGetLinkedBuffersLowHighInt16u
+                        0x08005705    0x22  Code  Gb  packet-buffer.o [13]
+emberGetLinkedBuffersPointer
+                        0x080055a1    0x30  Code  Gb  packet-buffer.o [13]
+emberGetNetworkParameters
+                        0x08008021    0x3e  Code  Gb  ember-stack-common.o [13]
+emberGetNodeId          0x0800a2f9     0x6  Code  Gb  nodeid.o [13]
+emberGetPanId           0x0800a2ff     0x6  Code  Gb  nodeid.o [13]
+emberGetRadioChannel    0x08004b9f     0x6  Code  Gb  analogue.o [13]
+emberGetRadioPower      0x08004ca1     0x8  Code  Gb  analogue.o [13]
+emberGetSender          0x08008cf5    0x10  Code  Gb  zigbee-dispatch.o [13]
+emberGetTxPowerMode     0x080049d9     0x6  Code  Gb  analogue.o [13]
+emberHaveLinkKey        0x08007e61    0x14  Code  Gb  aps-keys.o [11]
+emberIdConflictHandler  0x08007207     0x2  Code  Gb  ember-configuration.o [10]
+emberIncomingBootloadMessageHandler
+                        0x0800717f     0x2  Code  Gb  ember-configuration.o [10]
+emberIncomingManyToOneRouteRequestHandler
+                        0x0800718d     0x2  Code  Gb  ember-configuration.o [10]
+emberIncomingMessageHandler
+                        0x08000445    0x48  Code  Gb  callback.o [1]
+emberIncomingRouteErrorHandler
+                        0x0800718f     0x2  Code  Gb  ember-configuration.o [10]
+emberIncomingRouteRecordHandler
+                        0x08014489    0x4c  Code  Gb  source-route.o [10]
+emberInit               0x08008df1    0x7c  Code  Gb  zigbee-stack.o [13]
+emberJoinNetwork        0x080059fd    0xc4  Code  Gb  association.o [13]
+emberKeyTableSize       0x200014a5     0x1  Data  Gb  ember-configuration.o [10]
+emberLeaveNetwork       0x08008981     0x4  Code  Gb  leave.o [13]
+emberLookupEui64ByNodeId
+                        0x08008f59    0x58  Code  Gb  zigbee-stack.o [13]
+emberLookupNodeIdByEui64
+                        0x08008f35    0x22  Code  Gb  zigbee-stack.o [13]
+emberMacIndirectTimeout
+                        0x20000a74     0x2  Data  Gb  ember-configuration.o [10]
+emberMacPassthroughFilterHandler
+                        0x08007209     0x4  Code  Gb  ember-configuration.o [10]
+emberMacPassthroughFlags
+                        0x200014af     0x1  Data  Gb  mac-header.o [13]
+emberMacPassthroughMessageHandler
+                        0x080004f1     0x2  Code  Gb  callback.o [1]
+emberMaximumApsPayloadLength
+                        0x080087bf    0x10  Code  Gb  application-support.o [13]
+emberMeasureVddFast     0x0800488f    0x5e  Code  Gb  analogue.o [13]
+emberMessageBufferContents
+                        0x080051e5    0x10  Code  Gb  packet-buffer.o [13]
+emberMessageSentHandler
+                        0x0800048d    0x4a  Code  Gb  callback.o [1]
+emberMobileNodePollTimeout
+                        0x20000aa2     0x1  Data  Gb  ember-configuration.o [10]
+emberMulticastTable     0x20000944     0x4  Data  Gb  ember-configuration.o [10]
+emberMulticastTableSize
+                        0x20000a97     0x1  Data  Gb  ember-configuration.o [10]
+emberNetworkFoundHandler
+                        0x080178d9    0x24  Code  Gb  form-and-join-node-callbacks.o [10]
+emberNetworkState       0x08007ffd     0xa  Code  Gb  ember-stack-common.o [13]
+emberOrphanNotificationHandler
+                        0x08007205     0x2  Code  Gb  ember-configuration.o [10]
+emberPermitJoining      0x0800599b    0x40  Code  Gb  association.o [13]
+emberPollCompleteHandler
+                        0x0800717d     0x2  Code  Gb  ember-configuration.o [10]
+emberPollHandler        0x08000fd5    0x16  Code  Gb  common.o [1]
+emberRadioNeedsCalibratingHandler
+                        0x0800720d     0x4  Code  Gb  ember-configuration.o [10]
+emberRawTransmitCompleteHandler
+                        0x080004f3     0x2  Code  Gb  callback.o [1]
+emberRemoteDeleteBindingHandler
+                        0x08007189     0x4  Code  Gb  ember-configuration.o [10]
+emberRemoteSetBindingHandler
+                        0x08007185     0x4  Code  Gb  ember-configuration.o [10]
+emberRequestLinkKey     0x08007e91    0xcc  Code  Gb  aps-keys.o [11]
+emberReservedMobileChildEntries
+                        0x200014aa     0x1  Data  Gb  ember-configuration.o [10]
+emberRouterStackStatusHandler
+                        0x0800204b   0x274  Code  Gb  sensor.o [1]
+emberRunEvents          0x08017887    0x42  Code  Gb  event-control.o [13]
+emberScanCompleteHandler
+                        0x080178fd     0x4  Code  Gb  form-and-join-node-callbacks.o [10]
+emberScanErrorHandler   0x080004d9     0x2  Code  Gb  callback.o [1]
+emberScanForJoinableNetwork
+                        0x08009a21    0x1c  Code  Gb  form-and-join.o [10]
+emberScanForNextJoinableNetwork
+                        0x08009a3d    0x3a  Code  Gb  form-and-join.o [10]
+emberSendMulticast      0x08008405    0xc4  Code  Gb  application-support.o [13]
+emberSendReply          0x08008827    0x22  Code  Gb  application-support.o [13]
+emberSendUnicast        0x0800836d    0x8c  Code  Gb  application-support.o [13]
+emberSetAddressTableRemoteEui64
+                        0x08011381    0x5e  Code  Gb  address-table.o [13]
+emberSetAddressTableRemoteNodeId
+                        0x080113df    0x16  Code  Gb  address-table.o [13]
+emberSetExtendedTimeout
+                        0x08011641    0x26  Code  Gb  address-table.o [13]
+emberSetInitialSecurityState
+                        0x0800e425    0xdc  Code  Gb  aps-security.o [11]
+emberSetLinkedBuffersByte
+                        0x080055ff     0xc  Code  Gb  packet-buffer.o [13]
+emberSetLinkedBuffersLength
+                        0x08005567    0x22  Code  Gb  packet-buffer.o [13]
+emberSetLinkedBuffersLowHighInt16u
+                        0x08005727    0x20  Code  Gb  packet-buffer.o [13]
+emberSetMessageBufferLength
+                        0x080051f5     0xa  Code  Gb  packet-buffer.o [13]
+emberSetMessageFlag     0x08007991    0x1e  Code  Gb  jit.o [13]
+emberSetRadioChannel    0x08006845    0x54  Code  Gb  association.o [13]
+emberSetRadioPower      0x08004ba9    0xe4  Code  Gb  analogue.o [13]
+emberSetReplyFragmentData
+                        0x080087d5     0x8  Code  Gb  application-support.o [13]
+emberSetTxPowerMode     0x08004935    0x9c  Code  Gb  analogue.o [13]
+emberStackIsUp          0x08008007    0x14  Code  Gb  ember-stack-common.o [13]
+emberStackStatusHandler
+                        0x080004db    0x10  Code  Gb  callback.o [1]
+emberStartScan          0x0800f50d    0x88  Code  Gb  scan.o [13]
+emberStoreLowHighInt16u
+                        0x080056fd     0x8  Code  Gb  packet-buffer.o [13]
+emberSwitchNetworkKeyHandler
+                        0x0800104b     0x2  Code  Gb  common.o [1]
+emberTick               0x08008e6d    0x5c  Code  Gb  zigbee-stack.o [13]
+emberTrustCenterJoinHandler
+                        0x0800a315    0x22  Code  Gb  trust-center.o [10]
+emberTrustCenterLinkKeyRequestPolicy
+                        0x20000a9d     0x1  Data  Gb  ember-configuration.o [10]
+emberUnusedPanIdFoundHandler
+                        0x080004eb     0x2  Code  Gb  callback.o [1]
+emberZigbeeKeyEstablishmentHandler
+                        0x0800717b     0x2  Code  Gb  ember-configuration.o [10]
+emberZigbeeLeave        0x08008985    0x80  Code  Gb  leave.o [13]
+emberZigbeeRemoveChild  0x08008b85    0x3c  Code  Gb  leave.o [13]
+enableFlitf             0x08013821    0x30  Code  Lc  flash.o [8]
+enablePWM_outChannel    0x08001eeb    0x1a  Code  Gb  pwm.o [1]
+encryptBytes            0x08011b65    0x46  Code  Lc  crypto.o [13]
+encryptNonce            0x080118d5    0x24  Code  Lc  crypto.o [13]
+encryptPayload          0x08011a81    0xd8  Code  Lc  crypto.o [13]
+endpointDescription     0x08018484     0x8  Data  Gb  ledlamp.o [1]
+energyScanComplete      0x08009861    0x66  Code  Lc  form-and-join.o [10]
+energyScanMaxRssiDetected
+                        0x200009d6     0x1  Data  Lc  scan.o [13]
+energyScanResultsBuffer
+                        0x200009d5     0x1  Data  Lc  scan.o [13]
+entryCount              0x20000ab7     0x1  Data  Lc  source-route-common.o [10]
+entryScore              0x080122eb    0x20  Code  Lc  neighbor-exchange.o [13]
+erased                  0x20001490     0x1  Data  Lc  sim-eeprom-internal.o [8]
+eventStartTime          0x20001280     0x2  Data  Lc  retry.o [13]
+executeBarrierInstructions
+                        0x08013815     0xa  Code  Lc  flash.o [8]
+expectedRxBlocks        0x200008ac     0x1  Data  Lc  fragment.o [10]
+extendedPanIdCache      0x200009a0     0x8  Data  Lc  form-and-join.o [10]
+ezspRouterIncomingMessageHandler
+                        0x080011c5   0x680  Code  Gb  incoming.o [1]
+ezspRouterMessageSentHandler
+                        0x08001f79    0xd2  Code  Gb  sensor.o [1]
+fault                   0x08014d0b          Code  Gb  faults.o [10]
+fibFlashErase           0x08013931    0xac  Code  Lc  flash.o [8]
+fibFlashWrite           0x0801386d    0xc4  Code  Lc  flash.o [8]
+fibToEmberStatus        0x08019300     0x8  Data  Lc  flash.o [8]
+filterForceReCal        0x20000a6e     0x2  Data  Lc  analogue.o [13]
+findBinding             0x08012a0b    0x46  Code  Lc  binding-table.o [4]
+findBroadcastTableEntry
+                        0x08012ae5    0x48  Code  Lc  broadcast.o [13]
+findChildIndex          0x08007377    0x5c  Code  Lc  child.o [13]
+findDatagramDestination
+                        0x0800ba9d   0x110  Code  Lc  aps-retry.o [13]
+findLongAddressEntry    0x0801141f    0x3e  Code  Lc  address-table.o [13]
+findNeighborIndex       0x0800b163    0x34  Code  Lc  neighbor.o [13]
+findRouteTableEntry     0x08012e19    0x28  Code  Lc  route-table.o [13]
+finishNetworkShutdown   0x08008a39    0x60  Code  Lc  leave.o [13]
+finishPendingAckedMessage
+                        0x0800bc41   0x164  Code  Lc  aps-retry.o [13]
+finishSetChannel        0x08006815    0x30  Code  Lc  association.o [13]
+flashEraseIsActive      0x200014c4     0x1  Data  Gb  flash.o [8]
+formAndJoinEvents       0x080190c0    0x18  Data  Lc  form-and-join-node-adapter.o [10]
+formAndJoinScanType     0x20000978     0x1  Data  Lc  form-and-join.o [10]
+formAndJoinStackProfile
+                        0x08009c25     0x6  Code  Gb  form-and-join-node-adapter.o [10]
+forwardTunneledCommand  0x0800e6b3    0x9e  Code  Lc  aps-security.o [11]
+fragmentApsFrame        0x200008d4     0xc  Data  Lc  fragment.o [10]
+fragmentApsSequenceNumber
+                        0x200008a9     0x1  Data  Lc  fragment.o [10]
+fragmentDelay           0x20001269     0x1  Data  Lc  aps-retry.o [13]
+fragmentIndexOrDestination
+                        0x200008e0     0x2  Data  Lc  fragment.o [10]
+fragmentOutgoingType    0x200008c4     0x1  Data  Lc  fragment.o [10]
+fragmentSource          0x200008c0     0x2  Data  Lc  fragment.o [10]
+fragmentationEvents     0x08018ed0    0x10  Data  Lc  fragment.o [10]
+framePendingSetInOutgoingAck
+                        0x20001142     0x2  Data  Lc  phy.o [13]
+freePtr                 0x20001492     0x2  Data  Lc  sim-eeprom-internal.o [8]
+freelist                0x20000a90     0x1  Data  Lc  packet-buffer.o [13]
+frmcopystate            0x08003fc1    0x44  Code  Lc  vehicle.o [1]
+generateCreatorInfo     0x08010779    0x22  Code  Lc  sim-eeprom-internal.o [8]
+getChildTokenData       0x0800785d    0x3c  Code  Lc  child.o [13]
+getNonvolatileBinding   0x08012795    0x14  Code  Lc  binding-table.o [4]
+getRandomBackoff        0x0800acd9    0x2e  Code  Gb  phy-common.o [13]
+getTrustCenterToken     0x08007cbb     0xa  Code  Lc  aps-keys.o [11]
+halAdcIsr               0x08000185     0xc  Code  Gb  adc.o [1]
+halAppAddressTable      0x0800003c    0x9c  Data  Gb  cstartup-iar-common.o [10]
+halBaseBandIsr          0x08013b58          Code  Wk  isr-stubs.o [10]
+halBootloaderAddressTable
+                        0x08000000    0x3c  Data  Gb  cstartup-iar-common.o [10]
+halBusFaultIsr          0x08014d01          Code  Gb  faults.o [10]
+halButtonIsr            0x08000f01    0x26  Code  Gb  common.o [1]
+halButtonPinState       0x080096a5    0x22  Code  Gb  button.o [10]
+halClearGPIO            0x08001ac3    0x2a  Code  Gb  micro.o [1]
+halClearLed             0x08014599    0x1c  Code  Gb  led.o [10]
+halCommonCrc16          0x08014cd9    0x24  Code  Gb  crc.o [10]
+halCommonDelayMicroseconds
+                        0x08009599    0x48  Code  Gb  micro-internal.o [8]
+halCommonGetInt16uMillisecondTick
+                        0x080137d5     0xa  Code  Gb  system-timer.o [8]
+halCommonGetInt16uQuarterSecondTick
+                        0x080137df     0xc  Code  Gb  system-timer.o [8]
+halCommonGetInt32uMillisecondTick
+                        0x080137ed    0x10  Code  Gb  system-timer.o [8]
+halCommonGetRandom      0x0800a365    0x1c  Code  Gb  random.o [10]
+halCommonMemCompare     0x08006a39    0x18  Code  Gb  mem.o [10]
+halCommonMemCopy        0x080069a3    0x86  Code  Gb  mem.o [10]
+halCommonMemSet         0x08006a29          Code  Gb  mem.o [10]
+halDebugIsr             0x080132b5    0xc8  Code  Gb  debug-jtag.o [13]
+halDebugMonitorIsr      0x08014d07          Code  Gb  faults.o [10]
+halEntryPoint           0x08004131   0x138  Code  Gb  cstartup-iar.o [8]
+halFixedAddressTable    0x08040000    0x2c  Data  Gb  cstartup-iar-common.o [10]
+halGetMainStackBytesUsed
+                        0x08004e85    0x22  Code  Gb  diagnostic.o [10]
+halGetResetInfo         0x0800962f     0x8  Code  Gb  cstartup-iar-common.o [10]
+halGpioConfig           0x08001a37    0x3a  Code  Gb  micro.o [1]
+halHardFaultIsr         0x08014cff          Code  Gb  faults.o [10]
+halInternalAssertFailed
+                        0x08004cb1    0x24  Code  Gb  diagnostic.o [10]
+halInternalAssertFault  0x08004cad     0x4  Code  Lc  diagnostic.o [10]
+halInternalCalibrateFastRc
+                        0x08009329    0x28  Code  Gb  micro-internal.o [8]
+halInternalCalibratePads
+                        0x08001a71    0x28  Code  Gb  micro.o [1]
+halInternalCalibrateSlowRc
+                        0x08009521    0x78  Code  Gb  micro-internal.o [8]
+halInternalClassifyReset
+                        0x080095e5    0x4a  Code  Gb  cstartup-iar-common.o [10]
+halInternalConfigXtal24MhzFlashAccess
+                        0x08013b21    0x34  Code  Gb  flash.o [8]
+halInternalCrashHandler
+                        0x08004cd5   0x1b0  Code  Gb  diagnostic.o [10]
+halInternalEnableMPU    0x0800a385     0x4  Code  Gb  mpu.o [10]
+halInternalEnableWatchDog
+                        0x08001a11    0x1c  Code  Gb  micro.o [1]
+halInternalFlashBlockRead
+                        0x080106bd    0x20  Code  Gb  sim-eeprom-internal.o [8]
+halInternalFlashErase   0x080139e1    0x88  Code  Gb  flash.o [8]
+halInternalFlashWrite   0x08013a6d    0x96  Code  Gb  flash.o [8]
+halInternalGetTokenData
+                        0x08009221    0xa4  Code  Gb  token.o [10]
+halInternalIncrementCounterToken
+                        0x0800930f     0xe  Code  Gb  token.o [10]
+halInternalInitAdc      0x08000217    0x7c  Code  Gb  adc.o [1]
+halInternalInitButton   0x08009649    0x5c  Code  Gb  button.o [10]
+halInternalLoadMPU      0x0800a389    0x34  Code  Gb  mpu.o [10]
+halInternalResetWatchDog
+                        0x08001a2d     0xa  Code  Gb  micro.o [1]
+halInternalSearchForBiasTrim
+                        0x08009351    0x50  Code  Gb  micro-internal.o [8]
+halInternalSetRegTrim   0x08009425    0x74  Code  Gb  micro-internal.o [8]
+halInternalSetTokenData
+                        0x080092c5    0x4a  Code  Gb  token.o [10]
+halInternalSimEeGetData
+                        0x08010bdb    0x7a  Code  Gb  sim-eeprom-internal.o [8]
+halInternalSimEeIncrementCounter
+                        0x0801101f    0x86  Code  Gb  sim-eeprom-internal.o [8]
+halInternalSimEeSetData
+                        0x08010e91    0xf4  Code  Gb  sim-eeprom-internal.o [8]
+halInternalSimEeStartup
+                        0x08017905     0xe  Code  Gb  sim-eeprom.o [10]
+halInternalSimEeStartupCore
+                        0x080107f5   0x3c4  Code  Gb  sim-eeprom-internal.o [8]
+halInternalStartSystemTimer
+                        0x08001ba5    0x30  Code  Gb  micro.o [1]
+halInternalSwitchToXtal
+                        0x080093a1    0x72  Code  Gb  micro-internal.o [8]
+halInternalSysReset     0x08009499    0x58  Code  Gb  micro-internal.o [8]
+halInternalUart1RxIsr   0x08009819    0x22  Code  Gb  uart.o [10]
+halInternalUartInit     0x08009779    0x7e  Code  Gb  uart.o [10]
+halIrqAIsr              0x08013b58          Code  Wk  isr-stubs.o [10]
+halIrqBIsr              0x08013b58          Code  Wk  isr-stubs.o [10]
+halIrqCIsr              0x080096c7    0x36  Code  Gb  button.o [10]
+halIrqDIsr              0x08009725    0x3e  Code  Gb  button.o [10]
+halManagementIsr        0x080094f1    0x2c  Code  Gb  micro-internal.o [8]
+halMemoryFaultIsr       0x08014d03          Code  Gb  faults.o [10]
+halNmiIsr               0x08014cfd          Code  Gb  faults.o [10]
+halPendSvIsr            0x0800a3c5          Code  Gb  context-switch.o [8]
+halPendSvSaveContext    0x20001138          Code  Gb  context-switch.o [8]
+halReadAdcBlocking      0x080003b9    0x28  Code  Gb  adc.o [1]
+halReboot               0x08001b8f     0xc  Code  Gb  micro.o [1]
+halRequestAdcData       0x0800030f    0xaa  Code  Gb  adc.o [1]
+halReserved07Isr        0x08013b58          Code  Wk  isr-stubs.o [10]
+halReserved08Isr        0x08013b58          Code  Wk  isr-stubs.o [10]
+halReserved09Isr        0x08013b58          Code  Wk  isr-stubs.o [10]
+halReserved10Isr        0x08013b58          Code  Wk  isr-stubs.o [10]
+halReserved13Isr        0x08013b58          Code  Wk  isr-stubs.o [10]
+halResetInfo            0x20000000    0x94  Data  Gb  cstartup-iar-common.o [10]
+halSc1Isr               0x080097f7    0x20  Code  Gb  uart.o [10]
+halSc2Isr               0x08013b58          Code  Wk  isr-stubs.o [10]
+halSecurityIsr          0x08013b58          Code  Wk  isr-stubs.o [10]
+halSetGPIO              0x08001a99    0x2a  Code  Gb  micro.o [1]
+halSetLed               0x0801457d    0x1c  Code  Gb  led.o [10]
+halSimEepromCallback    0x08007215    0x64  Code  Gb  ember-configuration.o [10]
+halSimEepromErasePage   0x080110c1    0x88  Code  Gb  sim-eeprom-internal.o [8]
+halSleepTimerIsr        0x080137fd     0xe  Code  Gb  system-timer.o [8]
+halStackCancelSymbolDelayA
+                        0x08013b87    0x1c  Code  Gb  symbol-timer.o [13]
+halStackDebugActive     0x080131b5     0x4  Code  Gb  debug-jtag.o [13]
+halStackDebugPutBuffer  0x080132a5    0x10  Code  Gb  debug-jtag.o [13]
+halStackIndicateActivity
+                        0x080145bd     0x8  Code  Gb  led.o [10]
+halStackInitTokens      0x080091b5    0x6c  Code  Gb  token.o [10]
+halStackMacTimerIsr     0x08013109    0x28  Code  Gb  mac-em250.o [13]
+halStackOrderInt16uSymbolDelayA
+                        0x08013b59    0x2e  Code  Gb  symbol-timer.o [13]
+halStackProcessBootCount
+                        0x08001b9b     0xa  Code  Gb  micro.o [1]
+halStackReceiveVuartMessage
+                        0x08009817     0x2  Code  Gb  uart.o [10]
+halStackSeedRandom      0x0800a33d    0x18  Code  Gb  random.o [10]
+halStackSymbolDelayAIsr
+                        0x0800f2c1    0x58  Code  Gb  mac.o [13]
+halStartAdcConversion   0x08000293    0x7c  Code  Gb  adc.o [1]
+halSvCallIsr            0x08013b58          Code  Wk  isr-stubs.o [10]
+halTimer1Isr            0x08013b58          Code  Wk  isr-stubs.o [10]
+halTimer2Isr            0x08013b58          Code  Wk  isr-stubs.o [10]
+halTriggerContextRestore
+                        0x0800a3fd          Code  Gb  context-switch.o [8]
+halUsageFaultIsr        0x08014d05          Code  Gb  faults.o [10]
+handleApplicationKeyRequest
+                        0x0800d245   0x104  Code  Lc  trust-center-util.o [11]
+handleNonAddressConflictRouteError
+                        0x080117b9    0x4c  Code  Gb  route-error.o [13]
+hourTimeEventHandler    0x08001899    0x2a  Code  Gb  ledlamp.o [1]
+ignoreExtendedPanId     0x20000983     0x1  Data  Lc  form-and-join.o [10]
+incomingMfglibMessage   0x0801220d    0x28  Code  Lc  mac-receive.o [13]
+indexIntoBuffers        0x08005589    0x12  Code  Lc  packet-buffer.o [13]
+init_PWM_outChannel     0x08001f05    0x14  Code  Gb  pwm.o [1]
+init_msginfo            0x08006ff3     0xa  Code  Gb  msg.o [10]
+init_singleinfo         0x08007099    0x9c  Code  Gb  lamp.o [10]
+init_tableinfo          0x08006cd3    0x46  Code  Gb  table.o [10]
+initializeChildStatus   0x080072ed    0x28  Code  Lc  child.o [13]
+initializeNonceFromAuxFrame
+                        0x08011bab    0x52  Code  Lc  crypto.o [13]
+initializeNonceFromBuffer
+                        0x08011c01    0x44  Code  Lc  crypto.o [13]
+initializeRemoteNode    0x080128e3    0x2e  Code  Lc  binding-table.o [4]
+insertNeighbor          0x0800b21d    0xf4  Code  Lc  neighbor.o [13]
+isCallDevice            0x08003567    0x20  Code  Gb  vehicle.o [1]
+isCarDevice             0x08003587    0x20  Code  Gb  vehicle.o [1]
+isCompatibleStackProfile
+                        0x08005859    0x24  Code  Gb  association.o [13]
+isScanComplete          0x08009911    0x10  Code  Gb  form-and-join.o [10]
+isScanRunning           0x080098fd    0x14  Code  Gb  form-and-join.o [10]
+isStateJoiningOrRejoining
+                        0x08005881    0x1a  Code  Lc  association.o [13]
+jitMaskMulticastHello   0x20001480     0x2  Data  Gb  common.o [1]
+jitMessageApsFrame      0x20000c78     0xc  Data  Gb  common.o [1]
+jitMessageMulticastHello
+                        0x20000a8c     0x1  Data  Gb  common.o [1]
+joinAttemptFailed       0x08005931    0x4a  Code  Lc  association.o [13]
+joinData                0x200008e4    0x18  Data  Lc  association.o [13]
+joinInitial             0x20000a8f     0x1  Data  Lc  sensor.o [1]
+joinNetworkQuietly      0x08005acb    0x5a  Code  Lc  association.o [13]
+lampEvents              0x0801848c    0x18  Data  Gb  ledlamp.o [1]
+lastAgingTime           0x200013c2     0x2  Data  Lc  broadcast.o [13]
+lastAgingTimeQs         0x20001496     0x2  Data  Lc  route-table.o [13]
+lastChannel             0x2000097d     0x1  Data  Lc  form-and-join.o [10]
+lastChildAgeTimeMinutes
+                        0x20001350     0x2  Data  Lc  child-aging.o [13]
+lastChildAgeTimeMs      0x20001354     0x4  Data  Lc  child-aging.o [13]
+lastChildAgeTimeSeconds
+                        0x2000134e     0x2  Data  Lc  child-aging.o [13]
+lastEventTimeMS         0x200009fc     0x2  Data  Lc  mac-indirect.o [13]
+lastEventTimeMs         0x20001270     0x2  Data  Lc  aps-retry.o [13]
+lastReportTimeMin       0x20000a07     0x1  Data  Lc  zdo-channel.o [13]
+lastTxSfdTime           0x2000125c     0x4  Data  Gb  phy-common.o [13]
+lastVcoCalChannel       0x20000a6a     0x1  Data  Lc  analogue.o [13]
+lastVcoValue            0x20000a6b     0x1  Data  Lc  analogue.o [13]
+ledOff                  0x08003047    0x48  Code  Lc  vehicle.o [1]
+ledOn                   0x08003021    0x26  Code  Lc  vehicle.o [1]
+ledToggle               0x0800308f    0x1c  Code  Lc  vehicle.o [1]
+left                    0x20001491     0x1  Data  Lc  sim-eeprom-internal.o [8]
+lnaForceReCal           0x20000a70     0x2  Data  Lc  analogue.o [13]
+longIndirectPool        0x200009f4     0x4  Data  Lc  mac-indirect.o [13]
+macBufferStatus         0x200009aa     0x1  Data  Lc  mac-arbiter.o [13]
+macIsInactive           0x20000a06     0x1  Data  Lc  zdo-channel.o [13]
+main                    0x08001981    0x54  Code  Gb  ledlamp.o [1]
+matchingPoolAddress     0x0800fc1f    0x54  Code  Lc  mac-indirect.o [13]
+maybeSendAddressResponse
+                        0x08010029   0x160  Code  Lc  zigbee-device-util.o [13]
+maybeSendBasicAck       0x08008855    0x20  Code  Lc  application-support.o [13]
+maybeSendScanResults    0x08010611    0x66  Code  Lc  zdo-channel.o [13]
+memchr                  0x080169e1          Code  Gb  memchr.o [9]
+millTickEvent           0x20000c88     0x4  Data  Gb  ledlamp.o [1]
+millTickHook            0x08008d29    0xa6  Code  Gb  ticker.o [10]
+mnArray                 0x0801817c    0x18  Data  Gb  command.o [1]
+mobileChildData         0x20000a77     0x1  Data  Lc  child.o [13]
+mobileChildDataIndex    0x08007779    0x3e  Code  Lc  child.o [13]
+mobileChildDataLength   0x20000a7a     0x2  Data  Lc  child.o [13]
+mobileInit              0x08001c39     0xa  Code  Gb  mobile.o [1]
+mobileJoinApsFrame      0x08019248     0x8  Data  Lc  network.o [13]
+modDacForceReCal        0x2000148a     0x2  Data  Gb  analogue-mod-dac.o [13]
+mpuConfig               0x080190e8    0x40  Data  Lc  mpu.o [10]
+msSinceLastPoll         0x20001358     0x4  Data  Lc  child-aging.o [13]
+msTimeEventHandler      0x080018c3    0x12  Code  Gb  ledlamp.o [1]
+mtorFlags               0x08019334     0x8  Data  Lc  zigbee-device.o [13]
+ndigs                   0x080194e0    0x28  Data  Lc  xstoull.o [6]
+networkCount            0x20000984     0x1  Data  Gb  form-and-join.o [10]
+networkDecrypt          0x0800c1e5   0x158  Code  Lc  network.o [13]
+networkInfo2            0x20001100    0x30  Data  Gb  form-and-join.o [10]
+networkSubmitUnicast    0x0800c10d    0x6c  Code  Lc  network.o [13]
+network_info            0x20000de4    0x70  Data  Gb  network.o [1]
+newChannel              0x200014a1     0x1  Data  Lc  association.o [13]
+newNwkUpdateId          0x20000a01     0x1  Data  Lc  zdo-channel.o [13]
+newPanId                0x200009cc     0x2  Data  Lc  management.o [13]
+newestIndex             0x20000ab8     0x1  Data  Lc  source-route-common.o [10]
+nextApsFrameCounter     0x200013b4     0x4  Data  Lc  crypto.o [13]
+nextChannel             0x200009d1     0x1  Data  Lc  scan.o [13]
+nextIncomingRssi        0x200009ec     0x4  Data  Lc  scan.o [13]
+nextIndex               0x200014c8     0x1  Data  Lc  security-address-cache.o [10]
+nextNwkFrameCounter     0x200013b0     0x4  Data  Lc  crypto.o [13]
+nextOutgoingRssi        0x200009e8     0x4  Data  Lc  scan.o [13]
+nodeSecurityInit        0x0801780d    0x3c  Code  Gb  node.o [10]
+noteDiscoveryTimeout    0x08012c9d    0x6c  Code  Lc  route-table.o [13]
+notePreconfiguredKeyType
+                        0x0800ee41    0x22  Code  Lc  aps-security.o [11]
+notifyTrustCenter       0x08008b5d    0x28  Code  Lc  leave.o [13]
+oneScanDone             0x20000a08     0x1  Data  Lc  zdo-channel.o [13]
+originalChannel         0x200009d4     0x1  Data  Lc  scan.o [13]
+originalPanId           0x200009dc     0x2  Data  Lc  scan.o [13]
+paPresent               0x2000089a     0x1  Data  Lc  analogue.o [13]
+panConflictMeter        0x200009c4     0x1  Data  Lc  management.o [13]
+panid_info              0x08018f08    0x50  Data  Gb  table.o [10]
+pendingAckedCount       0x20001268     0x1  Data  Lc  aps-retry.o [13]
+permitJoining           0x200008fc     0x1  Data  Lc  association.o [13]
+phyHalEvents            0x08019034    0x18  Data  Gb  zigbee-stack.o [13]
+plc                     0x20001000     0xc  Data  Lc  vehicle.o [1]
+pollState               0x200009ae     0x1  Data  Lc  mac-arbiter.o [13]
+powerLevelSettings      0x08018eb4     0x8  Data  Gb  analogue.o [13]
+pows                    0x08017da8    0x48  Data  Lc  xdtento.o [6]
+previousTemperature     0x20001488     0x2  Data  Lc  phy.o [13]
+printEUI64              0x08000f43    0x32  Code  Gb  common.o [1]
+printLampHelp           0x08000589   0x11c  Code  Lc  command.o [1]
+processDeviceAnnounceAndFindIdConflict
+                        0x0800c8f1    0x94  Code  Lc  network.o [13]
+processKeyCommand       0x0800eb75   0x218  Code  Lc  aps-security.o [11]
+processRxAddressReceiveCompleteIsr
+                        0x0800a511    0xec  Code  Lc  phy.o [13]
+processRxPacketCompleteIsr
+                        0x0800a5fd    0xe4  Code  Lc  phy.o [13]
+processScanRequest      0x0801054d    0xc4  Code  Lc  zdo-channel.o [13]
+processZigbeePacket     0x0800c46d   0x354  Code  Lc  network.o [13]
+ptiEnabled              0x20000aab     0x1  Data  Lc  phy-common.o [13]
+ptrCache                0x20001364    0x4c  Data  Gb  sim-eeprom.o [10]
+ptrCacheLoc             0x0801079b    0x1c  Code  Lc  sim-eeprom-internal.o [8]
+pushInt16u              0x0800d58d     0xc  Code  Lc  zigbee-packet-header.o [13]
+quietlyEraseChild       0x080076c7    0x36  Code  Lc  child.o [13]
+radioCheckCrc           0x20000aaa     0x1  Data  Gb  phy-common.o [13]
+radioCurrentPowerStatus
+                        0x20000ab0     0x1  Data  Gb  phy-common.o [13]
+radioPowerOnIdleMode    0x200014bd     0x1  Data  Lc  mac.o [13]
+readAdcTemperatureChannel
+                        0x0800a871    0x22  Code  Lc  phy.o [13]
+readArray               0x08009921    0x2a  Code  Gb  form-and-join.o [10]
+readCounterValue        0x08010ff7    0x28  Code  Lc  sim-eeprom-internal.o [8]
+readError               0x20000981     0x1  Data  Lc  form-and-join.o [10]
+readNetworkTokens       0x080067e9    0x1e  Code  Lc  association.o [13]
+readNodeData            0x08006807     0xa  Code  Lc  association.o [13]
+readTokenData           0x0801072f    0x42  Code  Gb  sim-eeprom-internal.o [8]
+recalculateMacDataPendingBitField
+                        0x0800fc73    0x32  Code  Lc  mac-indirect.o [13]
+receiveQueue            0x20000a20     0x4  Data  Lc  debug-jtag.o [13]
+recvPlcStateFrm         0x0800400d    0xb0  Code  Gb  vehicle.o [1]
+recyclePendingAckedMessages
+                        0x0800b70d    0x48  Code  Lc  aps-retry.o [13]
+reenqueueSubmitHead     0x0800deb3    0x6e  Code  Lc  retry.o [13]
+rejoinUpdateDeviceStatusValues
+                        0x08018f00     0x8  Data  Lc  association.o [13]
+releaseFragments        0x08004f83    0x1c  Code  Lc  fragment.o [10]
+removeDevice            0x0800d0c5    0x78  Code  Lc  trust-center-util.o [11]
+requestKeyBuffer        0x20000ab2     0x1  Data  Lc  trust-center-util.o [11]
+retryEntries            0x20001284    0x30  Data  Lc  retry.o [13]
+routeRequestId          0x200014c5     0x1  Data  Lc  route-discovery.o [13]
+routeTableTimer         0x20001494     0x1  Data  Lc  route-table.o [13]
+routerExceptionHandler  0x0800104d   0x150  Code  Gb  exception.o [1]
+rs485Init               0x08002f45    0x12  Code  Lc  vehicle.o [1]
+rs485_cmd               0x20000f3c    0xc4  Data  Lc  vehicle.o [1]
+runEventHandler         0x0800b8ef    0xf6  Code  Lc  aps-retry.o [13]
+rxBuffer                0x20001144   0x114  Data  Lc  phy.o [13]
+rxFragments             0x200008b0     0xc  Data  Lc  fragment.o [10]
+rxWindowBase            0x200008aa     0x1  Data  Lc  fragment.o [10]
+sample                  0x2000102c    0x44  Data  Lc  vehicle.o [1]
+saveNetwork             0x08009b83    0x70  Code  Lc  form-and-join.o [10]
+savedMSP                0x2000113c          Code  Gb  context-switch.o [8]
+savedResetCause         0x20001486     0x2  Data  Lc  cstartup-iar-common.o [10]
+scanAction              0x2000149e     0x1  Data  Gb  sensor.o [1]
+scanChannel             0x20000988    0x14  Data  Lc  form-and-join.o [10]
+scanChannelMask         0x200009e4     0x4  Data  Lc  scan.o [13]
+scanCloseTimeOutEvent   0x08009c33     0x8  Code  Gb  form-and-join-node-adapter.o [10]
+scanDual                0x080099bd    0x4c  Code  Gb  form-and-join.o [10]
+scanDuration            0x200009d2     0x1  Data  Lc  scan.o [13]
+scanErrorHandler        0x08009965     0xa  Code  Gb  form-and-join.o [10]
+scanFail                0x2000097a     0x1  Data  Lc  form-and-join.o [10]
+scanFrameCounter        0x200009e0     0x4  Data  Lc  scan.o [13]
+scanInitial             0x0800996f    0x4e  Code  Gb  form-and-join.o [10]
+scanModule              0x080024db    0x2a  Code  Gb  sensor.o [1]
+scanOpenTimeOutEvent    0x08009c2b     0x8  Code  Gb  form-and-join-node-adapter.o [10]
+scanRequestHeader       0x20000a03     0x1  Data  Lc  zdo-channel.o [13]
+scanResults             0x20000a04     0x1  Data  Lc  zdo-channel.o [13]
+scanSet                 0x08009a09    0x12  Code  Gb  form-and-join.o [10]
+scanSingnal             0x2000097e     0x1  Data  Lc  form-and-join.o [10]
+scanStatus              0x20000979     0x1  Data  Lc  form-and-join.o [10]
+scanTimeOutEvent        0x20001134     0x4  Data  Lc  form-and-join-node-adapter.o [10]
+scanTimeOutEventHandler
+                        0x08009c47     0xa  Code  Lc  form-and-join-node-adapter.o [10]
+scanTransmitRetries     0x200009d3     0x1  Data  Lc  scan.o [13]
+scanWait                0x2000097b     0x1  Data  Lc  form-and-join.o [10]
+scaningStatus           0x08009a1b     0x6  Code  Gb  form-and-join.o [10]
+scansRemaining          0x20000a05     0x1  Data  Lc  zdo-channel.o [13]
+sea_addmultigroup       0x08001e03    0x14  Code  Gb  network.o [1]
+sea_adjustchannel       0x08006b89    0x30  Code  Gb  table.o [10]
+sea_carmagic            0x080032a5    0x34  Code  Lc  vehicle.o [1]
+sea_cleartable          0x08006c83    0x26  Code  Lc  table.o [10]
+sea_closelamp           0x08007023    0x20  Code  Lc  lamp.o [10]
+sea_configprint         0x080027e3    0x30  Code  Gb  sysinfo.o [1]
+sea_defaultconfig       0x0800272d    0x40  Code  Gb  sysinfo.o [1]
+sea_feedwatchdog        0x08001e5d     0x8  Code  Gb  network.o [1]
+sea_findchannelindex    0x08006bb9    0x26  Code  Gb  table.o [10]
+sea_firstable           0x08006c5d    0x1e  Code  Lc  table.o [10]
+sea_flashread           0x0800a2e1     0x8  Code  Gb  flash.o [10]
+sea_flashreadshort      0x0800a2ef     0x6  Code  Gb  flash.o [10]
+sea_flashwrite          0x0800a275    0x52  Code  Gb  flash.o [10]
+sea_getcount            0x08006ca9    0x2a  Code  Lc  table.o [10]
+sea_getfail             0x08002523    0xa2  Code  Lc  sensor.o [1]
+sea_getframe            0x0800a009    0x36  Code  Lc  frame.o [10]
+sea_getmsg              0x08006f79    0x2c  Code  Gb  msg.o [10]
+sea_getnumber           0x08002505     0xa  Code  Lc  sensor.o [1]
+sea_getopt              0x08006d41    0x5e  Code  Gb  console.o [10]
+sea_getrs485            0x08002fd7    0x4a  Code  Lc  vehicle.o [1]
+sea_getstatus           0x080025c5    0x18  Code  Lc  sensor.o [1]
+sea_getype              0x0800250f    0x14  Code  Lc  sensor.o [1]
+sea_initframe           0x0800a21d    0x34  Code  Gb  frame.o [10]
+sea_lampconfig          0x080009f5   0x45c  Code  Gb  command.o [1]
+sea_lampkeyboardinput   0x080006a5   0x190  Code  Gb  command.o [1]
+sea_lastable            0x08006c1b    0x32  Code  Lc  table.o [10]
+sea_makemultiapsframe   0x08001d19    0x24  Code  Lc  network.o [1]
+sea_makeuniapsframe     0x08001cf9    0x20  Code  Lc  network.o [1]
+sea_memcomp             0x08006979    0x2a  Code  Gb  mem.o [10]
+sea_memcpy              0x080068f1    0x86  Code  Gb  mem.o [10]
+sea_memset              0x08006977     0x2  Code  Gb  mem.o [10]
+sea_msgisempty          0x08006f65    0x14  Code  Gb  msg.o [10]
+sea_nextable            0x08006bdf    0x3c  Code  Lc  table.o [10]
+sea_openlamp            0x08007001    0x22  Code  Lc  lamp.o [10]
+sea_parsecommand        0x08006d9f    0x9a  Code  Gb  console.o [10]
+sea_parselampframe      0x08000835   0x1b8  Code  Gb  command.o [1]
+sea_printf              0x08006ec3    0x42  Code  Gb  serial.o [10]
+sea_printframe          0x0800a03f    0x34  Code  Lc  frame.o [10]
+sea_printlamp           0x08002c6d   0x1f8  Code  Gb  sysinfo.o [1]
+sea_printsysconfig      0x08002815   0x452  Code  Gb  sysinfo.o [1]
+sea_putframe            0x0800a073    0x80  Code  Gb  frame.o [10]
+sea_putframebyte        0x0800a0f9    0x10  Code  Lc  frame.o [10]
+sea_putframelong        0x0800a11d    0x22  Code  Lc  frame.o [10]
+sea_putframeshort       0x0800a109    0x14  Code  Lc  frame.o [10]
+sea_putrs485            0x08002f57    0x80  Code  Lc  vehicle.o [1]
+sea_recvbyte            0x0800a145    0xd8  Code  Lc  frame.o [10]
+sea_sendmsg             0x08006fa5    0x4e  Code  Gb  msg.o [10]
+sea_sendmultimsg        0x08001da5    0x5e  Code  Gb  network.o [1]
+sea_sendunimsg          0x08001d3d    0x68  Code  Gb  network.o [1]
+sea_startcar            0x080030ab    0xa4  Code  Lc  vehicle.o [1]
+sea_stopcar             0x0800314f    0x88  Code  Lc  vehicle.o [1]
+sea_tableflasherase     0x0800a2c7    0x1a  Code  Gb  flash.o [10]
+sea_togglelamp          0x08007043     0xc  Code  Lc  lamp.o [10]
+sea_turncar             0x080031d7    0xce  Code  Lc  vehicle.o [1]
+sea_uartclear           0x08006e8f     0xa  Code  Lc  serial.o [10]
+sea_uartgetbyte         0x08006e3d    0x26  Code  Lc  serial.o [10]
+sea_uartisempty         0x08006e63    0x14  Code  Lc  serial.o [10]
+sea_uartputbyte         0x08006e77    0x18  Code  Lc  serial.o [10]
+sea_uartsendbyte        0x08006e99    0x2a  Code  Gb  serial.o [10]
+sea_updatepercent       0x08007071    0x28  Code  Gb  lamp.o [10]
+sea_updatesysconfig     0x08006b41    0x3e  Code  Gb  table.o [10]
+sea_updatetime          0x0800704f    0x22  Code  Gb  lamp.o [10]
+sea_writedefaultconfig  0x08006a65    0xdc  Code  Gb  table.o [10]
+secTickEvent            0x20000c8c     0x4  Data  Gb  ledlamp.o [1]
+secTickHook             0x08008dcf    0x12  Code  Gb  ticker.o [10]
+secTimeEventHandler     0x080018d5    0x10  Code  Gb  ledlamp.o [1]
+securityAddToAddressCache
+                        0x08014d7d    0x6c  Code  Gb  security-address-cache.o [10]
+seed0                   0x20000a84     0x2  Data  Lc  random.o [10]
+seed1                   0x20000a86     0x2  Data  Lc  random.o [10]
+send1                   0x20000ce8    0xa4  Data  Gb  network.o [1]
+sendAckedUnicast        0x0800b9e5    0xa8  Code  Lc  aps-retry.o [13]
+sendApplicationKeys     0x0800d349    0xd4  Code  Lc  trust-center-util.o [11]
+sendFromChild           0x20000a7c     0x2  Data  Lc  application-support.o [13]
+sendLeaveCommand        0x08008bc1    0x78  Code  Lc  leave.o [13]
+sendNeighborExchange    0x08012245    0xa6  Code  Lc  neighbor-exchange.o [13]
+sendNextFragments       0x08004f2b    0x58  Code  Lc  fragment.o [10]
+sendSpecialJoinRequest  0x08005ba9    0xba  Code  Lc  association.o [13]
+sensorCommandHandler    0x08002645    0x58  Code  Gb  sensor.o [1]
+sensorCommonSetupSecurity
+                        0x08000f27    0x1c  Code  Gb  common.o [1]
+sensorInit              0x080025dd    0x68  Code  Gb  sensor.o [1]
+sensorJoinNetwork       0x080022bf   0x21c  Code  Gb  sensor.o [1]
+sequenceNumber          0x200014c2     0x1  Data  Lc  debug-jtag.o [13]
+serial_info             0x20000c90    0x54  Data  Gb  ledlamp.o [1]
+setBlockMask            0x08004fbf    0x28  Code  Lc  fragment.o [10]
+setChildTokenData       0x080078a7    0xa6  Code  Lc  child.o [13]
+setNetworkParameters    0x080066fd    0x48  Code  Lc  association.o [13]
+setNonvolatileBinding   0x080127a9     0xc  Code  Lc  binding-table.o [4]
+setRadioParameters      0x080066b5    0x48  Code  Lc  association.o [13]
+setTxStepTime           0x08004729    0x38  Code  Lc  analogue.o [13]
+shift                   0x0800a355    0x10  Code  Lc  random.o [10]
+shortIndirectPool       0x200009f8     0x4  Data  Lc  mac-indirect.o [13]
+simEeSetDataActiveSemaphore
+                        0x200014b1     0x1  Data  Gb  token.o [10]
+simulatedEepromStorage  0x0801e000  0x2000  Data  Gb  sim-eeprom.o [10]
+single_info             0x2000109c    0x44  Data  Gb  lamp.o [10]
+sizeCache               0x080192a4    0x10  Data  Gb  sim-eeprom.o [10]
+sleepTimerInterruptOccurred
+                        0x200014c3     0x1  Data  Lc  system-timer.o [8]
+sleepyBroadcastHeader   0x20000964     0x1  Data  Lc  jit.o [13]
+sourceRouteAddEntry     0x08014e0f    0x84  Code  Gb  source-route-common.o [10]
+sourceRouteFindIndex    0x08014ded    0x22  Code  Gb  source-route-common.o [10]
+sourceRouteTable        0x20000a24     0x4  Data  Gb  source-route.o [10]
+sourceRouteTableSize    0x20000ab6     0x1  Data  Gb  source-route.o [10]
+spTransmitConfig        0x20000970     0x8  Data  Gb  zigbee-stack.o [13]
+sscanf                  0x0801505d    0x20  Code  Gb  sscanf.o [6]
+st_turn                 0x20001070     0x8  Data  Lc  vehicle.o [1]
+stackEvents             0x08018fa4    0x90  Data  Gb  zigbee-stack.o [13]
+startChannelScan        0x0800f799    0x5c  Code  Lc  scan.o [13]
+startNetworkOperation   0x0800591d    0x14  Code  Lc  association.o [13]
+startNextConversion     0x08000191    0x86  Code  Gb  adc.o [1]
+startPanIdScan          0x080098c7    0x36  Code  Lc  form-and-join.o [10]
+strchr                  0x080150b5          Code  Gb  strchr.o [9]
+strlen                  0x0801507d          Code  Gb  strlen.o [9]
+strncmp                 0x08017a7b    0x2a  Code  Gb  strncmp.o [6]
+submitCount             0x20001279     0x1  Data  Lc  retry.o [13]
+swoOutput               0x080131d5    0xd0  Code  Lc  debug-jtag.o [13]
+sys_info                0x20000d8c    0x58  Data  Gb  network.o [1]
+systime                 0x200010fc     0x4  Data  Lc  ticker.o [10]
+table                   0x20001438    0x3c  Data  Lc  source-route.o [10]
+table_info              0x20001080    0x1c  Data  Gb  table.o [10]
+terminateScanRequest    0x08010515    0x26  Code  Lc  zdo-channel.o [13]
+ticksSinceLastPoll      0x2000134c     0x1  Data  Lc  child-aging.o [13]
+timeoutPools            0x0800fcc5    0xd4  Code  Lc  mac-indirect.o [13]
+tokenArraySize          0x08019398    0x10  Data  Gb  token-def.o [10]
+tokenCreators           0x08019358    0x20  Data  Gb  token-def.o [10]
+tokenDefaults           0x20000a28    0x40  Data  Gb  token-def.o [10]
+tokenIsCnt              0x08019378    0x10  Data  Gb  token-def.o [10]
+tokenSize               0x08019388    0x10  Data  Gb  token-def.o [10]
+tokensActive            0x200014b0     0x1  Data  Gb  token.o [10]
+totalTxBlocks           0x200008c5     0x1  Data  Lc  fragment.o [10]
+transmitQueue           0x200009b0     0x8  Data  Lc  mac-arbiter.o [13]
+trustCenterAllowJoins   0x20000aa8     0x1  Data  Lc  trust-center.o [10]
+trustCenterUsePreconfiguredKey
+                        0x20000aa9     0x1  Data  Lc  trust-center.o [10]
+txFragments             0x200008c8     0xc  Data  Lc  fragment.o [10]
+txWindowBase            0x200008c6     0x1  Data  Lc  fragment.o [10]
+uartfrm                 0x20000ac4   0x1b4  Data  Gb  command.o [1]
+unicastHead             0x20001424     0x1  Data  Lc  unicast-table.o [13]
+uninitializedIsr        0x08014d09          Code  Gb  faults.o [10]
+unsentMessageCount      0x200009ad     0x1  Data  Lc  mac-arbiter.o [13]
+unsolicitedChannelReport
+                        0x20000a02     0x1  Data  Lc  zdo-channel.o [13]
+vcoLastTuneValueAvailable
+                        0x20000a69     0x1  Data  Lc  analogue.o [13]
+vcoTuneModDacError      0x0800ab41    0x48  Code  Lc  analogue-mod-dac.o [13]
+vehicleAppHandler       0x08003c59   0x106  Code  Gb  vehicle.o [1]
+vehicleInit             0x080032d9   0x28e  Code  Gb  vehicle.o [1]
+vehicleMsEventHandler   0x08003dc9   0x10e  Code  Gb  vehicle.o [1]
+vehicleRouteTable       0x08003a79   0x1c8  Code  Gb  vehicle.o [1]
+vehicleTimeEventHandler
+                        0x08003f05    0xb4  Code  Gb  vehicle.o [1]
+vsprintf                0x080150d5    0x28  Code  Gb  vsprintf.o [6]
+walkDelayQueue          0x0800dd11    0xc0  Code  Lc  retry.o [13]
+writeArray              0x0800994b    0x1a  Code  Gb  form-and-join.o [10]
+writeMessage            0x08005693    0x58  Code  Lc  packet-buffer.o [13]
+writePageCounters       0x08010e21    0x6e  Code  Lc  sim-eeprom-internal.o [8]
+writeTokenBlockData     0x080106dd    0x52  Code  Gb  sim-eeprom-internal.o [8]
+xorBufferBytesIntoBlock
+                        0x080118f9    0x80  Code  Lc  crypto.o [13]
+zigDevApsStruct         0x20001360     0x4  Data  Lc  zigbee-device-util.o [13]
+zigDevRequestSequence   0x2000135c     0x1  Data  Lc  zigbee-device-util.o [13]
+
+
+[1] = G:\Workshops\renovate\lamps\build\obj
+[2] = command line
+[3] = alarm-library.a
+[4] = binding-table-library.a
+[5] = cbke-stub-library.a
+[6] = dl7M_tl_in.a
+[7] = end-device-bind-stub-library.a
+[8] = hal-library.a
+[9] = rt7M_tl.a
+[10] = sealib.a
+[11] = security-library-core.a
+[12] = security-library-link-keys.a
+[13] = zigbee-pro-stack.a
+
+  97 294 bytes of readonly  code memory
+   7 331 bytes of readonly  data memory
+  16 124 bytes of readwrite data memory
+
+Errors: none
+Warnings: none

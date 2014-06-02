@@ -1,0 +1,340 @@
+/** @file hal/micro/cortexm3/token.h
+ * @brief Cortex-M3 Token system for storing non-volatile information.
+ * See @ref token for documentation.
+ *
+ * <!-- Copyright 2007 by Ember Corporation. All rights reserved.        *80*-->
+ */
+
+/** @addtogroup token 
+ * See hal/micro/cortexm3/token.h for source code.
+ *@{ 
+ */
+
+#ifndef __PLAT_TOKEN_H__
+#define __PLAT_TOKEN_H__
+
+#ifndef __TOKEN_H__
+#error do not include this file directly - include micro/token.h
+#endif
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+
+//-- Build structure defines
+/**
+ * @description Simple declarations of all of the token types so that they can
+ * be referenced from anywhere in the code base.
+ */
+#define DEFINETYPES
+  #include "token-stack.h"
+#undef DEFINETYPES
+
+
+
+//-- Build parameter links
+#define DEFINETOKENS
+
+// The manufacturing tokens live in the Info Blocks, while all other tokens
+// live in the Simulated EEPROM.  This requires the token names to be defined
+// as different data (mfg tokens are memory address, all others are an enum).
+#undef TOKEN_MFG
+#undef TOKEN_DEF
+
+/**
+ * @description Macro for translating token defs into address variables
+ * that point to the correct location in the Info Blocks.  (This is the
+ * extern, the actual definition is found in hal/micro/cortexm3/token.c)
+ *
+ * @param name: The name of the token.
+ *
+ * @param TOKEN_##name##_ADDRESS: The address in EEPROM at which the token
+ * will be stored.  This parameter is generated with a macro above.
+ */
+#define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...)
+#define TOKEN_MFG(name,creator,iscnt,isidx,type,arraysize,...) \
+  extern const int16u TOKEN_##name;
+    #include "token-stack.h"
+#undef TOKEN_MFG
+#undef TOKEN_DEF
+
+
+/**
+ * @description Enum for translating token defs into a number.  This number is
+ * used as an index into the cache of token information the token system and
+ * Simulated EEPROM hold.
+ *
+ * The special entry TOKEN_COUNT is always at the top of the enum, allowing
+ * the token and sim-eeprom system to know how many tokens there are.
+ *
+ * @param name: The name of the token.
+ */
+#define TOKEN_MFG(name,creator,iscnt,isidx,type,arraysize,...)
+#define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+  TOKEN_##name,
+  enum{
+    #include "token-stack.h"
+    TOKEN_COUNT
+  };
+#undef TOKEN_MFG
+#undef TOKEN_DEF
+
+
+/**
+ * @description Macro for translating token definitions into size variables.
+ * This provides a convenience for abstracting the 'sizeof(type)' anywhere.
+ *
+ * @param name: The name of the token.
+ *
+ * @param type: The token type.  The types are found in token-stack.h.
+ */
+#define TOKEN_MFG TOKEN_DEF
+#define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+  TOKEN_##name##_SIZE = sizeof(type),
+  enum {
+    #include "token-stack.h"
+  };
+#undef TOKEN_MFG
+#undef TOKEN_DEF
+
+
+#define DEFINEADDRESSES
+/**
+ * @description Macro for creating a 'region' element in the enum below.  This
+ * creates an element in the enum that provides a starting point (address) for
+ * subsequent tokens to align against.  ( See hal/micro/cortexm3/token.c for
+ * the instances of TOKEN_NEXT_ADDRESS() );
+ *
+ * @param region: The name to give to the element in the address enum..
+ *
+ * @param address: The address in EEPROM where the region begins.
+ */
+#define TOKEN_NEXT_ADDRESS(region, address)      \
+  TOKEN_##region##_NEXT_ADDRESS = ((address) - 1),
+
+/**
+ * @description Macro for creating ADDRESS and END elements for each token in
+ * the enum below.  The ADDRESS element is linked to from the the normal
+ * TOKEN_##name macro and provides the value passed into the internal token
+ * system calls.  The END element is a placeholder providing the starting
+ * point for the ADDRESS of the next dynamically positioned token.
+ *
+ * @param name: The name of the token.
+ *
+ * @param arraysize: The number of elements in an indexed token (arraysize=1
+ * for scalar tokens).
+ */
+#define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...)
+#define TOKEN_MFG(name,creator,iscnt,isidx,type,arraysize,...) \
+  TOKEN_##name##_ADDRESS,                                      \
+  TOKEN_##name##_END = TOKEN_##name##_ADDRESS +                \
+                       (TOKEN_##name##_SIZE * arraysize) - 1,
+
+/**
+ * @description The enum that operates on the two macros above.  Also provides
+ * an indentifier so the address of the top of the token system can be known.
+ */
+enum {
+  #include "token-stack.h"
+  TOKEN_MAXIMUM_SIZE
+};
+#undef TOKEN_MFG
+#undef TOKEN_DEF
+#undef TOKEN_NEXT_ADDRESS
+#undef DEFINEADDRESSES
+
+
+
+//From this point on, the manufacturing tokens are defined like regular tokens.
+#define TOKEN_MFG TOKEN_DEF
+
+
+/**
+ * @description External declaration of an array of creator codes.  Since
+ * the token and sim-eeprom systems indentify tokens through an enum (see
+ * below for the enum) and these two systems need to link creator codes to
+ * their tokens, this array instantiates that link.
+ *
+ * @param creator: The creator code type.  The codes are found in
+ * token-stack.h.
+ */
+extern const int16u tokenCreators[];
+
+/**
+ * @description External declaration of an array of IsCnt flags.  Since
+ * the token and sim-eeprom systems indentify tokens through an enum (see
+ * below for the enum) and these two systems need to know which tokens
+ * are counter tokens, this array provides that information.
+ *
+ * @param iscnt: The flag indicating if the token is a counter.  The iscnt's
+ * are found in token-stack.h.
+ */
+extern const boolean tokenIsCnt[];
+
+/**
+ * @description External declaration of an array of sizes.  Since
+ * the token and sim-eeprom systems indentify tokens through an enum (see
+ * below for the enum) and these two systems need to know the size of each
+ * token, this array provides that information.
+ *
+ * @param type: The token type.  The types are found in token-stack.h.
+ */
+extern const int8u tokenSize[];
+
+/**
+ * @description External declaration of an array of array sizes.  Since
+ * the token and sim-eeprom systems indentify tokens through an enum (see
+ * below for the enum) and these two systems need to know the array size of
+ * each token, this array provides that information.
+ *
+ * @param arraysize: The array size.
+ */
+extern const int8u tokenArraySize[];
+
+/**
+ * @description External declaration of an array of all token default values.
+ * This array is filled with pointers to the set of constant declarations of
+ * all of the token default values.  Therefore, the index into this array
+ * chooses which token's defaults to access, and the address offset chooses the
+ * byte in the defaults to use.
+ *
+ * For example, to get the n-th byte of the i-th token, use: 
+ * int8u byte = *(((int8u *)tokenDefaults[i])+(n)
+ *
+ * @param TOKEN_##name##_DEFAULTS: A constant declaration of the token default
+ * values, generated for all tokens.
+ */
+extern const void * tokenDefaults[];
+
+/**
+ * @description A define for the token and Simulated EEPROM system that
+ * specifies, in bytes, the number of +1 marks available for a counter token.
+ * Since each mark requires a byte, this also corresponds to the number of
+ * words (COUNTER_TOKEN_PAD/2) that automatically pad out the counter tokens.
+ */
+#define COUNTER_TOKEN_PAD        50
+
+
+
+/**
+ * @description Macro for typedef'ing the CamelCase token type found in
+ * token-stack.h to a capitalized TOKEN style name that ends in _TYPE.
+ * This macro allows other macros below to use 'token##_TYPE' to declare
+ * a local copy of that token.
+ *
+ * @param name: The name of the token.
+ *
+ * @param type: The token type.  The types are found in token-stack.h.
+ */
+#define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+  typedef type TOKEN_##name##_TYPE;
+  #include "token-stack.h"
+#undef TOKEN_DEF
+#undef DEFINETOKENS
+
+#endif   //DOXYGEN_SHOULD_SKIP_THIS
+
+/**
+ * @description Copies the token value from non-volatile storage into a RAM
+ * location.  This is the internal function that the two exposed APIs
+ * (halCommonGetToken and halCommonGetIndexedToken) expand out to.  The
+ * API simplifies the access into this function by hiding the size parameter
+ * and hiding the value 0 used for the index parameter in scalar tokens.
+ *
+ * @param data: A pointer to where the data being read should be placed.
+ *
+ * @param token: The name of the token to get data from.  On this platform
+ * that name is defined as an address.
+ *
+ * @param index: The index to access.  If the token being accessed is not an
+ * indexed token, this parameter is set by the API to be 0.
+ *
+ * @param len: The length of the token being worked on.  This value is
+ * automatically set by the API to be the size of the token.
+ */
+void halInternalGetTokenData(void *data, int16u token, int8u index, int8u len);
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+/**
+ * @description Retreives the eui64 (either the custom value or the ember
+ * value).  This function is specifically designed for the bootloader.  It
+ * attempts to minimize code space usage.
+ *
+ * @param eui64: A pointer to where the eui64 data should be written.
+ */
+void halInternalGetEui64TokenData(int8u * eui64);
+#endif   //DOXYGEN_SHOULD_SKIP_THIS
+
+/**
+ * @description Sets the value of a token in non-volatile storage.  This is
+ * the internal function that the two exposed APIs (halCommonSetToken and
+ * halCommonSetIndexedToken) expand out to.  The API simplifies the access
+ * into this function by hiding the size parameter and hiding the value 0
+ * used for the index parameter in scalar tokens.
+ *
+ * @param token: The name of the token to get data from.  On this platform
+ * that name is defined as an address.
+ *
+ * @param index: The index to access.  If the token being accessed is not an
+ * indexed token, this parameter is set by the API to be 0.
+ *
+ * @param data: A pointer to the data being written.
+ *
+ * @param len: The length of the token being worked on.  This value is
+ * automatically set by the API to be the size of the token.
+ */
+void halInternalSetTokenData(int16u token, int8u index, void *data, int8u len);
+
+ /**
+ * @description Increments the value of a token that is a counter.  This is
+ * the internal function that the exposed API (halCommonIncrementCounterToken)
+ * expand out to.  This internal function is used as a level of simple
+ * redirection providing clean seperation from the lower token handler code.
+ *
+ * @param token: The name of the token.
+ */
+void halInternalIncrementCounterToken(int8u token);
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+
+// See hal/micro/token.h for the full explanation of the token API as
+// instantiated below.
+
+#define halCommonGetToken( data, token )                    \
+  halInternalGetTokenData(data, token, 0x7F, token##_SIZE)
+
+#define halCommonGetIndexedToken( data, token, index )      \
+  halInternalGetTokenData(data, token, index, token##_SIZE)
+    
+#define halStackGetIndexedToken( data, token, index, size ) \
+  halInternalGetTokenData(data, token, index, size)
+
+#define halCommonSetToken( token, data )                    \
+  halInternalSetTokenData(token, 0x7F, data, token##_SIZE)
+
+#define halCommonSetIndexedToken( token, index, data )      \
+  halInternalSetTokenData(token, index, data, token##_SIZE)
+
+#define halStackSetIndexedToken( token, index, data, size ) \
+  halInternalSetTokenData(token, index, data, size)
+
+#define halCommonIncrementCounterToken( token )             \
+  halInternalIncrementCounterToken(token);
+
+// For use only by the EZSP UART protocol
+#ifdef EZSP_UART
+  #ifdef CORTEXM3
+    #define halInternalMfgTokenPointer( address )  \
+      ((const void *)(address + DATA_BIG_INFO_BASE))
+    #define halInternalMfgIndexedToken( type, address, index )  \
+      (*((const type *)(address + DATA_BIG_INFO_BASE) + index))
+  #endif
+#endif
+
+#endif   //DOXYGEN_SHOULD_SKIP_THIS
+
+#undef TOKEN_MFG
+
+#endif // __PLAT_TOKEN_H__
+
+/**@} // END token group */
+

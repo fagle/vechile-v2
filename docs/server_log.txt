@@ -1,0 +1,59 @@
+//杭电嵌入式实验室 代码日志
+
+////////////////////////////////////////////////////////////
+2011-04-11
+老师的版本
+
+/////////////////////////////////////////////////////////////
+2011-04-12  by 郭太磊
+<Add>
+1）在老师版本上增加了部分注释，以++coment by ray开头；
+2）增加gprs接收框架void gprsCoordinatorMessageHandler ( )，待填充
+
+<Bug Remove>
+
+2）reset_roadbitmap（） map.act，map.sum也需要reset
+3）sea_singletimevent（）中,period的问题
+4）sea_sendmsg(ICHP_SV_RPT_FULL, road_info.map.size, road_info.map.sav);
+改为：
+     sea_sendmsg(ICHP_SV_RPT_FULL,sizeof(lamp_t)*road_info.map.sum ,road_info.head); 
+5）u8   lamp_rept[0x04 * MAXLAMPS];
+     定大了  (MAXLAMPS >> 0x03) + 0x01
+6)case ICHP_CO_OPEN_SINGLE:            // send commands to a lamp
+  case ICHP_CO_CLOSE_SINGLE:        
+      if (road_info.map.addr[single_info.lamp.number - 0x01])
+      sea_sendunimsg(ptr->id, road_info.map.addr[single_info.lamp.number - 0x01], 0x01,                      &sea_getsingleinfo()->mode);  // to a lamp
+
+7)几种状态，看一下 LAMP_FORCE，合适置？
+8)stage的用法
+9） sea_sendmultimsg(ptr->id, 0x01, &sea_getsingleinfo()->mode); 
+   tick中实际发送的对象不对
+10）ICHP_LP_RPT_LAMP中逻辑不对。 if (ptr->fail & get_lampfail(LAMP_ER_TM))wrong
+11) 编号还没弄好
+12）        case ICHP_LP_POWERON:   
+            sea_printf("\nreceived coordinator power on.");
+            sea_updatetime((psystime_t)info->msg);  
+            break;
+13)先编译一遍，解决可能的错误。
+14)控制规则表
+/////////////////////////////////////////////////////////////
+2011-04-13  by 郭太磊
+<Add>
+1）
+2）
+
+<Bug Remove>
+1）
+2）
+
+/////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////
+2011-7-18   by 李立轩
+1）串口buffer大小由0x30改成了0x100，因为小了可能导致从W108接受到的数据不全
+   同时，在开始收数据时要delay一下，否则也收不全
+2）在检测“IPDATA：”时要delay一下，否则IPDATA：后面的参数会跑到下个AT命令的返回中
+2011-8-4    by 李立轩
+1）在上次链接断开20分钟后，直接使用ipopen就可以重新建立连接，以后协调器真正使用时，每隔几分钟连接一次服务器，就不用etcpip了，直接ipopen就行。

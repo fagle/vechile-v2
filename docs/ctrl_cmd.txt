@@ -1,0 +1,20 @@
+
+control mode as following samples:    // 2011/10/06
+
+ close single:68 58 03 00 19 00 00 05 79               (No. 5 lamp)
+  open signle:68 56 03 00 19 64 00 05 eb               (No. 5 lamp)
+     open all:68 55 01 00 19 64 d3
+    close all:68 57 01 00 19 00 71
+    date time:68 54 07 00 19 db 07 0a 06 0b 01 02 74   (2011-10-06, 11:01:02)
+    open time:68 59 04 00 19 04 38 02 58 0c            (18:00-04:00, hold 10 hour)
+    auto mode:68 5a 04 00 19 41 00 00 01 b9            (lamp control automatic)
+  manual mode:68 5a 04 00 19 41 00 00 00 b8            (lamp control manual)
+    lamp test:68 5a 04 00 19 42 00 00 01 ba            (lamp toggle once)
+      road id:68 5a 04 00 19 43 00 00 19 d3            (road id 25)
+  lamp number:68 5a 04 00 19 44 00 11 09 d5            (change lamp No. from 256 to 265, (notes: 44 ab cd ef, cab old No. def new No.)
+report period:68 5a 04 00 19 45 00 00 05 c1            (lamp report time 5 minute)
+radio channel:68 5a 04 00 19 46 00 00 00 bd            (radio channel index 0)
+ lamp default:68 5a 02 00 19 47 00 bc                  (restore lamp default information)
+  lamp reboot:68 5a 02 00 19 48 00 bd                  (lamp reboot)
+  max. device:68 5a 04 00 19 49 00 01 f4 b5            (max. devices 500)
+  
