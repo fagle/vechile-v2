@@ -37,19 +37,19 @@ void ezspCoordinatorIncomingMessageHandler ( EmberIncomingMessageType type,
     {
         case ICHP_SV_CTRL:
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_CTRL, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_CTRL, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
         case ICHP_SV_SECKEY:
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_SECKEY, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_SECKEY, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
         case ICHP_SV_CHANNEL:
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_CHANNEL, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_CHANNEL, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
@@ -65,15 +65,9 @@ void ezspCoordinatorIncomingMessageHandler ( EmberIncomingMessageType type,
                     DBG("\r\n[coord]lamp address body length = %d", length);
             }
             break;
-        case ICHP_SV_END:
-            if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_END, sender, length, (u8 *)&ptr);
-            else
-                DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
-            break;
         case ICHP_SV_RESPONSE:     
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_RESPONSE, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_RESPONSE, sender, length, ptr);
             else
                 DBG("\r\n[coord]%02x cmd response of %dth vehicle status %d", ptr[0x01], ptr[0x00], ptr[0x02]);
             break;
@@ -91,35 +85,42 @@ void ezspCoordinatorIncomingMessageHandler ( EmberIncomingMessageType type,
                 DBG("\r\n[coord]new device join, logic address %04x", sender);
             sea_sendmsg(&send1, UNICAST, sender, ICHP_SV_ADDRESS, 0x00, NULL);
             break;
+#if 0
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  not use   2014/05/31         
+        case ICHP_SV_END:
+            if (sys_info.ctrl.release)
+                uartfrm.put(&uartfrm, ICHP_SV_END, sender, length, ptr);
+            else
+                DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
+            break;
         case ICHP_SV_CLOSE:     
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_CLOSE, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_CLOSE, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
         case ICHP_SV_ADJUST:
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_ADJUST, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_ADJUST, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
         case ICHP_SV_OPEN:     
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_OPEN, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_OPEN, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
         case ICHP_SV_ROUTE:     
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_ROUTE, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_ROUTE, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
         case ICHP_SV_BEEPER_STATUS:
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_BEEPER_STATUS, sender, length, (u8 *)&ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_BEEPER_STATUS, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
@@ -134,7 +135,8 @@ void ezspCoordinatorIncomingMessageHandler ( EmberIncomingMessageType type,
             else
                 DBG("\r\n[coord]%dth vehicle acknowledge return", road_info.number(sender));  
             break;
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////            
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+#endif
         default:
             if (sys_info.ctrl.release)
                 uartfrm.put(&uartfrm, apsFrame->clusterId, sender, length, ptr);
@@ -157,7 +159,7 @@ void ezspRouterIncomingMessageHandler ( EmberIncomingMessageType type, EmberApsF
     u8          length = emberMessageBufferLength(message);
     EmberNodeId sender = emberGetSender();
     u8    *     ptr = emberGetLinkedBuffersPointer(message, 0x00);
-    static  u8  table[0x03];
+    static  u8  table[0x05];
 
 //    DBG("\r\n[REC]msg id%2x len %d", apsFrame->clusterId, length);
     table[0x00] = sys_info.dev.num;
@@ -322,13 +324,15 @@ void ezspRouterIncomingMessageHandler ( EmberIncomingMessageType type, EmberApsF
                     sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
                 }
             }
-            else
-                sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
+//            else
+//                sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
             break;
         case ICHP_SV_DATE:
             sea_updatetime((psystime_t)ptr);  
             if (single_info.fail(GETFAILBIT, LAMP_ER_TM))
                 single_info.fail(CLRFAILBIT, LAMP_ER_TM);
+            table[0x02] = 0x00;
+            sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
             break;
         case ICHP_SV_JOIN:
             break;

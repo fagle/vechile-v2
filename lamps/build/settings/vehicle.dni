@@ -1,7 +1,8 @@
 [DebugChecksum]
-Checksum=1728019077
+Checksum=-47123739
 [DisAssemblyWindow]
-NumStates=_ 0
+NumStates=_ 1
+State 1=_ 1
 [InstructionProfiling]
 Enabled=_ 0
 [CodeCoverage]
@@ -42,10 +43,10 @@ SWOInfo_ITMPortsEnabled=0x00000000
 SWOInfo_ITMPortsTermIO=0x00000000
 SWOInfo_ITMPortsLogFile=0x00000000
 SWOInfo_ITMLogFile=$PROJ_DIR$\ITM.log
-[Disassemble mode]
-mode=1
-[Breakpoints]
-Count=0
+[DriverProfiling]
+Enabled=0
+Source=4
+Graph=0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -53,12 +54,6 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
-[Aliases]
-A0=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\flash.c" ""
-A1=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\mem.c" ""
-A2=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\table.c" ""
-Count=3
-SuppressDialog=0
 [DataLog]
 LogEnabled=0
 SumEnabled=0
@@ -74,7 +69,13 @@ SumSortOrder=0
 [TraceHelperExtra]
 Enabled=0
 ShowSource=1
-[DriverProfiling]
-Enabled=0
-Source=4
-Graph=0
+[Disassemble mode]
+mode=1
+[Breakpoints]
+Count=0
+[Aliases]
+A0=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\flash.c" ""
+A1=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\mem.c" ""
+A2=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\table.c" ""
+Count=3
+SuppressDialog=0

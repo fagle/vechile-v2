@@ -573,6 +573,9 @@ void CoordFrameCmdHandler ( frame_t fr )
             }
             sea_sendacknowledge(ICHP_SV_CLOSE_ACK, fr.road, num, ACK_OK);
             break;
+        case ICHP_SV_RESPONSE: 
+            sea_printf("\n%d-%dth vehicle's response, command %02x, result %d, len %d", num, fr.body[0x00], fr.body[0x01], fr.body[0x02], fr.len);
+            break;
         case ICHP_CAR_ROUTE:
         {
             u8 i;
@@ -604,7 +607,7 @@ void CoordFrameCmdHandler ( frame_t fr )
         }
         default:
         {
-            sea_printf("\nrec unknow id%d",fr.cmd);
+            sea_printf("\nrec unknow id %02x", fr.cmd);
             break;
         }
     }

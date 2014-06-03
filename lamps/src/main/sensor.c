@@ -150,7 +150,6 @@ void emberRouterStackStatusHandler ( EmberStatus status )
             single_info.on();
 #endif
             break;
-
         case EMBER_JOIN_FAILED:
             DBG("\r\nEVENT: stackStatus now EMBER_JOIN_FAILED!");
             //sensorRejoinNetwork();
@@ -158,13 +157,11 @@ void emberRouterStackStatusHandler ( EmberStatus status )
             single_info.on();
 #endif
             break;
-
         case EMBER_NO_BEACONS:
             DBG("\r\nEVENT: stackStatus now EMBER_NO_BEACONS");
             if (++ single_info.retry > NWPK_TOLERANCE)
                 single_info.retry = 0x00;
             break;
-            
         default:
             Debug( "\r\nEVENT: stackStatus now 0x%02x", status);
             break;
