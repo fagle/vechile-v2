@@ -12,7 +12,7 @@
           
           
           
-        <Column0>140</Column0><Column1>11</Column1><Column2>27</Column2><Column3>1242260</Column3></ColumnWidths>
+        <Column0>164</Column0><Column1>11</Column1><Column2>27</Column2><Column3>1242260</Column3></ColumnWidths>
       </Workspace>
       <Build>
         
@@ -20,7 +20,7 @@
         
         
       <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>915</ColumnWidth1><ColumnWidth2>244</ColumnWidth2><ColumnWidth3>61</ColumnWidth3></Build>
-    <TerminalIO/><Disassembly><MixedMode>1</MixedMode><CodeCovShow>0</CodeCovShow><InstrProfShow>0</InstrProfShow></Disassembly></Static>
+    <TerminalIO/><Disassembly><MixedMode>1</MixedMode><CodeCovShow>0</CodeCovShow><InstrProfShow>0</InstrProfShow></Disassembly><Find-in-Files><ColumnWidth0>470</ColumnWidth0><ColumnWidth1>67</ColumnWidth1><ColumnWidth2>806</ColumnWidth2></Find-in-Files><Debug-Log><ColumnWidth0>21</ColumnWidth0><ColumnWidth1>1306</ColumnWidth1></Debug-Log></Static>
     <Windows>
       
       
@@ -44,22 +44,22 @@
             <Factory>Build</Factory>
             <Session/>
           </Tab>
-        </Tabs>
+        <Tab><Identity>TabID-11155-31494</Identity><TabName>Find in Files</TabName><Factory>Find-in-Files</Factory><Session/></Tab><Tab><Identity>TabID-20990-12852</Identity><TabName>Debug Log</TabName><Factory>Debug-Log</Factory><Session/></Tab></Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd1></Windows>
+      <SelectedTab>2</SelectedTab></Wnd1></Windows>
     <Editor>
       
       
       
       
-    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\network.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\inc\config.h</Filename><XPos>0</XPos><YPos>21</YPos><SelStart>1462</SelStart><SelEnd>1462</SelEnd></Tab><ActiveTab>1</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\lamp\mobile.c</Filename><XPos>0</XPos><YPos>504</YPos><SelStart>16568</SelStart><SelEnd>16568</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\sensor.c</Filename><XPos>0</XPos><YPos>227</YPos><SelStart>9666</SelStart><SelEnd>9666</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\sysinfo.c</Filename><XPos>0</XPos><YPos>48</YPos><SelStart>2701</SelStart><SelEnd>2701</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\incoming.c</Filename><XPos>0</XPos><YPos>130</YPos><SelStart>4083</SelStart><SelEnd>4083</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\inc\network.h</Filename><XPos>0</XPos><YPos>126</YPos><SelStart>7224</SelStart><SelEnd>7224</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\command.c</Filename><XPos>0</XPos><YPos>116</YPos><SelStart>5224</SelStart><SelEnd>5224</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\ledlamp.c</Filename><XPos>0</XPos><YPos>264</YPos><SelStart>9699</SelStart><SelEnd>9699</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\network.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>125</SelStart><SelEnd>125</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\inc\config.h</Filename><XPos>0</XPos><YPos>21</YPos><SelStart>1809</SelStart><SelEnd>1809</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\lamp\mobile.c</Filename><XPos>0</XPos><YPos>504</YPos><SelStart>16568</SelStart><SelEnd>16568</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\sensor.c</Filename><XPos>0</XPos><YPos>228</YPos><SelStart>6525</SelStart><SelEnd>6525</SelEnd></Tab><ActiveTab>3</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\sysinfo.c</Filename><XPos>0</XPos><YPos>48</YPos><SelStart>2701</SelStart><SelEnd>2701</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\incoming.c</Filename><XPos>0</XPos><YPos>309</YPos><SelStart>13712</SelStart><SelEnd>13723</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\inc\network.h</Filename><XPos>0</XPos><YPos>141</YPos><SelStart>7224</SelStart><SelEnd>7224</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\command.c</Filename><XPos>0</XPos><YPos>20</YPos><SelStart>5224</SelStart><SelEnd>5224</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\ledlamp.c</Filename><XPos>0</XPos><YPos>264</YPos><SelStart>9699</SelStart><SelEnd>9699</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\inc\msg.h</Filename><XPos>0</XPos><YPos>30</YPos><SelStart>1320</SelStart><SelEnd>1320</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\lamp\vehicle.c</Filename><XPos>0</XPos><YPos>604</YPos><SelStart>18615</SelStart><SelEnd>18615</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\src\main\timevent.c</Filename><XPos>0</XPos><YPos>126</YPos><SelStart>4939</SelStart><SelEnd>4939</SelEnd></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-00b08b20><key>iaridepm.enu1</key></Toolbar-00b08b20></Sizes></Row0></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>481</Bottom><Right>198</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>156250</sizeHorzCX><sizeHorzCY>276243</sizeHorzCY><sizeVertCX>156250</sizeVertCX><sizeVertCY>667127</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>198</Bottom><Right>1282</Right><x>-2</x><y>-2</y><xscreen>1284</xscreen><yscreen>200</yscreen><sizeHorzCX>1003125</sizeHorzCX><sizeHorzCY>276243</sizeHorzCY><sizeVertCX>156250</sizeVertCX><sizeVertCY>276243</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-024f62d0><key>iaridepm.enu1</key></Toolbar-024f62d0></Sizes></Row0></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>510</Bottom><Right>222</Right><x>-2</x><y>-2</y><xscreen>213</xscreen><yscreen>192</yscreen><sizeHorzCX>155930</sizeHorzCX><sizeHorzCY>275862</sizeHorzCY><sizeVertCX>163982</sizeVertCX><sizeVertCY>735632</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>141</Bottom><Right>1368</Right><x>-2</x><y>-2</y><xscreen>1370</xscreen><yscreen>143</yscreen><sizeHorzCX>1002928</sizeHorzCX><sizeHorzCY>205460</sizeHorzCY><sizeVertCX>155930</sizeVertCX><sizeVertCY>275862</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Workspace>
 
