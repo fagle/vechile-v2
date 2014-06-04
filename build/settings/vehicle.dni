@@ -1,5 +1,5 @@
 [DebugChecksum]
-Checksum=-47123739
+Checksum=516416306
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 1
@@ -43,10 +43,6 @@ SWOInfo_ITMPortsEnabled=0x00000000
 SWOInfo_ITMPortsTermIO=0x00000000
 SWOInfo_ITMPortsLogFile=0x00000000
 SWOInfo_ITMLogFile=$PROJ_DIR$\ITM.log
-[DriverProfiling]
-Enabled=0
-Source=4
-Graph=0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -69,6 +65,10 @@ SumSortOrder=0
 [TraceHelperExtra]
 Enabled=0
 ShowSource=1
+[DriverProfiling]
+Enabled=0
+Source=4
+Graph=0
 [Disassemble mode]
 mode=1
 [Breakpoints]
@@ -77,5 +77,6 @@ Count=0
 A0=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\flash.c" ""
 A1=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\mem.c" ""
 A2=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\table.c" ""
-Count=3
+A3=_ "G:\Workshops\seavehicle\lamps\sealib\lamp\ticker.c" ""
+Count=4
 SuppressDialog=0

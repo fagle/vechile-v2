@@ -31,15 +31,15 @@ extern "C" {
 // 基本配置  
 //#define DISABLE_WATCHDOG  
 //#define ENERGY_LAMP                 //num 18 lamp version
-#define SINK_APP                    // 协调器容许
+//#define SINK_APP                    // 协调器容许
 //#define MOBILE_APP  
 //#define EMZ3118                   // 大功率模块配置
 //#define RANGE_TEST                // 距离测试配置  
 //#define RF_TEST                   // 射频测试
 //#define ENABLE_GATEWAY
 #define ENABLE_VEHICLE              // vehicle configuration
-#define EMZ3118B                    // 新大功率模块配置,2013/12
-#define VEHICLE_RELEASE            // debug/release version, 2014/01/12
+//#define EMZ3118B                    // 新大功率模块配置,2013/12
+//#define VEHICLE_RELEASE            // debug/release version, 2014/01/12
     
 #ifdef SINK_APP
   #define USE_HARDCODED_NETWORK_SETTINGS  // it is not recommended to ever hard code the network settings applications should always scan 

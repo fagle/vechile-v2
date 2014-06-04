@@ -314,18 +314,13 @@ void ezspRouterIncomingMessageHandler ( EmberIncomingMessageType type, EmberApsF
             sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
             break;
         case ICHP_SV_RPT:
-            if (ptr[0x00] == sys_info.dev.num)
+            if (isCarDevice())
+                set_lampmode(LAMP_CHANGE);
+            else if (isCallDevice())
             {
-                if (isCarDevice())
-                    set_lampmode(LAMP_CHANGE);
-                else if (isCallDevice())
-                {
-                    table[0x02] = carInfo.led;
-                    sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
-                }
+                table[0x02] = carInfo.led;
+                sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
             }
-//            else
-//                sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
             break;
         case ICHP_SV_DATE:
             sea_updatetime((psystime_t)ptr);  
