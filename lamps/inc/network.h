@@ -137,9 +137,9 @@
 //#define ICHP_SV_REVER              0x50      //++reset all devices                               80
 #define ICHP_SV_REBOOT              0x51      //++reset all devices                               81
 #define ICHP_SV_RPT                 0x52      //++return open/close status of lamps on road       83
-#define ICHP_SV_DATE                0x53      //++update coordinator current date and time        84
+#define ICHP_SV_CLOSE               0x53      //++close all the light                             87
 #define ICHP_SV_OPEN                0x54      //++open all the light                              85
-#define ICHP_SV_CLOSE               0x55      //++close all the light                             87
+#define ICHP_SV_DATE                0x55      //++update coordinator current date and time        84
 #define ICHP_SV_CHANNEL             0x56      //++get channel_t body                              89
 #define ICHP_SV_CTRL                0x57      //++subcommand of server control mode               90
 #define ICHP_SV_SECKEY              0x58      //++get key_t body                                  91
@@ -182,9 +182,9 @@
 #define ICHP_SV_RPT_CAR_ERROR               0xE4   // send error ID to server
 #define ICHP_SV_RPT_BEEPER_CALL             0xE5   // sink report beeper call to server
 #define ICHP_SV_BEEPER_STATUS               0XE7   // request for car info
-#define ICHP_CO_REBOOT_CAR                  0xE8   // reboot the car
-#define ICHP_CO_STOP_CAR                    0xEA
-#define ICHP_CAR_ADDRESS                    0xEB   // physic address information of device_t body
+//#define ICHP_CO_REBOOT_CAR                  0xE8   // reboot the car
+//#define ICHP_CO_STOP_CAR                    0xEA
+//#define ICHP_CAR_ADDRESS                    0xEB   // physic address information of device_t body
 
 #define PLC_CAR_INFO                        0xED   // plc report car info to w108
 
