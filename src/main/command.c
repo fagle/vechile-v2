@@ -242,21 +242,21 @@ void sea_parseroadframe ( pframe_t ptr )
             sea_sendmsg(&send1, MULTICAST, 0x00, ICHP_SV_DATE, sizeof(systime_t), &single_info.time);
             sea_sendresponse(ptr->body[0x00], ICHP_SV_DATE, SENDOK);
             break;   
-        case ICHP_SV_BEEPER_STATUS:
+        case ICHP_SV_ASSIGN:
         {
             if (ptr->road)
-                sea_sendmsg(&send1, UNICAST, ptr->road, ICHP_SV_BEEPER_STATUS, ptr->len, ptr->body); 
+                sea_sendmsg(&send1, UNICAST, ptr->road, ICHP_SV_ASSIGN, ptr->len, ptr->body); 
             else
             {
                 ptr->road = road_info.address(ptr->body[0x00]);
                 if (ptr->road)
-                    sea_sendmsg(&send1, UNICAST, ptr->road, ICHP_SV_BEEPER_STATUS, ptr->len, ptr->body); 
+                    sea_sendmsg(&send1, UNICAST, ptr->road, ICHP_SV_ASSIGN, ptr->len, ptr->body); 
                 else
-                    sea_sendresponse(ptr->body[0x00], ICHP_SV_BEEPER_STATUS, SENDERROR);
+                    sea_sendresponse(ptr->body[0x00], ICHP_SV_ASSIGN, SENDERROR);
             }
             ptr->road = road_info.address(ptr->body[0x03]);            // body[0x03], vehicle's number, send to vehicle
             if (ptr->road)
-                sea_sendmsg(&send1, UNICAST, ptr->road, ICHP_SV_BEEPER_STATUS, ptr->len, ptr->body); 
+                sea_sendmsg(&send1, UNICAST, ptr->road, ICHP_SV_ASSIGN, ptr->len, ptr->body); 
             break;
         }
         default:
@@ -610,7 +610,7 @@ void sea_roadkeyboardinput ( char ch )
 //*------------------------------------------------*/
 static void printLampHelp ( void )
 {
-    DBG("\r\nlamp Usage: lamp -[ntjaxklbr] nnnn ...");
+    DBG("\r\nlamp Usage: lamp -[ntjcaxklbr] nnnn ...");
     DBG("\r\n  -n num, change vehicle number.");
     DBG("\r\n  -t type, change vehicle type.");
     DBG("\r\n  -j index, adjust radio channel");
@@ -619,6 +619,7 @@ static void printLampHelp ( void )
     DBG("\r\n  -k nnn, change road rf_id, or caller's type(4~8).");
     DBG("\r\n  -l nnn, print route table.");
     DBG("\r\n  -r nnn, set debug/release mode.");
+    DBG("\r\n  -c print current vehicle/beep status.");
     DBG("\r\n  -b nnn, set system configuration (0x00 for default value).");
 }
 
@@ -891,7 +892,7 @@ void sea_lampconfig  ( int argc, char * argv[] )
         return;
     }
     
-    while ((opt = sea_getopt(argc, argv, "ntjaxklbr")) != -1) 
+    while ((opt = sea_getopt(argc, argv, "ntjcaxklbr")) != -1) 
     {
         if (opt != 0x00 && cmdhd1.optarg != NULL)
         {
@@ -981,14 +982,26 @@ void sea_lampconfig  ( int argc, char * argv[] )
                             DBG("%02x ", carInfo.route.line[i].action);
                     }
                     break;
+                case 'c':
+                    sea_printlamp(&single_info.lamp);
+                    if (isCarDevice())
+                    {
+                        if (carInfo.key)
+                            DBG("\r\n%dth vehicle will go to %dth station.", sys_info.dev.num, carInfo.key);
+                    }
+                    break;
                 case 'k':
                     sscanf(cmdhd1.optarg, "%d", &num);
-                    sea_printlamp(&single_info.lamp);
                     if (isCallDevice())
                     {
-                        DBG("\r\ncaller type %d.", num);
-                        carInfo.plc.status = num;
-                        set_lampmode(LAMP_UPDATE);
+                        DBG("\r\ncaller type %d (%d~%d).", num, CARIDST, CARIDST + CARIDCNT);
+                        if (num >= CARIDST && num < CARIDST + CARIDCNT)
+                        {
+                            carInfo.beep->call = num;
+                            set_lampmode(LAMP_FORCE);
+                            carInfo.beep->assign = 0x00;
+                            sea_printlamp(&single_info.lamp);
+                        }
                     }
                     else 
                     {

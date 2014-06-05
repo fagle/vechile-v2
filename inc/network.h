@@ -45,21 +45,6 @@
 #define ROUTERID               (0x02)
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// control device types, updated 2013/12/14
-//#define CENTERID               (0x01)     // control center must be coordinator
-//#define LAMPID                 (0x02)     // lamp id make as router
-//#define CALLAID                (0x03)     // for green, a call devices, added 3 devices for green's agv
-//#define CALLBID                (0x04)     // another green's call devices, commented by renyu 2013/11/03
-//#define MOBILEAID              (0x05)     // install on car loader, mobile zigbee devices
-//#define MOBILEBID              (0x06)     // install on car loader, mobile zigbee devices
-//#define MOBILECID              (0x07)     // install on car loader, mobile zigbee devices
-//#define MOBILEDID              (0x08)     // install on car loader, mobile zigbee devices
-//#define VEHICLEID              (0x09)     // install on car loader, vehicle zigbee devices
-//#define CONDITIONID            (0x0a)     // air condition control devices
-//#define GATEWAYID              (0x0b)     // gateway devices
-//#define OTHERID                (0x0c)
-
-/////////////////////////////////////////////////////////////////////////////////////////////
 // control device types, modified by renyu 2014/06/02
 #define CENTERIDST             (0x01)     // control center must be coordinator
 #define CENTERIDCNT            (0x0f)     
@@ -134,16 +119,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // the command of the GPRS module received from the remote web server, modified 2012/06/22, update on 2013/11/09
 #define ICHP_SV_JOIN                0x13      //++ zigbee new node jion, protocol command, added 2013/12/18
-//#define ICHP_SV_REVER              0x50      //++reset all devices                               80
+#define ICHP_SV_ASSIGN              0x50      //++dispatch which vehicle to                       80
 #define ICHP_SV_REBOOT              0x51      //++reset all devices                               81
-#define ICHP_SV_RPT                 0x52      //++return open/close status of lamps on road       83
-#define ICHP_SV_CLOSE               0x53      //++close all the light                             87
-#define ICHP_SV_OPEN                0x54      //++open all the light                              85
-#define ICHP_SV_DATE                0x55      //++update coordinator current date and time        84
-#define ICHP_SV_CHANNEL             0x56      //++get channel_t body                              89
-#define ICHP_SV_CTRL                0x57      //++subcommand of server control mode               90
-#define ICHP_SV_SECKEY              0x58      //++get key_t body                                  91
-#define ICHP_SV_ADDRESS             0x59      //++get device_t body                               92
+#define ICHP_SV_RPT                 0x52      //++return open/close status of lamps on road       82
+#define ICHP_SV_CLOSE               0x53      //++close all the light                             83
+#define ICHP_SV_OPEN                0x54      //++open all the light                              84
+#define ICHP_SV_DATE                0x55      //++update coordinator current date and time        85
+#define ICHP_SV_CHANNEL             0x56      //++get channel_t body                              86
+#define ICHP_SV_CTRL                0x57      //++subcommand of server control mode               87
+#define ICHP_SV_SECKEY              0x58      //++get key_t body                                  88
+#define ICHP_SV_ADDRESS             0x59      //++get device_t body                               89
 #define ICHP_SV_END                 0x5a      //++ the vehicle arrives target point. 
 #define ICHP_SV_DEFAULT             0x5b      //++get device_t table                              96
 #define ICHP_SV_ROUTE               0x5c      //++server load route table to sink
@@ -151,42 +136,20 @@
 #define ICHP_SV_ADJUST              0x5e      //++ adjust radio default channel
 #define ICHP_SV_RESPONSE            0x5f      //++ response of devices
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// the command send and recieve between coordiantor and lamp router
-//#define ICHP_CO_DATE                0x21      //++ update all router and lamps date and time
-//#define ICHP_CO_ACKNOWLEDGE         0x22      //++ send key response to all lamps
-//#define ICHP_CO_OPEN                0x23      //++ open lamps
-//#define ICHP_CO_CLOSE               0x24      //++ close lamps
-//#define ICHP_CO_CTRL                0x25      //++ send road index
-//#define ICHP_CO_RPT                 0x26      //++ request lamp send lamp_t information
-//#define ICHP_CO_SECKEY              0x27      //++ get key_t body information
-//#define ICHP_CO_CHANNEL             0x28      //++ change radio channel, added in 2011-10-06
-//#define ICHP_CO_DEFAULT             0x29      //++ restore default information, added in 2011-10-06
-//#define ICHP_CO_REBOOT              0x2a      //++ lamps reboot, added in 2011-10-06
-//#define ICHP_CO_ADDRESS             0x2b      //++ get lamps physical address and logic address, added in 2011-10-26
-//#define ICHP_CO_END                 0x2c      //++ the vehicle arrives target point. 
-//#define ICHP_CO_TABLE               0x2d      //++ get passed_t table                       
-//#define ICHP_CO_ROUTE               0x2e      //++ the sink send the router table to the car
-//#define ICHP_CO_ADJUST              0x2f      //++ adjust radio default channel
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 #define ICHP_MSG_HELLO              0x39      //++ multicast hello string for test
 #define ICHP_LARGE_DATA             0x3b
 #define ICHP_INTER_PAN              0x3c
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-#define ICHP_BEEPER_CALL                    0xE0   // beeper call to sink
-#define ICHP_CAR_RPT_ERROR                  0xE1   // send error ID to sink
-#define ICHP_CAR_RPT_INFO                   0xE2   // car info report to sink
-#define ICHP_SV_RPT_CAR_INFO                0xE3   // car info report to server
-#define ICHP_SV_RPT_CAR_ERROR               0xE4   // send error ID to server
-#define ICHP_SV_RPT_BEEPER_CALL             0xE5   // sink report beeper call to server
-#define ICHP_SV_BEEPER_STATUS               0XE7   // request for car info
-//#define ICHP_CO_REBOOT_CAR                  0xE8   // reboot the car
-//#define ICHP_CO_STOP_CAR                    0xEA
-//#define ICHP_CAR_ADDRESS                    0xEB   // physic address information of device_t body
+#define ICHP_SV_RPT_CAR_INFO        0xE3   // car info report to server
+#define ICHP_SV_RPT_BEEPER_CALL     0xE5   // sink report beeper call to server
+#define ICHP_SV_LOAD_ROUTE_TABLE    0xE6   // server load route table to sink
+#define ICHP_SV_BEEPER_STATUS       0XE7   // request for car info
 
-#define PLC_CAR_INFO                        0xED   // plc report car info to w108
+#define PLC_CAR_INFO                0xED   // plc report car info to w108
 
 ////////////////////////////////////////////////////////////////////////////////
 // network information structure definition here

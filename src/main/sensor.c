@@ -144,18 +144,12 @@ void emberRouterStackStatusHandler ( EmberStatus status )
 
         case EMBER_NETWORK_DOWN:
             network_info.stackstate = EMBER_NO_NETWORK;
-            network_info.appstate = EMBER_NO_NETWORK;
+            network_info.appstate   = EMBER_NO_NETWORK;
             DBG("\r\nEVENT: stackStatus now EMBER_NETWORK_DOWN");
-#ifdef RANGE_TEST 
-            single_info.on();
-#endif
             break;
         case EMBER_JOIN_FAILED:
             DBG("\r\nEVENT: stackStatus now EMBER_JOIN_FAILED!");
             //sensorRejoinNetwork();
-#ifdef RANGE_TEST
-            single_info.on();
-#endif
             break;
         case EMBER_NO_BEACONS:
             DBG("\r\nEVENT: stackStatus now EMBER_NO_BEACONS");

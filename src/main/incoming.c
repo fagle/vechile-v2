@@ -118,9 +118,9 @@ void ezspCoordinatorIncomingMessageHandler ( EmberIncomingMessageType type,
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
-        case ICHP_SV_BEEPER_STATUS:
+        case ICHP_SV_ASSIGN:
             if (sys_info.ctrl.release)
-                uartfrm.put(&uartfrm, ICHP_SV_BEEPER_STATUS, sender, length, ptr);
+                uartfrm.put(&uartfrm, ICHP_SV_ASSIGN, sender, length, ptr);
             else
                 DBG("\r\n[coord]%dth vehicle response %02x, body length %d", road_info.number(sender), apsFrame->clusterId, length);
             break;
@@ -168,18 +168,29 @@ void ezspRouterIncomingMessageHandler ( EmberIncomingMessageType type, EmberApsF
     
     switch (apsFrame->clusterId) 
     {
-        case ICHP_SV_BEEPER_STATUS:
+        case ICHP_SV_ASSIGN:
             if (ptr[0x00] == sys_info.dev.num || ptr[0x03] == sys_info.dev.num)
             {
-                DBG("\r\n[route]receive ICHP_SV_BEEPER_STATUS %d, led status %d", ptr[0x00], ptr[0x02]);
+                DBG("\r\n[route]receive ICHP_SV_ASSIGN %d, beeper status %d, %d", ptr[0x00], ptr[0x02], ptr[0x03]);
                 if (isCallDevice())
                 {
-                    carInfo.led = ptr[0x02];
-                    table[0x02] = carInfo.led;
+                    carInfo.beep->assign = 0x00;
+                    if (carInfo.beep->status != ptr[0x02])
+                        carInfo.beep->status = ptr[0x02];
+                    if (carInfo.beep->call)
+                        carInfo.beep->call = 0x00; 
+                    if (ptr[0x02] == ASSIGNCAR)
+                        carInfo.beep->car = ptr[0x03];
+                    else
+                        carInfo.beep->car = 0x00;
+                    table[0x02] = carInfo.beep->status;
                 }
-                else if (isCarDevice())      // ptr[0x00]--caller, ptr[0x01]--type, ptr[0x02]--status, ptr[0x03]--vehicle's number
+                else if (isCarDevice())             // ptr[0x00]--caller, ptr[0x01]--type, ptr[0x02]--status, ptr[0x03]--vehicle's number
                 {
-//                    if (ptr[0x01] == sys_info.dev.type)
+                    if (ptr[0x02] == ASSIGNCAR)
+                        carInfo.key = ptr[0x00];    // caller's station number
+                    else
+                        carInfo.key = 0x00;
                     table[0x02] = 0x00;
                 }
             }
@@ -318,8 +329,8 @@ void ezspRouterIncomingMessageHandler ( EmberIncomingMessageType type, EmberApsF
                 set_lampmode(LAMP_CHANGE);
             else if (isCallDevice())
             {
-                table[0x02] = carInfo.led;
-                sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
+                if (carInfo.beep->assign)
+                    set_lampmode(LAMP_FORCE);
             }
             break;
         case ICHP_SV_DATE:

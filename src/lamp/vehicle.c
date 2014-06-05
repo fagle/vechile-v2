@@ -172,9 +172,6 @@ static void ledOff ( void )
 {
     DBG("\r\n[car]led off");
     halSetGPIO(GPIO_LED);
-    if (carInfo.plc.fail & END_LINE)
-        carInfo.plc.fail &= ~END_LINE;
-    carInfo.led = 0x03;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,10 +185,9 @@ static void ledOff ( void )
 //*------------------------------------------------*/
 static void ledToggle ( void )
 {
+    DBG("\r\n[car]led toggle");
     if (GPIO_PAOUT & PA1)
-    {
         halClearGPIO(GPIO_LED);
-    }
     else
         halSetGPIO(GPIO_LED);
 }
@@ -369,6 +365,17 @@ void vehicleInit ( void )
         halGpioConfig(GPIO_BUTTONB, GPIOCFG_IN_PUD);
         halSetGPIO(GPIO_BUTTONA);                     // pull up
         halSetGPIO(GPIO_BUTTONB);                     // pull up
+        carInfo.beep = (pbeep_t)&single_info.lamp.vehicle;
+        carInfo.beep->number  = sys_info.dev.num;
+        carInfo.beep->type    = sys_info.dev.type;
+        carInfo.beep->assign  = 0x00;
+        carInfo.beep->call    = 0x00;
+        carInfo.beep->status  = 0x00;
+        carInfo.beep->car     = 0x00;
+        carInfo.beep->fail    = 0x00;
+        carInfo.beep->last    = 0x00;
+        carInfo.beep->tick    = 0x00;
+        carInfo.beep->times   = 5000;
     }
     else if (isCarDevice())
     {
@@ -391,6 +398,7 @@ void vehicleInit ( void )
             carInfo.home[i].action = 0x00;
         }
         vehicleRouteTable(0x00, carInfo.homeway, carInfo.home);
+        carInfo.beep = NULL;
     }
 }
 
@@ -613,8 +621,8 @@ static void carReportHandler ( void )
         {
             if (get_lampmode(LAMP_FORCE))
             {
-                DBG("\r\n[call]send call,carInfo.plc.status%d", carInfo.plc.status);
-                sea_sendmsg(&send1, UNICAST, 0x00, ICHP_SV_RPT, sizeof(vehicle_t), &carInfo.plc); 
+                DBG("\r\n[call]send call, carInfo.beep->caller's vehicle type %d", carInfo.beep->call);
+                sea_sendmsg(&send1, UNICAST, 0x00, ICHP_SV_RPT, sizeof(vehicle_t), carInfo.beep); 
                 clr_lampmode(LAMP_FORCE);
             }
         }
@@ -865,9 +873,6 @@ u8  vehicleRouteTable ( u8 index, u8 length, action_t * ptr )
 //*------------------------------------------------*/
 void vehicleAppHandler ( void ) 
 {
-    static u16 app_tick = 0x00;
-    static u8 last_led_status = 0x00;
-    
     if (network_info.appstate == EMBER_JOINED_NETWORK)
     {
         if (!network_info.substate)
@@ -882,31 +887,21 @@ void vehicleAppHandler ( void )
     
     if (isCallDevice())
     {
-        if(last_led_status != carInfo.led)
+        if (carInfo.beep->last != carInfo.beep->status)
         {
-            last_led_status = carInfo.led;
-            if(last_led_status == 0x03)
-            {
-                DBG("\r\n[car]led off");
-                halSetGPIO(GPIO_LED);
-            }
-            if(last_led_status == 0x02)
-            {
-                DBG("\r\n[car]led on");
-                halClearGPIO(GPIO_LED);
-            }
+            carInfo.beep->last = carInfo.beep->status;
+            if (carInfo.beep->status == ONLINECAR)
+                carInfo.off();
+            else if (carInfo.beep->status == ASSIGNCAR)
+                carInfo.on();
         }
-        if(last_led_status == 0x01)
+        if (carInfo.beep->status == WAITINGCAR)
         {
-            app_tick ++;
-            if(app_tick == 5000)
+            carInfo.beep->tick ++;
+            if(carInfo.beep->tick >= carInfo.beep->times)
             {
-                halClearGPIO(GPIO_LED);
-            }
-            if(app_tick >= 10000)
-            {
-                app_tick = 0x00;
-                halSetGPIO(GPIO_LED);
+                carInfo.toggle();
+                carInfo.beep->tick = 0x00;
             }
         }
     }
@@ -923,19 +918,12 @@ void vehicleAppHandler ( void )
 //*------------------------------------------------*/
 static u8 carScanKey ( void )
 {
-    if (single_info.lamp.vehicle.type == CALLIDST)
+    if (isCallDevice())
     {
         if ((GPIO_PAIN & (PA0)) != (PA0))
-            return CARIDST;
+            return CARIDST + (sys_info.dev.type - CALLIDST) * 0x02;
         if ((GPIO_PAIN & PA4) != PA4)
-            return CARIDST + 0x01;
-    }
-    else if (single_info.lamp.vehicle.type == CALLIDST + 0x01)
-    {
-        if ((GPIO_PAIN & (PA0)) != (PA0))
-            return CARIDST + 0x02;
-        if ((GPIO_PAIN & PA4) != PA4)
-            return CARIDST + 0x03;
+            return CARIDST + (sys_info.dev.type - CALLIDST) * 0x02 + 0x01;
     }
     return 0x00;
 }
@@ -969,14 +957,13 @@ void vehicleMsEventHandler ( void )
         if (carInfo.ms >= KEYTIMES)
         {
             u8 key;
-        
             key = carScanKey();
             if (key == carInfo.key && key)
             {
-                carInfo.plc.status = key;
-                DBG("\r\n[KEY]carInfo.plc.status %d",carInfo.plc.status);
+                carInfo.beep->call   = key;
+                carInfo.beep->assign = 0x01;
+                DBG("\r\n[KEY]carInfo.beep>caller's vehicle type %d", carInfo.beep->call);
                 set_lampmode(LAMP_FORCE);
-                carInfo.on();
                 carInfo.key = 0x00;
             }    
             else
@@ -1116,52 +1103,7 @@ static void frmcopystate ( u8 * body, pvehicle_t ptr )
 //*------------------------------------------------*/
 void recvPlcStateFrm ( pframe_t ptr )
 {
-#if 0
-    static u8 times = 0x00;
-    
-    if (!isCarDevice())   
-        return;
-    
-    carInfo.recv ++;
-    frmcopystate(ptr->body, &plc);
-    
-    if (plc.status == CAR_RUN && carInfo.status == CAR_STOP)   // ptr->body[0] == CAR_RUN)  //  && carInfo.action == CAR_STOP)      
-    {
-        times ++;
-        if (times >= 0x30)
-        {
-            carInfo.action   = CAR_RUN;
-            carInfo.status   = CAR_RUN;
-            carInfo.plc.fail = NO_ERROR;
-            set_lampmode(LAMP_UPDATE);
-            times = 0x00;
-        }
-    }
-    
-    if (plc.card != carInfo.card)   //  && plc.status == CAR_STOP)
-    {
-        if (plc.status == CAR_STOP)
-            plc.status = CAR_RUN;
-        sea_memcpy(&carInfo.plc, &plc, sizeof(vehicle_t));
-        set_lampmode(LAMP_UPDATE);
-    }
-    
-    if (sea_memcomp(&carInfo.plc, &plc, sizeof(vehicle_t)))
-    {
-        sea_memcpy(carInfo.map, &carInfo.map[0x01], (MAGICSIZE - 0x01) * sizeof(magic_t));
-        carInfo.magic(plc.magic, &carInfo.map[MAGICSIZE - 0x01]);
-        plc.magic = 0x00;
-        plc.speed = 0x00;
-        for (u8 i = 0x00; i < MAGICSIZE; i ++)
-        {
-            plc.magic += carInfo.map[i].cnt;
-            plc.speed += carInfo.map[i].dir;
-        }
-        sea_memcpy(&carInfo.plc, &plc, sizeof(vehicle_t));
-        set_lampmode(LAMP_UPDATE);
-    }
-#else   
-    if (!isCarDevice() || ptr->len < 0x05 || !ptr->body[2] || !ptr->body[0])
+    if (!isCarDevice() || ptr->len < 0x05 || !ptr->body[0x02] || !ptr->body[0x00])
         return;
 
     carInfo.recv ++;
@@ -1201,7 +1143,6 @@ void recvPlcStateFrm ( pframe_t ptr )
         }
 #endif        
     }
-#endif
 }
 
 #endif //SENSOR_APP
