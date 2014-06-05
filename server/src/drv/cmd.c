@@ -224,6 +224,15 @@ void ServerFrameCmdHandler ( frame_t fr )
                 w108frm1.put(&w108frm1, ICHP_SV_REBOOT, 0x01, dyn_info.addr[fr.body[0x00] - 0x01].logic, dyn_info.buffer);
             }
             break;
+        case ICHP_SV_ADJUST:
+            if (dyn_info.addr[fr.body[0x00] - 0x01].logic) 
+            {
+                dyn_info.buffer[0x00] = fr.body[0x00];
+                dyn_info.buffer[0x01] = fr.body[0x01];
+                sea_printf("\n%dth device radio channel adjust to %d", fr.body[0x00], fr.body[0x01]);
+                w108frm1.put(&w108frm1, ICHP_SV_ADJUST, 0x02, dyn_info.addr[fr.body[0x00] - 0x01].logic, dyn_info.buffer);
+            }
+            break;
         case ICHP_SV_BEEPER_STATUS:
             sea_printf("\nsend ICHP_SV_BEEPER_STATUS to caller %d call status %d, len %d", fr.body[0x00], fr.body[0x02], fr.len);
             if (isCallDevice(CALLIDST, fr.body[0x00]))
@@ -420,17 +429,18 @@ void sea_parsereport ( plamp_t ptr, u16 road )
                 }
                 else if (isCallDevice(ptr->vehicle.type, ptr->vehicle.number)) 
                 {
-                    if (ptr->vehicle.status)
+                    pbeep_t bep = (pbeep_t)&ptr->vehicle;
+                    if (bep->call)
                     {
-                        pcall_t cal = (pcall_t)rep_info.goal[ptr->vehicle.number - 0x01];
-                        if (cal->logic[beepidx(ptr->vehicle.status)] != road)
-                            cal->logic[beepidx(ptr->vehicle.status)] = road;
-                        cal->body[0x00] = ptr->vehicle.number;
-                        cal->body[0x01] = ptr->vehicle.status;
+                        pcall_t cal = (pcall_t)rep_info.goal[bep->number - 0x01];
+                        if (cal->logic[beepidx(bep->call)] != road)
+                            cal->logic[beepidx(bep->call)] = road;
+                        cal->body[0x00] = bep->number;
+                        cal->body[0x01] = bep->call;
                         if (dyn_info.report)
                             consfrm1.put(&consfrm1, ICHP_SV_RPT_BEEPER_CALL, 0x02, sys_info.ctrl.road, cal->body);
                         else
-                            sea_printf("\ncall vehicle type %d from station %02x", ptr->vehicle.status, ptr->vehicle.number);
+                            sea_printf("\ncall vehicle type %d from station %02x, status %d", bep->call, bep->number, bep->status);
                     }
                 } 
                 else
@@ -574,27 +584,27 @@ void CoordFrameCmdHandler ( frame_t fr )
             sea_sendacknowledge(ICHP_SV_CLOSE_ACK, fr.road, num, ACK_OK);
             break;
         case ICHP_SV_RESPONSE: 
-            sea_printf("\n%d-%dth vehicle's response, command %02x, result %d, len %d", num, fr.body[0x00], fr.body[0x01], fr.body[0x02], fr.len);
-            break;
-        case ICHP_CAR_ROUTE:
         {
-            u8 i;
-            sea_printf("\nreceive route car%d index%d len%d sum %d\n",fr.body[0],fr.body[1],fr.body[2],fr.body[3]);
-            
-            for(i=4;i<fr.len;i+=2)
+            sea_printf("\n%dth vehicle's response, command %02x, result %d, len %d", fr.body[0x00], fr.body[0x01], fr.body[0x02], fr.len);
+            switch (fr.body[0x01])
             {
-                sea_printf("%2x ",fr.body[i]);
+                case ICHP_SV_ASSIGN:
+                    sea_printf("\nrec ICHP_SV_ASSIGN, len %d, body %d", fr.len, fr.body[0x00]);
+                    if (isCallDevice(CALLIDST, fr.body[0x00]))
+                    {
+                        pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];
+                        if (cal->cnt)
+                            cal->cnt --;
+                        if (cal->state == fr.body[0x02] && cal->cnt == 0x00)  
+                            cal->ack = 0x00;
+                    }
+                    break;
             }
-            sea_printf("\n");
-            for(i=5;i<fr.len;i+=2)
-            {
-                sea_printf("%2x ",fr.body[i]);
-            }           
             break;
         }
-        case ICHP_SV_BEEPER_STATUS:
+        case ICHP_SV_ASSIGN:
         {
-            sea_printf("\nrec ICHP_SV_BEEPER_STATUS, len%d, body%d", fr.len, fr.body[0x00]);
+            sea_printf("\nrec ICHP_SV_ASSIGN, len%d, body%d", fr.len, fr.body[0x00]);
             if (isCallDevice(CALLIDST, fr.body[0x00]))
             {
                 pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];

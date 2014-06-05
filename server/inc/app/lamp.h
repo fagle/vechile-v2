@@ -234,6 +234,22 @@ typedef struct                  // 12bytes body, like as light_t in lamp.h
 } vehicle_t, *pvehicle_t;
 
 ////////////////////////////////////////////////////////////////////////////////////
+// the beeper key report
+typedef struct                  // 12bytes body, like as light_t in lamp.h
+{
+    u8      number;             // beep ÎïÀí±àºÅ£¬µÆºÅ(1 bytes(1~255))
+    u8      type;               // device type, beep, mobile etc
+    u8      fail;               // fail state
+    u8      status;             // beep report ×´Ì¬
+    u8      last;               // last led state
+    u8      car;                // car number
+    u8      call;               // caller type
+    u8      assign;             // assign vehicle
+    u16     times;              // time of flash
+    u16     tick;               // tick count  
+} beep_t, *pbeep_t;
+
+////////////////////////////////////////////////////////////////////////////////////
 // the car information body
 typedef struct
 {

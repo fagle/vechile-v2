@@ -27,6 +27,7 @@
 #define CAR_STRAIGHT              0x52
 #define CAR_STOP                  0x53
 #define CAR_RUN                   0x54
+#define CAR_ASSIGN                0x55
 #define CAR_OBSTACLE              0x58
 #define CAR_REQ_MSG               0x60
 
@@ -40,7 +41,7 @@
 #define PLCPERIOD                 (50)
 
 #define RS485SIZE                 (32)
-#define SINK_ADDRESS_TABLE_INDEX  (0x00)
+//#define SINK_ADDRESS_TABLE_INDEX  (0x00)
 
 ////////////////////////////////////////////////////////////////////////////////////
 // error status of vehicle, 
@@ -69,18 +70,10 @@
 #define RIGHTMINSPEED             (3650)
 
 /////////////////////////////////////////////////////////////////////////////////////
-//  define the car state
-enum  
-{
-    CARGOLEFT     = 0x01,  // car go left
-    CARGORIGHT    = 0x02,  // car go right
-    CARGOSTRAIGHT = 0x03,  // car go straight
-    CARSTOP       = 0x04,  // car stop
-    CARRUN        = 0x05,  // car run
-    CARFREE       = 0x06,  // car free
-    CAR_POS_ERROR = 0x07,  // car position error
-    CAR_OBSTACLE_PAUSE = 0x08
-};
+//  define the car status
+#define WAITINGCAR                (0x01)
+#define ASSIGNCAR                 (0x02)
+#define ONLINECAR                 (0x03)
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
@@ -170,14 +163,18 @@ typedef struct                  // 12bytes body, like as light_t in lamp.h
 
 ////////////////////////////////////////////////////////////////////////////////////
 // the beeper key report
-typedef struct                  // 6bytes body, like as light_t in lamp.h
+typedef struct                  // 12bytes body, like as light_t in lamp.h
 {
-    u8      number;             // beeper ÎïÀí±àºÅ£¬µÆºÅ(1 bytes(1~255))
+    u8      number;             // beep ÎïÀí±àºÅ£¬µÆºÅ(1 bytes(1~255))
     u8      type;               // device type, beep, mobile etc
-    u8      call;               // call's type
-    u8      status;             // beep ×´Ì¬
-    u8      target;             // target station
-    u8      led;                // led state
+    u8      fail;               // fail state
+    u8      status;             // beep report ×´Ì¬
+    u8      last;               // last led state
+    u8      car;                // car number
+    u8      call;               // caller type
+    u8      assign;             // assign vehicle
+    u16     times;              // time of flash
+    u16     tick;               // tick count  
 } beep_t, *pbeep_t;
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -189,13 +186,13 @@ typedef struct
     u16         recv;            // recieve frame count from plc
     u16         time;           // time (second) found new rfid card 
     u8          status;          // car action status
-    u8          led;             // call'led status
     u8          key;             // for caller and standby devices
     u8          card;            // current card read from plc
     u8          action;          // current line action
     u8          clash;           // car meet clash state
     u8          waiting;
     u8          homeway;         // count of home way
+    pbeep_t     beep;
     vehicle_t   plc;             // plc data information body
     action_t    home[HOMESIZE];  // goto home
     route_t     route;           // vehicle on line's action 
@@ -394,11 +391,7 @@ void vehicleMsEventHandler ( void );
 /////////////////////////////////////////////////////////////////////////////////////////
 //
 extern car_info_t carInfo;
-extern u16 delay_time;
-extern u8 led_status;
-extern u16 watch_time;
-extern u8 watch_time2;
-extern u8 watch_time3;
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 #endif //  __VEHICLE_H__

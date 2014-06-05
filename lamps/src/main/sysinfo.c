@@ -279,8 +279,10 @@ void sea_printlamp ( plamp_t ptr )
     }
     else if (sys_info.ctrl.app == eVehicle)
     {
-         DBG("\r\ntype number status fail obstacle card magic index count speed");
-         DBG("\r\n%4d   %4d   %4x %4x     %4x %4d  %4x  %4d  %4d  %4d", ptr->vehicle.type,
+         if (isCarDevice())
+         {
+             DBG("\r\ntype number status fail obstacle card magic index count speed");
+             DBG("\r\n%4d   %4d   %4x %4x     %4x %4d  %4x  %4d  %4d  %4d", ptr->vehicle.type,
                                                             ptr->vehicle.number,
                                                             ptr->vehicle.status,
                                                             ptr->vehicle.fail,
@@ -290,6 +292,22 @@ void sea_printlamp ( plamp_t ptr )
                                                             ptr->vehicle.index,
                                                             ptr->vehicle.count,
                                                             ptr->vehicle.speed);
+         }
+         else if (isCallDevice())
+         {
+             pbeep_t cal = (pbeep_t)&ptr->vehicle;
+             DBG("\r\ntype number status  car  call fail times last assign tick");
+             DBG("\r\n%4d   %4d   %4d %4d  %4d %4d  %4d %4d   %4d %4d", cal->type,
+                                                            cal->number,
+                                                            cal->status,
+                                                            cal->car,
+                                                            cal->call,
+                                                            cal->fail,
+                                                            cal->times,
+                                                            cal->last,
+                                                            cal->assign,
+                                                            cal->tick);
+         }
     }
 }
 

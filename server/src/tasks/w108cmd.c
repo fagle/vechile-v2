@@ -12,7 +12,7 @@ extern frame_info_t w108frm1;
 //
 static void printCommandHelp ( void )
 {
-    sea_printf("\nw108 Usage: w108 -[corxainp] nn");
+    sea_printf("\nw108 Usage: w108 -[codrxainp] nn");
     sea_printf("\n  -o nn, start number of nnth vehicle.");
     sea_printf("\n  -c nn, stop number of nnth vehicle.");
     sea_printf("\n  -e nn, send end_line to nnth vehicle.");
@@ -21,6 +21,7 @@ static void printCommandHelp ( void )
     sea_printf("\n  -n n1 num type, change vehicle from n1 to number and type.");
     sea_printf("\n  -i index mask, change vehicle radio index and mask.");
     sea_printf("\n  -a nnn, change vehicle application type.");
+    sea_printf("\n  -d cc tt ss vv, dispatch vv vehicle to cc caller's station.");
     sea_printf("\n  -x mmm bbb, change vehicle max. and base devices.");
     sea_printf("\n  -p nnn ccc, change vehicle report period and config mode.");
 }
@@ -109,7 +110,8 @@ void sea_w108config ( int argc, char * argv[] )
                 }
                 case 'd':
                 {
-                    sscanf(cmdhd1.optarg, "%d", &num);
+#if 0
+                  sscanf(cmdhd1.optarg, "%d", &num);
                     tmp = num & 0xff;
                     
                     ppath_t ptr = msg_info.find(num);
@@ -131,7 +133,24 @@ void sea_w108config ( int argc, char * argv[] )
                             sea_printf("%2x ",ptr->line[i].action);
                         }
                     }
-                    
+#else
+                    sscanf(cmdhd1.optarg, "%d", &num);                   
+                    tmp = num & 0xff;  
+                    if (dyn_info.addr[tmp - 0x01].logic)
+                    {
+                        frm.body[0x00] = tmp;                // caller's station number
+                        sscanf(argv[0x03], "%d", &num);
+                        frm.body[0x01] = num & 0xff;         // call vehicle type
+                        sscanf(argv[0x04], "%d", &num);
+                        frm.body[0x02] = num & 0xff;         // caller's status, waiting, assign, online
+                        sscanf(argv[0x05], "%d", &num);
+                        frm.body[0x03] = num & 0xff;         // assign vehicle number
+                        frm.cmd        = ICHP_SV_BEEPER_STATUS;
+                        frm.len        = 0x04;
+                        frm.road       = dyn_info.addr[frm.body[0x00] - 0x01].logic;
+                        ServerFrameCmdHandler(frm);
+                    }
+#endif                    
                     break;
                 }
                 case 's':
@@ -287,10 +306,17 @@ void sea_w108config ( int argc, char * argv[] )
                     }
                     break;
                 case 'i':
-                    if (argc == 0x04)
+                    sscanf(cmdhd1.optarg, "%d", &num);                   
+                    tmp = num & 0xff;  
+                    if (dyn_info.addr[tmp - 0x01].logic)
                     {
-                        sea_printf("\nsend command: road -i %s %s", cmdhd1.optarg, argv[0x03]); 
-                        w108frm1.print(&w108frm1, "road -i %s %s\r\n", cmdhd1.optarg, argv[0x03]);
+                        frm.body[0x00] = tmp;                // device number
+                        sscanf(argv[0x03], "%d", &num);
+                        frm.body[0x01] = num & 0xff;         // radio channel index
+                        frm.cmd        = ICHP_SV_ADJUST;
+                        frm.len        = 0x02;
+                        frm.road       = dyn_info.addr[frm.body[0x00]  - 0x01].logic;
+                        ServerFrameCmdHandler(frm);
                     }
                     break;
                 default:

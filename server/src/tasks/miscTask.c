@@ -90,12 +90,12 @@ void vMiscellaneaTask ( void *pvParameters )
                     if (cal->logic[0x00])
                     {
                         cal->cnt ++;
-                        w108frm1.put(&w108frm1, ICHP_SV_BEEPER_STATUS, 0x04, cal->logic[0x00], cal->body);
+                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x00], cal->body);
                     }
                     if (cal->logic[0x01])
                     {
                         cal->cnt ++;
-                        w108frm1.put(&w108frm1, ICHP_SV_BEEPER_STATUS, 0x04, cal->logic[0x01], cal->body);
+                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x01], cal->body);
                     }
                 }
             }
