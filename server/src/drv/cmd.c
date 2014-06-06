@@ -120,16 +120,17 @@ static u8  sea_parseroutetable ( ppath_t ptr )
 *************************************************/ 
 void sea_sendacknowledge ( u8 cmd, u16 id, u8 num, u8 state )
 {
-  u8 buf[0x03] = {0x00, 0x00,};
+    u8 buf[0x05] = {0x00, 0x00,};
     
     if (dyn_info.report)
     {
         buf[0x00] = num;
-        buf[0x01] = state;
-        consfrm1.put(&consfrm1, cmd, 0x02, id, buf);
+        buf[0x01] = cmd;
+        buf[0x02] = state;
+        consfrm1.put(&consfrm1, ICHP_SV_RESPONSE, 0x03, id, buf);
     }
     else
-        sea_printf("\nsend %02x command to car %s", cmd, state ? "FAIL" : "OK");
+        sea_printf("\nsend %02x command response from device of %d, status %d", cmd, num, state);
 }
 
 /************************************************
@@ -152,10 +153,10 @@ void ServerFrameCmdHandler ( frame_t fr )
                 
     switch (fr.cmd)
     {
-        case ICHP_SV_LOAD_ROUTE_TABLE: 
-            if (dyn_info.addr[fr.body[0x00] - 0x01].logic && (fr.len & 0x01) == 0x00)
+        case ICHP_PC_ROUTE: 
+//            if (dyn_info.addr[fr.body[0x00] - 0x01].logic && (fr.len & 0x01) == 0x00)
             {
-                if (rep_info.key[fr.body[0x00] - 0x01].vehicle.status == CAR_STOP)
+//                if (rep_info.key[fr.body[0x00] - 0x01].vehicle.status == CAR_STOP)
                 {
                     if (msg_info.add(fr.body[0x00], fr.body[0x01], fr.body[0x03] * sizeof(action_t), &fr.body[0x04]))
                     {
@@ -167,20 +168,20 @@ void ServerFrameCmdHandler ( frame_t fr )
                                 if (sea_parseroutetable(rut)) 
                                     sea_sendroutetable(rut); 
                                 else 
-                                    sea_sendacknowledge(ICHP_SV_ROUTE_ACK, fr.road, fr.body[0x00], ACK_FAIL);
+                                    sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
                             }
                             else
-                                sea_sendacknowledge(ICHP_SV_ROUTE_ACK, fr.road, fr.body[0x00], ACK_FAIL);
+                                sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
                         }
                     }
                     else
-                        sea_sendacknowledge(ICHP_SV_ROUTE_ACK, fr.road, fr.body[0x00], ACK_FAIL);
+                        sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
                }
-               else
-                   sea_sendacknowledge(ICHP_SV_ROUTE_ACK, fr.road, fr.body[0x00], ACK_FAIL);
+//               else
+//                   sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
             }
-            else
-                sea_sendacknowledge(ICHP_SV_ROUTE_ACK, fr.road, fr.body[0x00], ACK_FAIL);
+//            else
+//                sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
             break;
         case ICHP_SV_END:   
             if (dyn_info.addr[fr.body[0x00] - 0x01].logic) 
@@ -233,8 +234,8 @@ void ServerFrameCmdHandler ( frame_t fr )
                 w108frm1.put(&w108frm1, ICHP_SV_ADJUST, 0x02, dyn_info.addr[fr.body[0x00] - 0x01].logic, dyn_info.buffer);
             }
             break;
-        case ICHP_SV_BEEPER_STATUS:
-            sea_printf("\nsend ICHP_SV_BEEPER_STATUS to caller %d call status %d, len %d", fr.body[0x00], fr.body[0x02], fr.len);
+        case ICHP_PC_ASSIGN:
+            sea_printf("\nsend ICHP_PC_ASSIGN to caller %d call status %d, len %d", fr.body[0x00], fr.body[0x02], fr.len);
             if (isCallDevice(CALLIDST, fr.body[0x00]))
             {
                 pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];
@@ -395,7 +396,7 @@ void sea_parsereport ( plamp_t ptr, u16 road )
                         report1.magic    = ptr->vehicle.magic;
                         //if(sea_findcard(rut, ptr->vehicle.card))
                         {
-                            consfrm1.put(&consfrm1, ICHP_SV_RPT_CAR_INFO, sizeof(report_t), sys_info.ctrl.road, (u8 *)&report1);
+                            consfrm1.put(&consfrm1, ICHP_PC_RPTCAR, sizeof(report_t), sys_info.ctrl.road, (u8 *)&report1);
                         }
                     }
                     else
@@ -438,7 +439,7 @@ void sea_parsereport ( plamp_t ptr, u16 road )
                         cal->body[0x00] = bep->number;
                         cal->body[0x01] = bep->call;
                         if (dyn_info.report)
-                            consfrm1.put(&consfrm1, ICHP_SV_RPT_BEEPER_CALL, 0x02, sys_info.ctrl.road, cal->body);
+                            consfrm1.put(&consfrm1, ICHP_PC_RPTBEEP, 0x02, sys_info.ctrl.road, cal->body);
                         else
                             sea_printf("\ncall vehicle type %d from station %02x, status %d", bep->call, bep->number, bep->status);
                     }
@@ -548,7 +549,6 @@ void CoordFrameCmdHandler ( frame_t fr )
         case ICHP_SV_END:  
             sea_printf("\n%dth vehicle ends line", num);
             if (rut)    msg_info.clear(num);
-//            sea_sendacknowledge(ICHP_SV_END_ACK, fr.road, num, ACK_OK);
             break;
         case ICHP_SV_ROUTE:  
             {
@@ -563,7 +563,7 @@ void CoordFrameCmdHandler ( frame_t fr )
                     w108frm1.put(&w108frm1, ICHP_SV_END, 0x01, fr.road, dyn_info.buffer);
                 }
             }
-            sea_sendacknowledge(ICHP_SV_ROUTE_ACK, fr.road, num, ACK_OK);
+            sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPOK);
             break;
         case ICHP_SV_OPEN:  
             sea_printf("\n%dth vehicle is running ...", num);
@@ -572,7 +572,7 @@ void CoordFrameCmdHandler ( frame_t fr )
                 if (rut->status == CAR_START)
                     rut->status = CAR_NONE;
             }
-            sea_sendacknowledge(ICHP_SV_OPEN_ACK, fr.road, num, ACK_OK);
+            sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPOK);
             break;
         case ICHP_SV_CLOSE: 
             sea_printf("\n%dth vehicle is stopped", num);
@@ -581,7 +581,7 @@ void CoordFrameCmdHandler ( frame_t fr )
                 if (rut->status == CAR_PAUSE)
                     rut->status = CAR_NONE;
             }
-            sea_sendacknowledge(ICHP_SV_CLOSE_ACK, fr.road, num, ACK_OK);
+            sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPOK);
             break;
         case ICHP_SV_RESPONSE: 
         {

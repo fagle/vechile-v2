@@ -12,18 +12,19 @@ extern frame_info_t w108frm1;
 //
 static void printCommandHelp ( void )
 {
-    sea_printf("\nw108 Usage: w108 -[codrxainp] nn");
-    sea_printf("\n  -o nn, start number of nnth vehicle.");
-    sea_printf("\n  -c nn, stop number of nnth vehicle.");
-    sea_printf("\n  -e nn, send end_line to nnth vehicle.");
-    sea_printf("\n  -b nn, send reboot to nnth vehicle.");
+    sea_printf("\nw108 Usage: w108 -[codrxalinp] nn");
+    sea_printf("\n  -o nn, start number of nn vehicle.");
+    sea_printf("\n  -c nn, stop number of nn vehicle.");
+    sea_printf("\n  -e nn, send end_line to nn vehicle.");
+    sea_printf("\n  -b nn, send reboot to nn vehicle.");
     sea_printf("\n  -r n1 idx id act id act ..., set route table to vehicle.");
     sea_printf("\n  -n n1 num type, change vehicle from n1 to number and type.");
     sea_printf("\n  -i index mask, change vehicle radio index and mask.");
-    sea_printf("\n  -a nnn, change vehicle application type.");
+    sea_printf("\n  -a nn, change vehicle application type.");
+    sea_printf("\n  -l nn, print nn route table.");
     sea_printf("\n  -d cc tt ss vv, dispatch vv vehicle to cc caller's station.");
-    sea_printf("\n  -x mmm bbb, change vehicle max. and base devices.");
-    sea_printf("\n  -p nnn ccc, change vehicle report period and config mode.");
+    sea_printf("\n  -x mm bb, change vehicle max. and base devices.");
+    sea_printf("\n  -p nn cc, change vehicle report period and config mode.");
 }
 
 void sea_w108config ( int argc, char * argv[] )
@@ -45,7 +46,7 @@ void sea_w108config ( int argc, char * argv[] )
         return;
     }
     
-    while ((opt = sea_getopt(argc, argv, "coberxainpdsf1234g")) != -1) 
+    while ((opt = sea_getopt(argc, argv, "coberxainpldsf1234g")) != -1) 
     {
         if (opt != 0x00 && cmdhd1.optarg != NULL)
         {
@@ -83,7 +84,7 @@ void sea_w108config ( int argc, char * argv[] )
                             sscanf(argv[0x04 + i], "%d", &num);          // id and action
                             dyn_info.buffer[i + 0x04] = num & 0xff;
                         }
-                        frm.cmd        = ICHP_SV_LOAD_ROUTE_TABLE;
+                        frm.cmd        = ICHP_PC_ROUTE;
                         frm.len        = argc;
                         frm.road       = dyn_info.addr[tmp - 0x01].logic;
                         
@@ -108,32 +109,28 @@ void sea_w108config ( int argc, char * argv[] )
                         
                     break;
                 }
-                case 'd':
+                case 'l':
                 {
-#if 0
-                  sscanf(cmdhd1.optarg, "%d", &num);
+                    sscanf(cmdhd1.optarg, "%d", &num);
                     tmp = num & 0xff;
-                    
                     ppath_t ptr = msg_info.find(num);
-                    if(ptr == NULL)
-                    {
+
+                    if (ptr == NULL || ptr->cnt == 0x00)
                         sea_printf("\ncan not find table");
-                    }
                     else
                     {
-                        sea_printf("\nroute table of %d,cnt %d", tmp,ptr->cnt);
+                        sea_printf("\nroute table of %d, cnt %d", tmp, ptr->cnt);
                         sea_printf("\n");
-                        for(u8 i = 0;i<ptr->cnt;i++)
-                        {
-                            sea_printf("%2x ",ptr->line[i].id);
-                        }
+                        for (u8 i = 0x00; i < ptr->cnt; i ++)
+                            sea_printf("%2x ", ptr->line[i].id);
                         sea_printf("\n");
-                        for(u8 i = 0;i<ptr->cnt;i++)
-                        {
+                        for(u8 i = 0x00; i < ptr->cnt; i ++)
                             sea_printf("%2x ",ptr->line[i].action);
-                        }
                     }
-#else
+                    break;
+                }
+                case 'd':
+                {
                     sscanf(cmdhd1.optarg, "%d", &num);                   
                     tmp = num & 0xff;  
                     if (dyn_info.addr[tmp - 0x01].logic)
@@ -145,12 +142,11 @@ void sea_w108config ( int argc, char * argv[] )
                         frm.body[0x02] = num & 0xff;         // caller's status, waiting, assign, online
                         sscanf(argv[0x05], "%d", &num);
                         frm.body[0x03] = num & 0xff;         // assign vehicle number
-                        frm.cmd        = ICHP_SV_BEEPER_STATUS;
+                        frm.cmd        = ICHP_PC_ASSIGN;
                         frm.len        = 0x04;
                         frm.road       = dyn_info.addr[frm.body[0x00] - 0x01].logic;
                         ServerFrameCmdHandler(frm);
                     }
-#endif                    
                     break;
                 }
                 case 's':
@@ -271,7 +267,7 @@ void sea_w108config ( int argc, char * argv[] )
                 case 'r':
                     sscanf(cmdhd1.optarg, "%d", &num);                   
                     tmp = num & 0xff;
-                    if (dyn_info.addr[tmp - 0x01].logic && (argc & 0x01) == 0x00)
+//                    if (dyn_info.addr[tmp - 0x01].logic && (argc & 0x01) == 0x00)
                     {
                         dyn_info.buffer[0x00] = tmp;                     // number of logic 
                         sscanf(argv[0x03], "%d", &num);           
@@ -283,7 +279,7 @@ void sea_w108config ( int argc, char * argv[] )
                             sscanf(argv[0x04 + i], "%d", &num);          // id and action
                             dyn_info.buffer[i + 0x04] = num & 0xff;
                         }
-                        frm.cmd        = ICHP_SV_LOAD_ROUTE_TABLE;
+                        frm.cmd        = ICHP_PC_ROUTE;
                         frm.len        = argc;
                         frm.road       = dyn_info.addr[tmp - 0x01].logic;
                         sea_memcpy(frm.body, dyn_info.buffer, frm.len);

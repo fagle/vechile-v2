@@ -1,5 +1,5 @@
 [DebugChecksum]
-Checksum=411773559
+Checksum=1173160960
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 1
@@ -35,6 +35,7 @@ mode=1
 [Breakpoints]
 Count=0
 [Aliases]
-A0=_ "G:\Workshops\seavehicle\server\sealib\st_lib\stm32f10x_rcc.c" ""
-Count=1
+A0=_ "G:\Workshops\renovate_nv_full\server\sealib\st_lib\stm32f10x_rcc.c" ""
+A1=_ "G:\Workshops\seavehicle\server\sealib\st_lib\stm32f10x_rcc.c" ""
+Count=2
 SuppressDialog=0

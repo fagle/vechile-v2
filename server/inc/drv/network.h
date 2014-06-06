@@ -57,6 +57,10 @@
 #define MACSIZE                (0x06)
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+// application types, modified 2012/06/22, update  2013/12/14
+enum  { eLights = 0x01, eVehicle, eCondition };  // type of application, such as staightlights, vehicle, air condition etc.
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 // zigbee types of device, modified 2012/06/22, update 2013/11/18
 #define COORDID                (0x00)     // coordinator's id, it must be different with other devices.  
 #define ENDEVID                (0x01)     // please modify node id here, and use different node ids for different node.
@@ -95,8 +99,10 @@
 #define LAMP_OTHER             (0x80)
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// error types
+// response status
 #define NOERROR                (0x00)
+#define RESPERR                (0xff)
+#define RESPOK                 (0x00)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // the command of the GPRS module received from the remote web server, modified 2012/06/22, update on 2013/11/09
@@ -119,29 +125,32 @@
 #define ICHP_SV_RESPONSE            0x5f      //++ response of devices
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 #define ICHP_MSG_HELLO              0x39      //++ multicast hello string for test
 #define ICHP_LARGE_DATA             0x3b
 #define ICHP_INTER_PAN              0x3c
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-#define ACK_OK                      0x00
-#define ACK_FAIL                    0x01
-#define ICHP_SV_ROUTE_ACK           0xB1
-#define ICHP_SV_OPEN_ACK            0xB2
-#define ICHP_SV_CLOSE_ACK           0xB3
-#define ICHP_SV_END_ACK             0xB4
-#define ICHP_SV_BEEPER_ACK          0xB5
+//#define ACK_OK                      0x00
+//#define ACK_FAIL                    0x01
+//#define ICHP_SV_ROUTE_ACK           0xB1
+//#define ICHP_SV_OPEN_ACK            0xB2
+//#define ICHP_SV_CLOSE_ACK           0xB3
+//#define ICHP_SV_END_ACK             0xB4
+//#define ICHP_SV_BEEPER_ACK          0xB5
 
-#define ICHP_SV_RPT_CAR_INFO        0xE3   // car info report to server
-#define ICHP_SV_RPT_BEEPER_CALL     0xE5   // sink report beeper call to server
-#define ICHP_SV_LOAD_ROUTE_TABLE    0xE6   // server load route table to sink
-#define ICHP_SV_BEEPER_STATUS       0XE7   // request for car info
+//#define ICHP_SV_RPT_CAR_INFO        0xE3   // car info report to server
+//#define ICHP_SV_RPT_BEEPER_CALL     0xE5   // sink report beeper call to server
+//#define ICHP_SV_LOAD_ROUTE_TABLE    0xE6   // server load route table to sink
+//#define ICHP_SV_BEEPER_STATUS       0XE7   // request for car info
+
+#define ICHP_PC_RPTCAR              0xe3   // car info report to server
+#define ICHP_PC_RPTBEEP             0xe5   // sink report beeper call to server
+#define ICHP_PC_ROUTE               0xe6   // server load route table to sink
+#define ICHP_PC_ASSIGN              0xe7   // dispatch which vehicle to 
 
 #define PLC_CAR_INFO                0xED   // plc report car info to w108
-
-#define DEFAULT_START_TIME          0x13
-#define DEFAULT_STOP_TIME           0x04
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // function of endian
@@ -150,12 +159,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // control mode functions
-#define set_ctrlmode(type)     (sys_info.ctrl.config |= (type))
-#define clr_ctrlmode(type)     (sys_info.ctrl.config &= ~(type))
-#define get_ctrlmode(type)     (sys_info.ctrl.config & (type))
+#define set_ctrlmode(type)          (sys_info.ctrl.config |= (type))
+#define clr_ctrlmode(type)          (sys_info.ctrl.config &= ~(type))
+#define get_ctrlmode(type)          (sys_info.ctrl.config & (type))
 
-#define Hex2Bcd(ch)            (((ch / 10) * 16) + ch % 10)
-#define Bcd2Hex(ch)            (((ch / 16) * 10) +  ch % 16)
+#define Hex2Bcd(ch)                 (((ch / 10) << 0x04) + (ch % 10))
+#define Bcd2Hex(ch)                 (((ch >> 0x04) * 10) +  (ch & 0x0f))
 
 //////////////////////////////////////////////////////////////////////////////////////
 // note: each device has a phsical information of device id and device type(2bytes),
@@ -175,8 +184,6 @@
 #define KEYBIT     0x08  
 #define INITBIT    0x80
 #define W108MASK   0x0f
-
-enum { eLights = 0x01, eVehicle, eCondition };  // type of application, such as staightlights, vehicle, air condition etc. 2013/12/14
 
 //////////////////////////////////////////////////////////////////////////////////////
 //
@@ -351,19 +358,19 @@ typedef struct                 // some information want to save in flash
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
-#define BUF_SIZE    (0x400)
+#define BUF_SIZE    (0x100)
 typedef struct
 {
     u8    buf[BUF_SIZE];
     int   len;
-} buf_t, *pbuf_t;
+} sbuf_t, *psbuf_t;
 
 typedef struct 
 {
-    int   sock;		  // socket 标识符 -1无效，>= 0 有效
-    int   conn;		  // socket 是否连接成功，0 未连接，>= 1 连接
-    buf_t recv;
-    buf_t send;
+    int    sock;		  // socket 标识符 -1无效，>= 0 有效
+    int    conn;		  // socket 是否连接成功，0 未连接，>= 1 连接
+    sbuf_t recv;
+    sbuf_t send;
 } client_info_t, *pclient_info_t;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
