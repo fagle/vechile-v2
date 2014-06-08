@@ -21,8 +21,9 @@
 //#define KEY_ENABLE                  // key enable
 //#define LCD_ENABLE                  // lcd display enable
 //#define PCF8365T_ENABLE             // enable pcf8365t       
-//#define LWIP_ENABLE                 // enable/disable
+#define LWIP_ENABLE                 // enable/disable
 //#define MACINT_ENABLE
+//#ifdef CARD_ENABLE                  // card check enable
 
 //#define LANDSCAPE_MODE              // ¾°¹ÛµÆ¿ØÖÆ
 #define VEHICLE_MODE                // vehicle mode

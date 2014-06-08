@@ -375,7 +375,7 @@ void vehicleInit ( void )
         carInfo.beep->fail    = 0x00;
         carInfo.beep->last    = 0x00;
         carInfo.beep->tick    = 0x00;
-        carInfo.beep->times   = 5000;
+        carInfo.beep->times   = 9800;
     }
     else if (isCarDevice())
     {

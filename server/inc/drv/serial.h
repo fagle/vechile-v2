@@ -81,22 +81,13 @@ void vSerialClose( xComPortHandle xPort );
 #define PRINTFBUF              (0x100)
 
 #define MAXUSART               (0x03)
-#define GPS_COM                (USART2)
-#define GPRS_COM               (USART2)
-#define OTDR_COM               (USART3)
-#define CPLD_COM               (UART4)//
+#define TCP_COM                (USART3)
 #define CONSOLE_COM            (USART1)
-
 #define W108_COM               (USART2)
-#define WIFI_COM               (USART3)
 
 #define CONSOLE_COM_INX        (0x00)
-#define GPS_COM_INX            (0x01)
-#define GPRS_COM_INX           (0x01)
-#define OTDR_COM_INX           (0x02)
-
+#define TCP_COM_INX            (0x02)
 #define W108_COM_INX           (0x01)
-#define WIFI_COM_INX           (0x02)
 
 //////////////////////////////////////////////////////////////////////////////////
 /***************  Serial peripheral define values ******************** */

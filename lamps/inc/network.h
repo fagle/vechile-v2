@@ -144,12 +144,13 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-#define ICHP_SV_RPT_CAR_INFO        0xE3   // car info report to server
-#define ICHP_SV_RPT_BEEPER_CALL     0xE5   // sink report beeper call to server
-#define ICHP_SV_LOAD_ROUTE_TABLE    0xE6   // server load route table to sink
-#define ICHP_SV_BEEPER_STATUS       0XE7   // request for car info
+#define ICHP_PC_RPTCAR              0xe3      // car info report to server
+#define ICHP_PC_RPTBEEP             0xe5      // sink report beeper call to server
+#define ICHP_PC_ROUTE               0xe6      // server load route table to sink
+#define ICHP_PC_ASSIGN              0xe7      // dispatch which vehicle to 
+#define ICHP_PC_RESPONSE            0x5f      //++ response of devices
 
-#define PLC_CAR_INFO                0xED   // plc report car info to w108
+#define PLC_CAR_INFO                0xED      // plc report car info to w108
 
 ////////////////////////////////////////////////////////////////////////////////
 // network information structure definition here

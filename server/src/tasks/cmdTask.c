@@ -15,7 +15,7 @@ const menu_t mnArray[] = { {"land", "config server information", sea_landconfig}
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
-extern frame_info_t consfrm1, w108frm1;     // for console protocol
+extern frame_info_t consfrm1, w108frm1, tcpfrm1;     // for console protocol
 static cmdin_t cmdin1 = { 0x00, 0x00, 0x00, 0x00, };
 
 /******************************************************************************
@@ -175,7 +175,9 @@ void keyboardinput ( char ch )
 *********************************************************/
 void vCommandTask ( void *pvParameters )
 {
+    extern int lwip_send ();
     vu32     ticker = 0x00L;
+    u8       ch;
 
 #ifdef VEHICLE_RELEASE 
     if (!sys_info.ctrl.release)
@@ -200,13 +202,88 @@ void vCommandTask ( void *pvParameters )
             KeyCommandHandler(sea_readkey());
  
 #ifdef LWIP_ENABLE
-        if (client.send.len)
+        if (client.send.len && client.conn)
         { 
-            if (client.conn)
-                lwip_send(client.sock, client.send.buf, client.send.len, 0x00);
+            if (lwip_send(client.sock, client.send.buf, client.send.len, 0x00) < 0x00)
+                client.conn = 0x00;
             client.send.len = 0x00;
         }
 #endif        
+        
+        if ((ticker % 0x200) == 0x00)           // ~4 second
+        {
+	    for (ch = 0x01; ch <= sys_info.ctrl.car && client.send.len == 0x00; ch ++)
+            {
+                ppath_t rut = msg_info.find(sys_info.ctrl.base + ch);
+                if (rut->update)
+                {
+                    plamp_t ptr = (plamp_t)&rep_info.key[sys_info.ctrl.base + ch - 0x01];
+                    if (dyn_info.report)
+                    {
+                        report_t  report1;
+                        report1.carid    = ptr->vehicle.number;
+                        report1.cardid   = ptr->vehicle.card;
+                        report1.type     = ptr->vehicle.type;
+                        report1.status   = ptr->vehicle.status;
+                        report1.obstacle = ptr->vehicle.obstacle;
+                        report1.step     = ptr->vehicle.index;
+                        report1.count    = ptr->vehicle.count;
+                        report1.fail     = ptr->vehicle.fail;
+                        report1.speed    = ptr->vehicle.speed;
+                        report1.magic    = ptr->vehicle.magic;
+                        consfrm1.put(&consfrm1, ICHP_PC_RPTCAR, sizeof(report_t), sys_info.ctrl.road, (u8 *)&report1);
+#ifdef LWIP_ENABLE
+                        tcpfrm1.put(&tcpfrm1, ICHP_PC_RPTCAR, sizeof(report_t), sys_info.ctrl.road, (u8 *)&report1);
+#endif
+                    }
+                    else
+                    {
+                        sea_printreport(ptr);
+#ifdef LWIP_ENABLE
+                        tcpfrm1.print(&tcpfrm1, "\n%4d %4d %4x %4x %4x %4d %4x %4d %4d %4d, %2d:%2d", 
+                                                            ptr->vehicle.type,
+                                                            ptr->vehicle.number,
+                                                            ptr->vehicle.status,
+                                                            ptr->vehicle.fail,
+                                                            ptr->vehicle.obstacle,
+                                                            ptr->vehicle.card,
+                                                            ptr->vehicle.magic,
+                                                            ptr->vehicle.index,
+                                                            ptr->vehicle.count,
+                                                            ptr->vehicle.speed,
+                                                            sea_getsystime()->min, sea_getsystime()->sec);
+#endif
+                    }
+                    rut->update = 0x00;
+                }
+            }
+            
+            for (ch = 0x00; ch < sys_info.ctrl.call && client.send.len == 0x00; ch ++)
+            {
+                pcall_t cal = (pcall_t)rep_info.goal[ch];
+                if (cal->update)
+                {
+                    if (dyn_info.report)
+                    {
+                        dyn_info.buffer[0x00] = cal->num;
+                        dyn_info.buffer[0x01] = cal->type;
+                        consfrm1.put(&consfrm1, ICHP_PC_RPTBEEP, 0x02, sys_info.ctrl.road, dyn_info.buffer);
+#ifdef LWIP_ENABLE
+                        tcpfrm1.put(&tcpfrm1, ICHP_PC_RPTBEEP, 0x02, sys_info.ctrl.road, dyn_info.buffer);
+#endif
+                    }
+                    else
+                    {
+                        sea_printf("\ncall vehicle type %d from station %02x", cal->type, cal->num);
+#ifdef LWIP_ENABLE
+                        tcpfrm1.print(&tcpfrm1, "\ncall vehicle type %d from station %02x", cal->type, cal->num);
+#endif
+                    }
+                    cal->update = 0x00;
+                }
+            }
+        }
+        
 	vTaskDelay(0x01 / portTICK_RATE_MS);
     }
 } 

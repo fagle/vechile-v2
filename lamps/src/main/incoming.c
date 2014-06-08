@@ -204,8 +204,9 @@ void ezspRouterIncomingMessageHandler ( EmberIncomingMessageType type, EmberApsF
                 table[0x02] = (length - 0x02) / sizeof(action_t);  // route sum
                 table[0x02] = vehicleRouteTable(table[0x01], table[0x02], (paction_t)&ptr[0x02]);  
                 table[0x01] = apsFrame->clusterId;
+                table[0x03] = ptr[0x01];
             }
-            sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 
+            sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x04, table);    // special
             break;
         case ICHP_SV_OPEN:
             if (ptr[0x00] == sys_info.dev.num)

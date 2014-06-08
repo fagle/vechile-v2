@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -17,7 +18,79 @@
 //
 serial_info_t serial_info[MAXUSART];         
 frame_info_t  consfrm1, w108frm1;
+#ifdef LWIP_ENABLE     
+frame_info_t  tcpfrm1;
+#endif
 rep_info_t    rep_info;
+
+#ifdef LWIP_ENABLE     
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : static u8 sea_tcpsendbyte ( USART_TypeDef * uart, u8 ch )
+//* 功能        : data output
+//* 输入参数    : USART_TypeDef * uart, u8 ch
+//* 输出参数    : 无
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+static u8 sea_tcpsendbyte ( USART_TypeDef * uart, u8 ch )
+{ return 0x01; }
+ 
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : static s16 sea_tcpsendframe ( struct frm_t frm, u8 cmd, u8 len, u16 road, const u8 * str )
+//* 功能        : data output
+//* 输入参数    : struct frm_t * frm, u8 cmd, u8 len, u16 road, const u8 * str
+//* 输出参数    : 无
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+static s16 sea_tcpsendframe ( struct frm_t * frm, u8 cmd, u8 len, u16 road, const u8 * str )
+{
+    u8   ch, sum;
+
+    if (!len)   return 0x01;
+    taskENTER_CRITICAL();
+    client.send.len = 0x00;
+    client.send.buf[client.send.len ++] = PREFIX;    
+    client.send.buf[client.send.len ++] = cmd;
+    client.send.buf[client.send.len ++] = len;      
+    client.send.buf[client.send.len ++] = (road >> 0x08) & 0xff;
+    client.send.buf[client.send.len ++] = road & 0xff;
+    sum = cmd + len + (road & 0xff) + ((road >> 0x08) & 0xff);  
+    for (ch = 0x00; ch < len; ch ++)
+    {
+        client.send.buf[client.send.len ++] = str[ch];
+        sum += (str[ch] & 0xff);
+    }
+    client.send.buf[client.send.len ++] = sum;
+    taskEXIT_CRITICAL();
+    return 0x01;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : static void sea_tcprintframe ( struct frm_t * frm, const u8 * str, ... )
+//* 功能        : print frame infmation
+//* 输入参数    : struct frm_t * frm, const u8 * str, ...
+//* 输出参数    : 无
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+static void sea_tcprintframe ( struct frm_t * frm, const u8 * str, ... )
+{
+    va_list v_list;
+    
+    sea_memset(frm->buf, 0x00, FRPRINTBUF);
+    va_start(v_list, str);     
+    vsprintf((char *)frm->buf, (char const *)str, v_list); 
+    va_end(v_list);
+    taskENTER_CRITICAL();
+    client.send.len = sea_strlen(frm->buf);
+    sea_memcpy(client.send.buf, frm->buf, client.send.len);
+    taskEXIT_CRITICAL();
+}
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -48,6 +121,12 @@ void SYS_Configuration ( void )
     
     sea_initframe(&consfrm1, CONSOLE_COM);
     sea_initframe(&w108frm1, W108_COM);
+#ifdef LWIP_ENABLE     
+    sea_initframe(&tcpfrm1, TCP_COM);
+    tcpfrm1.put      = sea_tcpsendframe;      
+    tcpfrm1.print    = sea_tcprintframe;            
+    tcpfrm1.sendbyte = sea_tcpsendbyte;
+#endif
     
     sea_initmsg();
     sea_printsysinfo();
@@ -62,8 +141,8 @@ void SYS_Configuration ( void )
 *******************************************************************************/
 pserial_info_t get_serialinfo ( USART_TypeDef * uart )
 {
-    if (uart == GPRS_COM)
-        return &serial_info[GPRS_COM_INX];
+    if (uart == TCP_COM)
+        return &serial_info[TCP_COM_INX];
     else if(uart == W108_COM)
         return &serial_info[W108_COM_INX];
     else if(uart == CONSOLE_COM)
@@ -84,14 +163,14 @@ pserial_info_t get_serialinfo ( USART_TypeDef * uart )
 void UART_Configuration ( void )
 {
     extern const SERIAL_InitTypeDef uart1_params, uart2_params, uart3_params, uart4_params, uart5_params;
-    u8 i;
     
-    for ( i = 0x00; i < MAXUSART; i ++)
+    for (u8 i = 0x00; i < MAXUSART; i ++)
         sea_memset(&serial_info[i], 0x00, sizeof(serial_info_t));
     
     SERIAL_Init(&uart1_params);
     SERIAL_Init(&uart2_params);
     
+    reset_serialinfo(get_serialinfo(TCP_COM));        // tcp/ip used
     reset_serialinfo(get_serialinfo(W108_COM));       // why ? must do it, 2014/01/17
     reset_serialinfo(get_serialinfo(CONSOLE_COM));    // why ? must to it, 2014/01/17
 }

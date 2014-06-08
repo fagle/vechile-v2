@@ -9,7 +9,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-extern frame_info_t consfrm1, w108frm1;
+extern frame_info_t consfrm1, w108frm1, tcpfrm1;
 extern msg_info_t   msg_info;
 
 /*******************************************************************************
@@ -53,6 +53,19 @@ void vMiscellaneaTask ( void *pvParameters )
         
         if (consfrm1.get(&consfrm1, &frm) != NULL)
             ServerFrameCmdHandler(frm);
+
+#ifdef LWIP_ENABLE     
+        if (!sea_isempty(get_serialinfo(tcpfrm1.uart))) 
+        {
+            ch = sea_readbyte(get_serialinfo(tcpfrm1.uart));
+            tcpfrm1.recv(&tcpfrm1, ch);  
+            if (tcpfrm1.state == PRT_IDLE)
+                keyboardinput(ch);
+        }
+
+        if (tcpfrm1.get(&tcpfrm1, &frm) != NULL)
+            ServerFrameCmdHandler(frm);
+#endif
         
         if (w108frm1.get(&w108frm1, &frm) != NULL)  
              CoordFrameCmdHandler(frm);
@@ -82,21 +95,23 @@ void vMiscellaneaTask ( void *pvParameters )
                 pcall_t cal = (pcall_t)rep_info.goal[ch];
                 if (cal->ack)
                 {
-                    cal->cnt        = 0x00;
-                    cal->body[0x00] = cal->num;
-                    cal->body[0x01] = cal->type;
-                    cal->body[0x02] = cal->state;
-                    cal->body[0x03] = cal->vehicle;
+                    u8  body[0x05];
+                    cal->cnt   = 0x00;
+                    body[0x00] = cal->num;
+                    body[0x01] = cal->type;
+                    body[0x02] = cal->state;
+                    body[0x03] = cal->vehicle;
                     if (cal->logic[0x00])
                     {
                         cal->cnt ++;
-                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x00], cal->body);
+                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x00], body);
                     }
                     if (cal->logic[0x01])
                     {
                         cal->cnt ++;
-                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x01], cal->body);
+                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x01], body);
                     }
+                    break;
                 }
             }
         }

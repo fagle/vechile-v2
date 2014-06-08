@@ -7,14 +7,14 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 //
-extern frame_info_t consfrm1, w108frm1;     // for console protocol
+extern frame_info_t consfrm1, w108frm1, tcpfrm1;     // for console protocol
 extern rep_info_t   rep_info;
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
-report_t            report1;
 traffic_info_t traffic_info;
 
+#if 0
 /*******************************************************************************
 * Function Name  : u8 sea_findcard ( ppath_t ptr, u8 card )
 * Description    : find card in route table
@@ -31,6 +31,7 @@ u8 sea_findcard ( ppath_t ptr, u8 card )
     }
     return 0x00;
 }
+#endif
 
 /*******************************************************************************
 * Function Name  : u8 sea_isvalidateroute ( ppath_t ptr ) 
@@ -87,6 +88,7 @@ static u8  sea_parseroutetable ( ppath_t ptr )
     if (msg_info.garage[sea_getcartype(ptr->num) - CARIDST] != card[idx - 0x01])
         msg_info.garage[sea_getcartype(ptr->num) - CARIDST] = card[idx - 0x01];
        
+#ifdef CARD_ENABLE
     card[0x00] = sys_info.card.cnt;
     for (i = 0x00; i < ptr->cnt; i ++)
     {
@@ -107,6 +109,7 @@ static u8  sea_parseroutetable ( ppath_t ptr )
         sea_printf("\nupdate card's list.");
         sea_updatesysinfo();
     }
+#endif
     return 0x01;
 }
 
@@ -127,10 +130,18 @@ void sea_sendacknowledge ( u8 cmd, u16 id, u8 num, u8 state )
         buf[0x00] = num;
         buf[0x01] = cmd;
         buf[0x02] = state;
-        consfrm1.put(&consfrm1, ICHP_SV_RESPONSE, 0x03, id, buf);
+        consfrm1.put(&consfrm1, ICHP_PC_RESPONSE, 0x03, id, buf);
+#ifdef LWIP_ENABLE
+        tcpfrm1.put(&tcpfrm1, ICHP_PC_RESPONSE, 0x03, id, buf);
+#endif
     }
     else
-        sea_printf("\nsend %02x command response from device of %d, status %d", cmd, num, state);
+    {
+        sea_printf("\n%dth device's %02x command status %d", num, cmd, state);
+#ifdef LWIP_ENABLE
+        tcpfrm1.print(&tcpfrm1, "\n%dth device's %02x command status %d", num, cmd, state);
+#endif
+    }
 }
 
 /************************************************
@@ -146,17 +157,14 @@ void ServerFrameCmdHandler ( frame_t fr )
     ppath_t rut = NULL;
     
     if (isCarDevice(CARIDST, fr.body[0x00]))
-    {
-        if ((rut = msg_info.find(fr.body[0x00])) == NULL)
-            return;
-    }
+        rut = msg_info.find(fr.body[0x00]);
                 
     switch (fr.cmd)
     {
         case ICHP_PC_ROUTE: 
-//            if (dyn_info.addr[fr.body[0x00] - 0x01].logic && (fr.len & 0x01) == 0x00)
+            if (dyn_info.addr[fr.body[0x00] - 0x01].logic && (fr.len & 0x01) == 0x00)
             {
-//                if (rep_info.key[fr.body[0x00] - 0x01].vehicle.status == CAR_STOP)
+                if (rep_info.key[fr.body[0x00] - 0x01].vehicle.status == CAR_STOP)
                 {
                     if (msg_info.add(fr.body[0x00], fr.body[0x01], fr.body[0x03] * sizeof(action_t), &fr.body[0x04]))
                     {
@@ -177,11 +185,11 @@ void ServerFrameCmdHandler ( frame_t fr )
                     else
                         sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
                }
-//               else
-//                   sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
+               else
+                   sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
             }
-//            else
-//                sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
+            else
+                sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
             break;
         case ICHP_SV_END:   
             if (dyn_info.addr[fr.body[0x00] - 0x01].logic) 
@@ -352,113 +360,58 @@ void ServerFrameCmdHandler ( frame_t fr )
 //*------------------------------------------------*/
 void sea_parsereport ( plamp_t ptr, u16 road )
 {
-    if (!ptr)     return;
+    if (!ptr || sys_info.ctrl.app != eVehicle)   return;
     
-    if (sys_info.ctrl.app == eLights)
+    if (ptr->vehicle.number > 0x00 && ptr->vehicle.number <= sys_info.ctrl.maxdev)
     {
-    }
-    else if (sys_info.ctrl.app == eVehicle)
-    {
-        if (ptr->vehicle.number > 0x00 && ptr->vehicle.number <= sys_info.ctrl.maxdev)
+        if (ptr->vehicle.type != CENTERIDST)   
         {
-            if (ptr->vehicle.type != CENTERIDST)   
-            {
-                time_t  tm;
-                
-                if (dyn_info.addr[ptr->vehicle.number - 0x01].logic != road)
-                    dyn_info.addr[ptr->vehicle.number - 0x01].logic = road;
+            time_t  tm;
+            if (dyn_info.addr[ptr->vehicle.number - 0x01].logic != road)
+                dyn_info.addr[ptr->vehicle.number - 0x01].logic = road;
 
-                if (dyn_info.addr[ptr->vehicle.number - 0x01].dev.type != ptr->vehicle.type)
-                    dyn_info.addr[ptr->vehicle.number - 0x01].dev.type = ptr->vehicle.type;
-                
-                if (isCarDevice(ptr->vehicle.type, ptr->vehicle.number))   
+            if (dyn_info.addr[ptr->vehicle.number - 0x01].dev.type != ptr->vehicle.type)
+                dyn_info.addr[ptr->vehicle.number - 0x01].dev.type = ptr->vehicle.type;
+              
+            if (isCarDevice(ptr->vehicle.type, ptr->vehicle.number))   
+            {
+                ppath_t rut = msg_info.find(ptr->vehicle.number);
+                if (rut->reboot)
                 {
-                    ppath_t rut = msg_info.find(ptr->vehicle.number);
-                    
-                    if (rut->reboot)
-                    {
-                        if (ptr->vehicle.count != rut->cnt && rut->cnt)
-                            rut->send = 0x01;
-                        else
-                            rut->reboot = 0x00;
-                    }
-                    if (dyn_info.report)
-                    {
-                        report1.carid    = ptr->vehicle.number;
-                        report1.cardid   = ptr->vehicle.card;
-                        report1.type     = ptr->vehicle.type;
-                        report1.status   = ptr->vehicle.status;
-                        report1.obstacle = ptr->vehicle.obstacle;
-                        report1.step     = ptr->vehicle.index;
-                        report1.count    = ptr->vehicle.count;
-                        report1.fail     = ptr->vehicle.fail;
-                        report1.speed    = ptr->vehicle.speed;
-                        report1.magic    = ptr->vehicle.magic;
-                        //if(sea_findcard(rut, ptr->vehicle.card))
-                        {
-                            consfrm1.put(&consfrm1, ICHP_PC_RPTCAR, sizeof(report_t), sys_info.ctrl.road, (u8 *)&report1);
-                        }
-                    }
+                    if (ptr->vehicle.count != rut->cnt && rut->cnt)
+                        rut->send = 0x01;
                     else
-                    {
-#ifdef LWIP_ENABLE     
-                        if (client.conn)
-                        {
-                            if (lwip_send(client.s, ptr, sizeof(vehicle_t), 0x00) < 0x00)
-                                client.conn = 0x00;
-                        }
-#endif
-                        sea_printreport(ptr);
-                    }
-#ifdef TRAFFIC_ENABLE
-                    if (ptr->vehicle.card != rep_info.key[ptr->vehicle.number - 0x01].vehicle.card)
-                    {
-                        s8 index = sea_findindex(rut, ptr->vehicle.card);
-                        if (index > rut->index && index > 0x00)
-                        {
-                            rut->index = index;
-                            traffic_info.del(rep_info.key[ptr->vehicle.number - 0x01].vehicle.card, ptr->vehicle.number);
-                            traffic_info.put(ptr->vehicle.card, ptr->vehicle.number);
-                            if (get_cardbitmap(msg_info.state, ptr->vehicle.card - 0x01) && ptr->vehicle.status != CAR_STOP)
-                            {
-                                sea_printf("\n%dth vehicle meets another on the %dth lane, please waiting ...", ptr->vehicle.number, ptr->vehicle.card);
-                                sea_sendsinglecommand(ICHP_SV_CLOSE, ptr->vehicle.number);
-                            }
-                        }
-                    }
-#endif
+                        rut->reboot = 0x00;
                 }
-                else if (isCallDevice(ptr->vehicle.type, ptr->vehicle.number)) 
-                {
-                    pbeep_t bep = (pbeep_t)&ptr->vehicle;
-                    if (bep->call)
-                    {
-                        pcall_t cal = (pcall_t)rep_info.goal[bep->number - 0x01];
-                        if (cal->logic[beepidx(bep->call)] != road)
-                            cal->logic[beepidx(bep->call)] = road;
-                        cal->body[0x00] = bep->number;
-                        cal->body[0x01] = bep->call;
-                        if (dyn_info.report)
-                            consfrm1.put(&consfrm1, ICHP_PC_RPTBEEP, 0x02, sys_info.ctrl.road, cal->body);
-                        else
-                            sea_printf("\ncall vehicle type %d from station %02x, status %d", bep->call, bep->number, bep->status);
-                    }
-                } 
-                else
-                {
-                    sea_printf("\nnumber %d, type %d are not allow devices in the application", ptr->vehicle.number, ptr->vehicle.type);
-                    ptr->vehicle.fail |= LAMP_ER_NP;
-                    if (ptr->vehicle.number >= sys_info.ctrl.maxdev || !ptr->vehicle.number)
-                        ptr->vehicle.number = sys_info.ctrl.base;
-                }
-                sea_memcpy(&rep_info.key[ptr->vehicle.number - 0x01], ptr, sizeof(lamp_t));
-                sea_memcpy(&rep_info.time[ptr->vehicle.number - 0x01], sea_getcurtime(&tm), sizeof(time_t));
+                rut->update = 0x01;
             }
+            else if (isCallDevice(ptr->vehicle.type, ptr->vehicle.number)) 
+            {
+                pbeep_t bep = (pbeep_t)&ptr->vehicle;
+                if (bep->call)
+                {
+                    pcall_t cal = (pcall_t)rep_info.goal[bep->number - 0x01];
+                    if (cal->logic[beepidx(bep->call)] != road)
+                        cal->logic[beepidx(bep->call)] = road;
+                    cal->num    = bep->number;
+                    cal->type   = bep->call;
+                    cal->update = 0x01;
+                }
+            } 
+            else
+            {
+                sea_printf("\nnumber %d, type %d are not allow devices in the application", ptr->vehicle.number, ptr->vehicle.type);
+                ptr->vehicle.fail |= LAMP_ER_NP;
+                if (ptr->vehicle.number >= sys_info.ctrl.maxdev || !ptr->vehicle.number)
+                    ptr->vehicle.number = sys_info.ctrl.base;
+            }
+            sea_memcpy(&rep_info.key[ptr->vehicle.number - 0x01], ptr, sizeof(lamp_t));
+            sea_memcpy(&rep_info.time[ptr->vehicle.number - 0x01], sea_getcurtime(&tm), sizeof(time_t));
         }
-       
-        if (ptr->vehicle.fail & LAMP_ER_TM)
-            w108frm1.put(&w108frm1, ICHP_SV_DATE, sizeof(systime_t) - 0x04, sys_info.ctrl.road, (u8 *)sea_getsystime());
     }
+      
+    if (ptr->vehicle.fail & LAMP_ER_TM)
+        w108frm1.put(&w108frm1, ICHP_SV_DATE, sizeof(systime_t) - 0x04, sys_info.ctrl.road, (u8 *)sea_getsystime());
 }
 
 /************************************************
@@ -546,10 +499,6 @@ void CoordFrameCmdHandler ( frame_t fr )
             }
             break;
         }
-        case ICHP_SV_END:  
-            sea_printf("\n%dth vehicle ends line", num);
-            if (rut)    msg_info.clear(num);
-            break;
         case ICHP_SV_ROUTE:  
             {
                 u8 sum = 0x00;
@@ -564,6 +513,10 @@ void CoordFrameCmdHandler ( frame_t fr )
                 }
             }
             sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPOK);
+            break;
+        case ICHP_SV_END:  
+            sea_printf("\n%dth vehicle ends line", num);
+            if (rut)    msg_info.clear(num);
             break;
         case ICHP_SV_OPEN:  
             sea_printf("\n%dth vehicle is running ...", num);
@@ -583,25 +536,6 @@ void CoordFrameCmdHandler ( frame_t fr )
             }
             sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPOK);
             break;
-        case ICHP_SV_RESPONSE: 
-        {
-            sea_printf("\n%dth vehicle's response, command %02x, result %d, len %d", fr.body[0x00], fr.body[0x01], fr.body[0x02], fr.len);
-            switch (fr.body[0x01])
-            {
-                case ICHP_SV_ASSIGN:
-                    sea_printf("\nrec ICHP_SV_ASSIGN, len %d, body %d", fr.len, fr.body[0x00]);
-                    if (isCallDevice(CALLIDST, fr.body[0x00]))
-                    {
-                        pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];
-                        if (cal->cnt)
-                            cal->cnt --;
-                        if (cal->state == fr.body[0x02] && cal->cnt == 0x00)  
-                            cal->ack = 0x00;
-                    }
-                    break;
-            }
-            break;
-        }
         case ICHP_SV_ASSIGN:
         {
             sea_printf("\nrec ICHP_SV_ASSIGN, len%d, body%d", fr.len, fr.body[0x00]);
@@ -615,9 +549,75 @@ void CoordFrameCmdHandler ( frame_t fr )
             }
             break;
         }
+        case ICHP_SV_RESPONSE: 
+        {
+            sea_printf("\n%dth vehicle's response, command %02x, result %d, len %d", fr.body[0x00], fr.body[0x01], fr.body[0x02], fr.len);
+            switch (fr.body[0x01])
+            {
+                case ICHP_SV_ASSIGN:
+                    if (isCallDevice(CALLIDST, fr.body[0x00]))
+                    {
+                        pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];
+                        sea_printf("\n%d caller's ICHP_SV_ASSIGN", fr.body[0x00]);
+                        if (cal->cnt)
+                            cal->cnt --;
+                        if (cal->state == fr.body[0x02] && cal->cnt == 0x00)  
+                            cal->ack = 0x00;
+                    }
+                    else
+                    {
+                        for (u8 ch = 0x00; ch < sys_info.ctrl.call; ch ++)
+                        {
+                            pcall_t cal = (pcall_t)rep_info.goal[ch];
+                            if (cal->vehicle == fr.body[0x00] && cal->ack)
+                            {
+                                cal->ack = 0x00;
+                                break;
+                            }
+                        }
+                        sea_printf("\n%d vehicle's ICHP_SV_ASSIGN", fr.body[0x00]);
+                    }
+                    break;
+                case ICHP_SV_CLOSE: 
+                case ICHP_SV_OPEN:  
+                    sea_printf("\n%dth vehicle is running or stopped, status %d", num, fr.body[0x02]);
+                    if (rut)
+                    {
+                        if (rut->status != CAR_NONE)
+                            rut->status = CAR_NONE;
+                    }
+                    sea_sendacknowledge(fr.body[0x01], fr.road, fr.body[0x00], fr.body[0x02]);
+                    break;
+                case ICHP_SV_END:  
+                    sea_printf("\n%dth vehicle ends line, status %d", num, fr.body[0x02]);
+                    if (rut)    msg_info.clear(num);
+                    sea_sendacknowledge(fr.body[0x01], fr.road, fr.body[0x00], fr.body[0x02]);
+                    break;
+                case ICHP_SV_ROUTE:  
+                {
+                    u8 sum = 0x00;
+//                    u8 size = fr.body[0x03] + RTSENDSIZE < rut->cnt ? (RTSENDSIZE) : (rut->cnt - fr.body[0x03]);
+                    sea_printf("\n%dth vehicle route table, sum %d", num, fr.body[0x02]);
+//                    for (u8 i = 0x00; i < size; i ++)
+//                        sum += rut->line[i + fr.body[0x03]].id + rut->line[i + fr.body[0x03]].action;
+                    for (u8 i = 0x00; i < rut->cnt; i ++)
+                        sum += rut->line[i].id + rut->line[i].action;
+                    if (sum != fr.body[0x02])
+                    {
+                        sea_printf("\n%dth vehicle route table return fail, clear it", num);
+                        dyn_info.buffer[0x00] = fr.body[0x00];
+                        w108frm1.put(&w108frm1, ICHP_SV_END, 0x01, fr.road, dyn_info.buffer);
+                    }
+                    else
+                        sea_sendacknowledge(fr.body[0x01], fr.road, fr.body[0x00], RESPOK);
+                    break;
+                }
+            }
+            break;
+        }
         default:
         {
-            sea_printf("\nrec unknow id %02x", fr.cmd);
+            sea_printf("\nreceived unknow id %02x", fr.cmd);
             break;
         }
     }

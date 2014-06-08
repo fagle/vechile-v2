@@ -22,11 +22,8 @@ typedef u8    EmberEUI64[EUI64_SIZE];          // @brief EUI 64-bit ID (an IEEE 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //the configuration infomation
-//#define ROADID             (0x1b)   // (27) (0x19)   // 金沙南路
 #define ROADID             (0x24)   // (36) (0x24)   // 邓实验
-//#define ROADID             (0x21)   // (33) 杭电三教
 #define MAXLAMPS           (250)    // 道路的总路灯数, max lamps on a road
-//#define LINESIZE                  (0x80)
 #define MAXCARDS           (0x80)
 
 #define DEFALUTPERIOD      (0x01)   // report single lamp information time 1 min.
@@ -335,22 +332,28 @@ typedef struct
 {
     u8       num;
     u8       cnt;
-    u8       status:6;
+    u8       status:5;
     u8       send:1;
     u8       reboot:1;
+    u8       update:1;
+    u8       cmd;
+    u8       retry;
     action_t line[MAXPATH];
 } path_t, *ppath_t;
 
 typedef struct
 {
     u8       num;
-    u8       state:5;
+    u8       state:2;
+    u8       cnt:3;
+    u8       status:1;
     u8       ack:1;
-    u8       cnt:2;
+    u8       update:1;
     u8       type;
     u8       vehicle;
+    u8       cmd;
+    u8       retry;
     u16      logic[0x02];
-    u8       body[0x04];
 } call_t, *pcall_t;
 
 typedef union

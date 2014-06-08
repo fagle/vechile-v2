@@ -267,7 +267,7 @@ void sea_w108config ( int argc, char * argv[] )
                 case 'r':
                     sscanf(cmdhd1.optarg, "%d", &num);                   
                     tmp = num & 0xff;
-//                    if (dyn_info.addr[tmp - 0x01].logic && (argc & 0x01) == 0x00)
+                    if (dyn_info.addr[tmp - 0x01].logic && (argc & 0x01) == 0x00)
                     {
                         dyn_info.buffer[0x00] = tmp;                     // number of logic 
                         sscanf(argv[0x03], "%d", &num);           

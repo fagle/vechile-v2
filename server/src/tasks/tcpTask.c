@@ -15,6 +15,9 @@
 #include "enc28j60.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////
+extern frame_info_t consfrm1, w108frm1, tcpfrm1;     // for console protocol
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 client_info_t  client;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,10 +50,10 @@ static int sea_createsocket ( void )
     struct sockaddr_in server;
     int sock;
     int optval = 0x01;
-    u8     iptxt[20];
+    u8  iptxt[20];
+    u8  retry = 0x00;
     
     sea_resetetherif();                                // reset enc28j60 chip.
-    
     server.sin_family      = AF_INET;
 #if 0
 #ifdef HOME_IPADDR    
@@ -71,8 +74,10 @@ static int sea_createsocket ( void )
     lwip_setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
     while (lwip_connect(sock, (struct sockaddr *)&server, sizeof(struct sockaddr_in)) == -1)
     {
-        lwip_close(sock);                   
-        vTaskDelay(5 / portTICK_RATE_MS);
+        lwip_close(sock);                
+        if (++ retry >= 0x03)
+            return -1;
+        vTaskDelay(1 / portTICK_RATE_MS);
         if ((sock = lwip_socket(AF_INET, SOCK_STREAM, 0x00)) == -1)   //  IPPROTO_TCP)) == -1)
             return -1;
         lwip_setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, &optval, sizeof(optval));
@@ -93,34 +98,54 @@ void vTCPClientTask ( void *pvParameters )
 {
     vu32 ticker = 0x00;
     
-    client.conn = 0x00;
-    client.sock = -1;
+    client.conn  = 0x00;
+    client.sock  = -1;
+    client.retry = 0x00;
     while (1)
     {
-        if (client.conn == 0x00)
+        if (client.retry < 0x100)
         {
-            if (client.sock >= 0x00)
+            if (client.conn == 0x00)
             {
-                lwip_close(client.sock);
-                client.sock = -1;
-            }
+                if (client.sock >= 0x00)
+                {
+                    lwip_close(client.sock);
+                    client.sock = -1;
+                }
               
-            if ((client.sock = sea_createsocket()) < 0x00)
-                continue;
-            client.conn = 0x01;
-            sea_printf("\n连接服务器成功！");
+                if ((client.sock = sea_createsocket()) < 0x00)
+                {
+                    client.retry ++;
+                    continue;
+                }
+                client.conn  = 0x01;
+                client.retry = 0x00;
+                sea_printf("\nconnected！");
+            }
+            else
+            {
+                client.recv.len = lwip_recv(client.sock, client.recv.buf, BUF_SIZE, 0x00);
+                if (client.recv.len < 0x00)
+                    client.conn = 0x00;
+	        else if (client.recv.len > 0x00)
+                {
+                    u16 i = 0x00;
+                    client.recv.buf[client.recv.len ++] = '\n';
+                    client.recv.buf[client.recv.len ++] = '\r';
+                    taskENTER_CRITICAL();
+                    while (client.recv.len --)
+                        sea_putbyte(get_serialinfo(tcpfrm1.uart), client.recv.buf[i ++]);
+                    taskEXIT_CRITICAL();
+                }
+            }
         }
         else
         {
-//            len = lwip_recv(client.s, client.recv.buf, BUF_SIZE, 0x00);
-            client.recv.len = lwip_recv(client.sock, client.recv.buf, BUF_SIZE, 0x00);
-            if (client.recv.len < 0x00)
-                client.conn = 0x00;
-	    else if (client.recv.len > 0x00)
-            {
-                client.recv.buf[client.recv.len] = 0x00;
-            }
+            sea_printf("\ncan't find server!");
+            vTaskDelay(client.retry / portTICK_RATE_MS);
+            client.retry >>= 0x01;
         }
+        
         vTaskDelay(1 / portTICK_RATE_MS);
         ticker ++;
     }
