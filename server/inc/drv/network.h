@@ -136,7 +136,7 @@ enum  { eLights = 0x01, eVehicle, eCondition };  // type of application, such as
 #define ICHP_PC_RPTBEEP             0xe5      // sink report beeper call to server
 #define ICHP_PC_ROUTE               0xe6      // server load route table to sink
 #define ICHP_PC_ASSIGN              0xe7      // dispatch which vehicle to 
-#define ICHP_PC_RESPONSE            0x5f      //++ response of devices
+#define ICHP_PC_RESPONSE            0x5f      // ++ response of devices
 
 #define PLC_CAR_INFO                0xED      // plc report car info to w108
 

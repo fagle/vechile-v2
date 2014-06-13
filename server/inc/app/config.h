@@ -24,12 +24,13 @@
 #define LWIP_ENABLE                 // enable/disable
 //#define MACINT_ENABLE
 //#ifdef CARD_ENABLE                  // card check enable
+//#define WIFI_ENABLE                 // wifi enable/disable
 
 //#define LANDSCAPE_MODE              // 景观灯控制
 #define VEHICLE_MODE                // vehicle mode
 //#define SHRIMP_MODE                 // 虾米养殖环境监测 
 //#define ARC_MODE                    // air condition controller
-//#define WIFI_MODE
+//#define LAMP_MODE                   // lamp controller
 
 //#define VEHICLE_RELEASE             // release/debug control
 

@@ -217,10 +217,10 @@ void vCommandTask ( void *pvParameters )
                 ppath_t rut = msg_info.find(sys_info.ctrl.base + ch);
                 if (rut->update)
                 {
+                    report_t  report1;
                     plamp_t ptr = (plamp_t)&rep_info.key[sys_info.ctrl.base + ch - 0x01];
                     if (dyn_info.report)
                     {
-                        report_t  report1;
                         report1.carid    = ptr->vehicle.number;
                         report1.cardid   = ptr->vehicle.card;
                         report1.type     = ptr->vehicle.type;
@@ -240,6 +240,7 @@ void vCommandTask ( void *pvParameters )
                     {
                         sea_printreport(ptr);
 #ifdef LWIP_ENABLE
+#if 0
                         tcpfrm1.print(&tcpfrm1, "\n%4d %4d %4x %4x %4x %4d %4x %4d %4d %4d, %2d:%2d", 
                                                             ptr->vehicle.type,
                                                             ptr->vehicle.number,
@@ -252,6 +253,19 @@ void vCommandTask ( void *pvParameters )
                                                             ptr->vehicle.count,
                                                             ptr->vehicle.speed,
                                                             sea_getsystime()->min, sea_getsystime()->sec);
+#else
+                        report1.carid    = ptr->vehicle.number;
+                        report1.cardid   = ptr->vehicle.card;
+                        report1.type     = ptr->vehicle.type;
+                        report1.status   = ptr->vehicle.status;
+                        report1.obstacle = ptr->vehicle.obstacle;
+                        report1.step     = ptr->vehicle.index;
+                        report1.count    = ptr->vehicle.count;
+                        report1.fail     = ptr->vehicle.fail;
+                        report1.speed    = ptr->vehicle.speed;
+                        report1.magic    = ptr->vehicle.magic;
+                        tcpfrm1.put(&tcpfrm1, ICHP_PC_RPTCAR, sizeof(report_t), sys_info.ctrl.road, (u8 *)&report1);
+#endif
 #endif
                     }
                     rut->update = 0x00;
@@ -276,7 +290,13 @@ void vCommandTask ( void *pvParameters )
                     {
                         sea_printf("\ncall vehicle type %d from station %02x", cal->type, cal->num);
 #ifdef LWIP_ENABLE
+#if 0
                         tcpfrm1.print(&tcpfrm1, "\ncall vehicle type %d from station %02x", cal->type, cal->num);
+#else
+                        dyn_info.buffer[0x00] = cal->num;
+                        dyn_info.buffer[0x01] = cal->type;
+                        tcpfrm1.put(&tcpfrm1, ICHP_PC_RPTBEEP, 0x02, sys_info.ctrl.road, dyn_info.buffer);
+#endif
 #endif
                     }
                     cal->update = 0x00;

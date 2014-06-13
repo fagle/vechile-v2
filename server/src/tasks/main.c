@@ -64,6 +64,7 @@ static s16 sea_tcpsendframe ( struct frm_t * frm, u8 cmd, u8 len, u16 road, cons
         sum += (str[ch] & 0xff);
     }
     client.send.buf[client.send.len ++] = sum;
+    client.send.buf[client.send.len]    = 0x00;
     taskEXIT_CRITICAL();
     return 0x01;
 }
@@ -106,7 +107,6 @@ void SYS_Configuration ( void )
     sea_memcpy(&sys_info, sea_flashread(0x00, sizeof(sys_info_t)), sizeof(sys_info_t));
     if (sys_info.mark != SYSMARK || sys_info.size != sizeof(sys_info_t))
         sea_writedefaultsysinfo();
-    set_ctrlmode(LAMP_AUTO);                // note: default value automatic open/close lamps.
 
     sea_memset(&dyn_info, 0x00, sizeof(dyn_info_t)); 
     dyn_info.semserial = xSemaphoreCreateMutex();

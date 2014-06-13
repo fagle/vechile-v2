@@ -139,7 +139,14 @@ void sea_sendacknowledge ( u8 cmd, u16 id, u8 num, u8 state )
     {
         sea_printf("\n%dth device's %02x command status %d", num, cmd, state);
 #ifdef LWIP_ENABLE
+#if 0
         tcpfrm1.print(&tcpfrm1, "\n%dth device's %02x command status %d", num, cmd, state);
+#else
+        buf[0x00] = num;
+        buf[0x01] = cmd;
+        buf[0x02] = state;
+        tcpfrm1.put(&tcpfrm1, ICHP_PC_RESPONSE, 0x03, id, buf);
+#endif
 #endif
     }
 }
