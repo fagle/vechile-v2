@@ -15,16 +15,6 @@
 
 #define beepidx(n)        ((n - CARIDST) >> 0x01)
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// message body definition
-typedef struct
-{
-    u8     id;             // note: use different message ids for different node.
-    u8     size;           // message body size.
-    u16    dest;           // destination short id
-    u8     body[MSGBODYSIZE];
-} msg_t, *pmsg_t;
-
 ////////////////////////////////////////////////////////////////////////////////
 // message information definition
 typedef struct 
@@ -77,69 +67,6 @@ typedef struct
 * Return         : None
 *******************************************************************************/
 void sea_initmsg ( void );
-
-/*******************************************************************************
-* Function Name  : void sea_sendmsg ( pmsg_info_t ptr, u8 id, u8 size, u16 dest, void * msg )
-* Description    : Inserts msg_t body to list.
-* Input          : pmsg_info_t ptr, u8 id, u8 size, u16 dset, void * msg 
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void sea_sendmsg ( pmsg_info_t ptr, u8 id, u8 size, u16 dest, void * msg );
-
-/*******************************************************************************
-* Function Name  : pmsg_t sea_getmsg ( pmsg_info_t ptr )
-* Description    : get msg_t body from ring.
-* Input          : pmsg_info_t ptr
-* Output         : pointer of msg_t
-* Return         : None
-*******************************************************************************/
-pmsg_t sea_getmsg ( pmsg_info_t ptr );
-
-/*******************************************************************************
-* Function Name  : void sea_deletemsg ( pmsg_info_t ptr, u8 id, u8 num )
-* Description    : clear msg_t body from ring.
-* Input          : pmsg_info_t ptr, u8 id, u8 num
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void sea_deletemsg ( pmsg_info_t ptr, u8 id, u8 num );
-
-/*******************************************************************************
-* Function Name  : void sea_deleteallmsg ( pmsg_info_t ptr, u8 num )
-* Description    : clear msg_t body from ring.
-* Input          : pmsg_info_t ptr, u8 num
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void sea_deleteallmsg ( pmsg_info_t ptr, u8 num );
-
-/*******************************************************************************
-* Function Name  : void sea_clearmsg ( pmsg_info_t ptr )
-* Description    : clear msg_t body from ring.
-* Input          : pmsg_info_t ptr
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void sea_clearmsg ( pmsg_info_t ptr );
-
-/*******************************************************************************
-* Function Name  : bool sea_isempty ( pmsg_info_t ptr  )
-* Description    : is empty of list.
-* Input          : pmsg_info_t ptr 
-* Output         : boolean
-* Return         : None
-*******************************************************************************/
-bool sea_msgisempty ( pmsg_info_t ptr  );
-
-/*******************************************************************************
-* Function Name  : void sea_msgfinish ( pmsg_info_t ptr )
-* Description    : get msg_t body from ring.
-* Input          : pmsg_info_t ptr
-* Output         : pointer of msg_t
-* Return         : None
-*******************************************************************************/
-void sea_msgfinish ( pmsg_info_t ptr );
 
 /*******************************************************************************
 * Function Name  : void sea_resetw108 ( void )
@@ -285,6 +212,16 @@ void ServerFrameCmdHandler ( frame_t fr );
 * 备注        : 无
 *************************************************/ 
 void CoordFrameCmdHandler ( frame_t fr );
+
+/************************************************
+* 函数名      : void TaskCmdHandler ( void )
+* 功能        : taskcommand handler from server
+* 输入参数    : 无
+* 输出参数    : 无
+* 修改记录    : 无
+* 备注        : 无
+*************************************************/ 
+void TaskCmdHandler ( void );
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //

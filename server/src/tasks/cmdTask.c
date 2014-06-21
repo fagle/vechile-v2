@@ -210,7 +210,7 @@ void vCommandTask ( void *pvParameters )
         }
 #endif        
         
-        if ((ticker % 0x200) == 0x00)           // ~4 second
+        if ((ticker % 0x200) == 0x00)           // ~0.5 second
         {
 //	    for (ch = 0x01; ch <= sys_info.ctrl.car && client.send.len == 0x00; ch ++)
 	    for (ch = 0x01; ch <= sys_info.ctrl.car; ch ++)
@@ -270,6 +270,7 @@ void vCommandTask ( void *pvParameters )
 #endif
                     }
                     rut->update = 0x00;
+                    break;
                 }
             }
             
@@ -302,6 +303,7 @@ void vCommandTask ( void *pvParameters )
 #endif
                     }
                     cal->update = 0x00;
+                    break;
                 }
             }
         }

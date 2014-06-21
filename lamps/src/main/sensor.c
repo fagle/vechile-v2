@@ -60,9 +60,7 @@ void ezspRouterMessageSentHandler ( EmberOutgoingMessageType type,
     {            
         if (status != EMBER_SUCCESS) 
         {   
-            DBG("\r\nROUTER send status = %02x, id = %02x, seq %d", status, apsFrame->clusterId, apsFrame->profileId);
-            if (isCallDevice())
-                sea_sendmsg(&send1, UNICAST, send1.curmsg->dest, send1.curmsg->id, send1.curmsg->size, send1.curmsg->body);   // send it again
+            sea_sendmsg(&send1, UNICAST, send1.curmsg->dest, send1.curmsg->id, send1.curmsg->size, send1.curmsg->body);   // send it again
             if (++ single_info.retry >= NWPK_TOLERANCE) 
             {
                 DBG("\r\nERROR: %d too many data msg failures, looking for new sink", single_info.retry);
@@ -71,11 +69,8 @@ void ezspRouterMessageSentHandler ( EmberOutgoingMessageType type,
                 network_info.appstate = EMBER_NO_NETWORK;
             }
         }
-        else 
-        {
-//            DBG("\r\nROUTER send ok, seq%d", apsFrame->profileId);
+        else if (single_info.retry)
             single_info.retry   = 0x00;
-        }
     }
 }
 

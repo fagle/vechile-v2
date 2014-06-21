@@ -33,30 +33,6 @@ u8 sea_findcard ( ppath_t ptr, u8 card )
 }
 #endif
 
-/*******************************************************************************
-* Function Name  : u8 sea_isvalidateroute ( ppath_t ptr ) 
-* Description    : validate route table
-* Input          : ppath_t ptr
-* Output         : true/false
-* Return         : None
-*******************************************************************************/
-u8 sea_isvalidateroute ( ppath_t ptr )      
-{
-    u8 i, j = 0x00;
-    
-    if (ptr == NULL)
-        return 0x00;
-    
-    for (i = 0x00; i < ptr->cnt; i ++)
-    {
-        if (!ptr->line[i].id || !ptr->line[i].action)
-            return 0x00;
-        if (ptr->line[i].action == CAR_STOP)
-            j ++;
-    }
-    return (j > 0x00 && j < 0x06) ? 0x01 : 0x00;
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 //* 函数名      : static u8  sea_sendroutetable ( ppath_t ptr )
 //* 功能        : parse route table to w108
@@ -77,6 +53,8 @@ static u8  sea_parseroutetable ( ppath_t ptr )
     {
         if (ptr->line[i].action == CAR_STOP)  
             card[idx ++] = ptr->line[i].id;
+        if (!ptr->line[i].id || !ptr->line[i].action)
+            return 0x00;
         if (idx >= 0x06)   
             return 0x00;
     }
@@ -151,6 +129,7 @@ void sea_sendacknowledge ( u8 cmd, u16 id, u8 num, u8 state )
     }
 }
 
+#if 0
 /************************************************
 * 函数名      : void ServerFrameCmdHandler ( frame_t fr )
 * 功能        : frame command handler from server
@@ -354,7 +333,165 @@ void ServerFrameCmdHandler ( frame_t fr )
             break;
     }
 }
+#else
+/************************************************
+* 函数名      : void ServerFrameCmdHandler ( frame_t fr )
+* 功能        : frame command handler from server
+* 输入参数    : frame_t fr
+* 输出参数    : 无
+* 修改记录    : 无
+* 备注        : 无
+*************************************************/ 
+void ServerFrameCmdHandler ( frame_t fr )
+{
+    pmsg_t  msg = (pmsg_t)&rep_info.send[fr.body[0x00] - 0x01];
 
+    if (dyn_info.addr[fr.body[0x00] - 0x01].logic == 0x00 || msg->id != 0x00) 
+    {
+        sea_printf("\n%dth device is power off or send message is busy.", fr.body[0x00]);
+        sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);   // command can't return from devices yet.
+        return;
+    }
+    switch (fr.cmd)
+    {
+        case ICHP_PC_ROUTE: 
+            if (rep_info.key[fr.body[0x00] - 0x01].vehicle.status == CAR_STOP && 
+                (fr.len & 0x01) == 0x00 && isCarDevice(CARIDST, fr.body[0x00]))
+            {
+                if (msg_info.add(fr.body[0x00], fr.body[0x01], fr.body[0x03] * sizeof(action_t), &fr.body[0x04]))
+                {
+                    ppath_t rut = msg_info.find(fr.body[0x00]);
+                    if (sea_parseroutetable(rut)) 
+                    {
+                        sea_printf("\nsend ICHP_PC_ROUTE to %dth vehicle index %d, size %d", fr.body[0x00], fr.body[0x01], fr.body[0x02]);
+                        msg->id  = fr.cmd;
+//                        sea_sendroutetable(rut); 
+                    }
+                    else 
+                        sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
+                }
+                else
+                    sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
+           }
+           else
+               sea_sendacknowledge(fr.cmd, fr.road, fr.body[0x00], RESPERR);
+            break;
+        case ICHP_PC_ASSIGN:
+            if (isCallDevice(CALLIDST, fr.body[0x00]))
+            {
+                pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];
+                if (cal->state != fr.body[0x02])
+                {
+                    sea_printf("\nsend ICHP_PC_ASSIGN to caller %d call status %d", fr.body[0x00], fr.body[0x02]);
+                    msg->id      = fr.cmd;
+                    cal->type    = fr.body[0x01];
+                    cal->state   = fr.body[0x02];
+                    cal->vehicle = fr.body[0x03];
+                    if (isCarDevice(CARIDST, fr.body[0x03]))
+                    {
+                        rep_info.send[fr.body[0x03] - 0x01].id        = fr.cmd;
+                        rep_info.send[fr.body[0x03] - 0x01].buf[0x00] = fr.body[0x00];
+                    }
+                }
+            }
+            break;
+        case ICHP_SV_DATE:
+            sea_getsystime()->year = 2000 + fr.body[0x00]; 
+            sea_getsystime()->mon  = fr.body[0x01]; 
+            sea_getsystime()->day  = fr.body[0x02]; 
+            sea_getsystime()->hour = fr.body[0x03]; 
+            sea_getsystime()->min  = fr.body[0x04]; 
+            sea_getsystime()->sec  = fr.body[0x05]; 
+            msg->id   = fr.cmd;
+            break;
+        case ICHP_SV_OPEN:                       
+        case ICHP_SV_END:   
+        case ICHP_SV_REBOOT:
+        case ICHP_SV_CLOSE:                   
+        case ICHP_SV_ADJUST:
+            sea_printf("\nsend %02x command to %dth device", fr.cmd, fr.body[0x00]);
+            msg->id        = fr.cmd;
+            msg->buf[0x00] = fr.body[0x00];
+            if (fr.cmd == ICHP_SV_ADJUST)
+                msg->buf[0x01] = fr.body[0x01];
+            break;
+        default:
+            sea_printf("\npc send unknow command %02x.", fr.cmd);
+            break;
+    }
+}
+
+/************************************************
+* 函数名      : void TaskCmdHandler ( void )
+* 功能        : taskcommand handler from server
+* 输入参数    : 无
+* 输出参数    : 无
+* 修改记录    : 无
+* 备注        : 无
+*************************************************/ 
+void TaskCmdHandler ( void )
+{
+    for (u8 i = 0x00; i < MAXLAMPS; i ++)
+    {
+        if (dyn_info.addr[i].logic)
+        {
+            pmsg_t  msg = (pmsg_t)&rep_info.send[i];
+            if (!msg->id)   continue;
+            switch (msg->id)
+            {
+                case ICHP_PC_ROUTE: 
+                    sea_sendroutetable(msg_info.find(i + 0x01)); 
+                    msg->cnt ++;
+                    break; 
+                case ICHP_PC_ASSIGN:
+                {
+                    pcall_t cal = NULL;
+                    u8  body[0x05];
+                    
+                    if (i > sys_info.ctrl.base)
+                        cal = (pcall_t)rep_info.goal[msg->buf[0x00]];
+                    else
+                        cal = (pcall_t)rep_info.goal[i];
+                    body[0x00] = cal->num;
+                    body[0x01] = cal->type;
+                    body[0x02] = cal->state;
+                    body[0x03] = cal->vehicle;
+                    if (isCallDevice(CALLIDST, i + 0x01))
+                    {
+                        if (cal->logic[0x00])
+                            w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x00], body);
+                        if (cal->logic[0x01])
+                            w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x01], body);
+                    }
+                    else if (isCarDevice(CARIDST, i + 0x01))
+                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, dyn_info.addr[i].logic, body);
+                    msg->cnt ++;
+                    break; 
+                }
+                case ICHP_SV_ADJUST:
+                    w108frm1.put(&w108frm1, msg->id, 0x02, dyn_info.addr[i].logic, msg->buf);
+                    msg->cnt ++;
+                    break; 
+                case ICHP_SV_DATE:
+                    w108frm1.put(&w108frm1, msg->id, sizeof(systime_t) - 0x04, sys_info.ctrl.road, (u8 *)sea_getsystime());
+                    msg->cnt ++;
+                    break; 
+                default:
+                    w108frm1.put(&w108frm1, msg->id, 0x01, dyn_info.addr[i].logic, msg->buf);
+                    msg->cnt ++;
+                    break;
+            }
+            
+            if (msg->cnt > 0x01)    // retry too much.
+            {
+                msg->id   = 0x00;
+                msg->cnt  = 0x00;
+            }
+            return;
+        }
+    }
+}
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -382,15 +519,7 @@ void sea_parsereport ( plamp_t ptr, u16 road )
               
             if (isCarDevice(ptr->vehicle.type, ptr->vehicle.number))   
             {
-                ppath_t rut = msg_info.find(ptr->vehicle.number);
-                if (rut->reboot)
-                {
-                    if (ptr->vehicle.count != rut->cnt && rut->cnt)
-                        rut->send = 0x01;
-                    else
-                        rut->reboot = 0x00;
-                }
-                rut->update = 0x01;
+                msg_info.find(ptr->vehicle.number)->update = 0x01;
             }
             else if (isCallDevice(ptr->vehicle.type, ptr->vehicle.number)) 
             {
@@ -421,6 +550,7 @@ void sea_parsereport ( plamp_t ptr, u16 road )
         w108frm1.put(&w108frm1, ICHP_SV_DATE, sizeof(systime_t) - 0x04, sys_info.ctrl.road, (u8 *)sea_getsystime());
 }
 
+#if 0
 /************************************************
 * 函数名      : void CoordFrameCmdHandler ( frame_t fr )
 * 功能        : frame command handler from coordinator
@@ -629,7 +759,113 @@ void CoordFrameCmdHandler ( frame_t fr )
         }
     }
 }
-
+#else
+/************************************************
+* 函数名      : void CoordFrameCmdHandler ( frame_t fr )
+* 功能        : frame command handler from coordinator
+* 输入参数    : frame_t fr
+* 输出参数    : 无
+* 修改记录    : 无
+* 备注        : 无
+*************************************************/ 
+void CoordFrameCmdHandler ( frame_t fr )
+{
+    u8  num = sea_lookuplogic(fr.road);  
+    
+    if (rep_info.send[num - 0x01].id)
+        rep_info.send[num - 0x01].id = 0x00;
+    
+    switch (fr.cmd)
+    {
+        case ICHP_SV_RPT:
+            sea_parsereport((plamp_t)fr.body, fr.road);
+            break;
+        case ICHP_SV_DATE:
+            w108frm1.put(&w108frm1, ICHP_SV_DATE, sizeof(systime_t) - 0x04, sys_info.ctrl.road, (u8 *)sea_getsystime());
+            break;
+        case ICHP_SV_CTRL:     
+            sea_memcpy(&dyn_info.w108.ctrl, fr.body, sizeof(ctrl_t));
+            if (dyn_info.ready & CTRLBIT)
+                dyn_info.ready &= ~CTRLBIT;
+            break;
+        case ICHP_SV_ADDRESS:                        // device_t body 
+        {
+            device_t dev;
+            sea_memcpy(&dev, fr.body, sizeof(device_t));
+            if (dev.type == CENTERIDST)
+            {
+                if (sea_memcomp(&sys_info.dev, &dev, sizeof(device_t)) != 0x00)
+                {
+                    sea_printf("\nupdate physic address of control center.");
+                    sea_memcpy(&sys_info.dev, &dev.eui, sizeof(device_t));
+                    sea_updatesysinfo();
+                }
+                if (dyn_info.ready & ADDRBIT)
+                    dyn_info.ready &= ~ADDRBIT;
+            }
+            else if (isEUI64(&dev.eui))  
+            {
+                if (dev.num > 0x00 && dev.num <= sys_info.ctrl.maxdev)
+                {
+                    if (sea_memcomp(&dyn_info.addr[dev.num - 0x01].dev, &dev, sizeof(device_t)) != 0x00)
+                    {
+                        sea_printf("\n[sv_address]new device join.");
+                        sea_memcpy(&dyn_info.addr[dev.num - 0x01].dev, &dev, sizeof(device_t));
+                        dyn_info.addr[dev.num - 0x01].logic = fr.road;
+                    }
+                }
+            }
+            else
+                sea_printf("\nchange num completed");
+            break;
+        }
+        case ICHP_SV_CHANNEL:                        // channel body 
+            sea_memcpy(&dyn_info.w108.channel, fr.body, sizeof(channel_t));
+            if (dyn_info.ready & CHNBIT)
+                dyn_info.ready &= ~CHNBIT;
+            break;
+        case ICHP_SV_SECKEY:                         // key_t body 
+            sea_memcpy(&dyn_info.w108.key, fr.body, sizeof(key_t));
+            if (dyn_info.ready & KEYBIT)
+                dyn_info.ready &= ~KEYBIT;
+            break;
+        case ICHP_SV_JOIN:                           // logic and physic address 
+        {
+            u16 no;
+            if (no = sea_lookuphysical((EmberEUI64 *)&fr.body[0x02]))
+            {
+                sea_printf("\n[co_join]change logic address %d to %d", dyn_info.addr[no - 0x01].logic, *((u16 *)fr.body));
+                dyn_info.addr[no - 0x01].logic = *((u16 *)fr.body);
+                if (isCarDevice(CARIDST, no))
+                    rep_info.send[no - 0x01].id  = ICHP_PC_ROUTE;
+                else if (isCarDevice(CALLIDST, no))
+                    rep_info.send[no - 0x01].id  = ICHP_PC_ASSIGN;
+            }
+            break;
+        }
+        case ICHP_SV_RESPONSE: 
+            switch (fr.body[0x01])
+            {
+                case ICHP_SV_ASSIGN:
+                case ICHP_SV_CLOSE: 
+                case ICHP_SV_OPEN:  
+                case ICHP_SV_ROUTE:  
+                case ICHP_SV_END:  
+                    if (ICHP_SV_END == fr.body[0x01])   
+                         msg_info.clear(num);
+                    sea_sendacknowledge(fr.body[0x01], fr.road, fr.body[0x00], fr.body[0x02]);
+                    break;
+                default:
+                    sea_printf("\n[coord]received unknow response %02x", fr.body[0x01]);
+                    break;
+            }
+            break;
+        default:
+            sea_printf("\n[coord]received unknow id %02x", fr.cmd);
+            break;
+    }
+}
+#endif
 //////////////////////////////////////////////////////////////////////////////////////
 
 

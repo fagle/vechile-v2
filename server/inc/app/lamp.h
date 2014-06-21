@@ -137,7 +137,7 @@ typedef u8    EmberEUI64[EUI64_SIZE];          // @brief EUI 64-bit ID (an IEEE 
 #define CARPLCCMDLEN              (0x06)
 #define MAXROUTERTABLEN           (20)
 #define RS485CMDSIZE              (0x08)
-#define MAXPATH                   (0x30)   // (MAXCARDS >> 0x01)
+#define MAXPATH                   (0x20)   // (MAXCARDS >> 0x01)
 
 #define	GPIO_485_TX	          PORTA_PIN(2)
 #define RS485SIZE                 (32)
@@ -331,28 +331,18 @@ typedef struct
 typedef struct
 {
     u8       num;
-    u8       cnt;
-    u8       status:5;
-    u8       send:1;
-    u8       reboot:1;
+    u8       cnt:7;
     u8       update:1;
-    u8       cmd;
-    u8       retry;
     action_t line[MAXPATH];
 } path_t, *ppath_t;
 
 typedef struct
 {
     u8       num;
-    u8       state:2;
-    u8       cnt:3;
-    u8       status:1;
-    u8       ack:1;
+    u8       state:7;
     u8       update:1;
     u8       type;
     u8       vehicle;
-    u8       cmd;
-    u8       retry;
     u16      logic[0x02];
 } call_t, *pcall_t;
 
@@ -362,6 +352,13 @@ typedef union
     pcall_t  call;
 } goal_t, *pgoal_t;
 
+typedef struct
+{
+    u8       id;
+    u8       cnt;
+    u8       buf[0x02];
+} msg_t, *pmsg_t;
+
 ////////////////////////////////////////////////////////////////////////////////////////
 //
 typedef struct
@@ -370,6 +367,7 @@ typedef struct
     lamp_t   key[MAXLAMPS];
     void   * goal[MAXLAMPS];
     time_t   time[MAXLAMPS];
+    msg_t    send[MAXLAMPS];
 #else
     lamp_t   key[MAXLAMPS];
     u8       full[FULL_DATA_SIZE];

@@ -4,7 +4,6 @@
 #include "serial.h"
 #include "frame.h"
 #include "network.h"
-#include "gprs.h"
 #include "cmd.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -69,53 +68,7 @@ void vMiscellaneaTask ( void *pvParameters )
         
         if (w108frm1.get(&w108frm1, &frm) != NULL)  
              CoordFrameCmdHandler(frm);
-        
-        if ((ticker % 0x10000) == 0x00)           // ~2 minute handler
-        {
-	    for (ch = 0x00; ch < sys_info.ctrl.car; ch ++)
-            {
-                if (dyn_info.addr[sys_info.ctrl.base + ch].logic)
-                {
-                    if (isCarActive(sys_info.ctrl.base + ch + 0x01))
-                        set_bitmap(msg_info.act, ch);   // sea_printf("\n%dth vehicle is alive now.", sys_info.ctrl.base + ch + 0x01);
-                    else if (get_bitmap(msg_info.act, ch))
-                    {
-                        dyn_info.buffer[0x00] = sys_info.ctrl.base + ch + 0x01;
-                        w108frm1.put(&w108frm1, ICHP_SV_RPT, 0x01, 0x00, dyn_info.buffer);
-                        clr_bitmap(msg_info.act, ch);   // sea_printf("\n%dth vehicle is power off now.", sys_info.ctrl.base + ch + 0x01);
-                    }
-                }
-            }
-        }
-        
-        if ((ticker % 0x1000) == 0x00)           // ~4 second
-        {
-            for (ch = 0x00; ch < sys_info.ctrl.call; ch ++)
-            {
-                pcall_t cal = (pcall_t)rep_info.goal[ch];
-                if (cal->ack)
-                {
-                    u8  body[0x05];
-                    cal->cnt   = 0x00;
-                    body[0x00] = cal->num;
-                    body[0x01] = cal->type;
-                    body[0x02] = cal->state;
-                    body[0x03] = cal->vehicle;
-                    if (cal->logic[0x00])
-                    {
-                        cal->cnt ++;
-                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x00], body);
-                    }
-                    if (cal->logic[0x01])
-                    {
-                        cal->cnt ++;
-                        w108frm1.put(&w108frm1, ICHP_SV_ASSIGN, 0x04, cal->logic[0x01], body);
-                    }
-                    break;
-                }
-            }
-        }
-        
+       
 #ifdef TRAFFIC_ENABLE
         if ((ticker % 0x800) == 0x00 && msg_info.update)
         {

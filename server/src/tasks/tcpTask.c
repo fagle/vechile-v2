@@ -5,7 +5,6 @@
 
 #include "stm32f10x_it.h"
 #include "flash.h"
-#include "gprs.h"
 #include "system.h"
 #include "network.h"
 #include "usrTasks.h"

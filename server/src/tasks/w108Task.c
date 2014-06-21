@@ -4,7 +4,6 @@
 #include "serial.h"
 #include "frame.h"
 #include "network.h"
-#include "gprs.h"
 #include "cmd.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +65,6 @@ void sea_initw108 ( void )
 void vW108MsgTask ( void *pvParameters )
 {
     vu32 ticker  = 0x00L;
-    ppath_t      rut;
  
     dyn_info.ready = W108MASK | INITBIT;
     sea_resetw108();
@@ -78,7 +76,7 @@ void vW108MsgTask ( void *pvParameters )
     {
         ticker ++;
         
-        if ((ticker % 0x100) == 0x00)
+        if ((ticker % 0x400) == 0x00)      // ~1 second
         {
             if (dyn_info.ready & W108MASK)     
             {
@@ -99,12 +97,28 @@ void vW108MsgTask ( void *pvParameters )
             }
             else
             {
-                if ((rut = sea_findsend()) != NULL)
-                    sea_sendroutetable(rut); 
+                TaskCmdHandler();                         // ~1 second handler
+                if ((ticker % 0x10000) == 0x00)           // ~2 minute handler
+                {
+	            for (u8 ch = 0x00; ch < sys_info.ctrl.car; ch ++)
+                    {
+                        if (dyn_info.addr[sys_info.ctrl.base + ch].logic)
+                        {
+                            if (isCarActive(sys_info.ctrl.base + ch + 0x01))
+                                set_bitmap(msg_info.act, ch);   // sea_printf("\n%dth vehicle is alive now.", sys_info.ctrl.base + ch + 0x01);
+                            else if (get_bitmap(msg_info.act, ch))
+                            {
+                                dyn_info.buffer[0x00] = sys_info.ctrl.base + ch + 0x01;
+                                w108frm1.put(&w108frm1, ICHP_SV_RPT, 0x01, 0x00, dyn_info.buffer);
+                                clr_bitmap(msg_info.act, ch);   // sea_printf("\n%dth vehicle is power off now.", sys_info.ctrl.base + ch + 0x01);
+                            }
+                        }
+                    }
+                }
             }
         }
 
-        vTaskDelay(0x5 / portTICK_RATE_MS);
+        vTaskDelay(0x01 / portTICK_RATE_MS);
     }
 } 
 

@@ -130,25 +130,20 @@ void sea_w108config ( int argc, char * argv[] )
                     break;
                 }
                 case 'd':
-                {
                     sscanf(cmdhd1.optarg, "%d", &num);                   
                     tmp = num & 0xff;  
-                    if (dyn_info.addr[tmp - 0x01].logic)
-                    {
-                        frm.body[0x00] = tmp;                // caller's station number
-                        sscanf(argv[0x03], "%d", &num);
-                        frm.body[0x01] = num & 0xff;         // call vehicle type
-                        sscanf(argv[0x04], "%d", &num);
-                        frm.body[0x02] = num & 0xff;         // caller's status, waiting, assign, online
-                        sscanf(argv[0x05], "%d", &num);
-                        frm.body[0x03] = num & 0xff;         // assign vehicle number
-                        frm.cmd        = ICHP_PC_ASSIGN;
-                        frm.len        = 0x04;
-                        frm.road       = dyn_info.addr[frm.body[0x00] - 0x01].logic;
-                        ServerFrameCmdHandler(frm);
-                    }
+                    frm.body[0x00] = tmp;                // caller's station number
+                    sscanf(argv[0x03], "%d", &num);
+                    frm.body[0x01] = num & 0xff;         // call vehicle type
+                    sscanf(argv[0x04], "%d", &num);
+                    frm.body[0x02] = num & 0xff;         // caller's status, waiting, assign, online
+                    sscanf(argv[0x05], "%d", &num);
+                    frm.body[0x03] = num & 0xff;         // assign vehicle number
+                    frm.cmd        = ICHP_PC_ASSIGN;
+                    frm.len        = 0x04;
+                    frm.road       = dyn_info.addr[frm.body[0x00] - 0x01].logic;
+                    ServerFrameCmdHandler(frm);
                     break;
-                }
                 case 's':
                 {
                     sscanf(cmdhd1.optarg, "%d", &num);                   
@@ -171,62 +166,38 @@ void sea_w108config ( int argc, char * argv[] )
                 case 'o':
                     sscanf(cmdhd1.optarg, "%d", &num);
                     tmp = num & 0xff;
-                    if (dyn_info.addr[tmp - 0x01].logic) 
-                    {
-                        sea_printf("\nopen vehicle %d, logic address %d", tmp, dyn_info.addr[tmp - 0x01].logic);
-                        frm.cmd        = ICHP_SV_OPEN;
-                        frm.len        = 0x01;
-                        frm.road       = dyn_info.addr[tmp - 0x01].logic;
-                        frm.body[0x00] = tmp;
-                        ServerFrameCmdHandler(frm);
-                    }
-                    else
-                        sea_printf("\nvehicle no logic address");
+                    frm.cmd        = ICHP_SV_OPEN;
+                    frm.len        = 0x01;
+                    frm.road       = dyn_info.addr[tmp - 0x01].logic;
+                    frm.body[0x00] = tmp;
+                    ServerFrameCmdHandler(frm);
                     break;
                 case 'c':
                     sscanf(cmdhd1.optarg, "%d", &num);
                     tmp = num & 0xff;
-                    if (dyn_info.addr[tmp - 0x01].logic) 
-                    {
-                        sea_printf("\nclose vehicle %d, logic address %d", tmp, dyn_info.addr[tmp - 0x01].logic);
-                        frm.cmd        = ICHP_SV_CLOSE;
-                        frm.len        = 0x01;
-                        frm.road       = dyn_info.addr[tmp - 0x01].logic;
-                        frm.body[0x00] = tmp;
-                        ServerFrameCmdHandler(frm);
-                    }
-                    else
-                        sea_printf("\nvehicle no logic address");
+                    frm.cmd        = ICHP_SV_CLOSE;
+                    frm.len        = 0x01;
+                    frm.road       = dyn_info.addr[tmp - 0x01].logic;
+                    frm.body[0x00] = tmp;
+                    ServerFrameCmdHandler(frm);
                     break;
                 case 'e':
                     sscanf(cmdhd1.optarg, "%d", &num);
                     tmp = num & 0xff;
-                    if (dyn_info.addr[tmp - 0x01].logic) 
-                    {
-                        sea_printf("\nsend end_line vehicle %d, logic address %d", tmp, dyn_info.addr[tmp - 0x01].logic);
-                        frm.cmd        = ICHP_SV_END;
-                        frm.len        = 0x01;
-                        frm.road       = dyn_info.addr[tmp - 0x01].logic;
-                        frm.body[0x00] = tmp;
-                        ServerFrameCmdHandler(frm);
-                    }
-                    else
-                        sea_printf("\nvehicle no logic address");
+                    frm.cmd        = ICHP_SV_END;
+                    frm.len        = 0x01;
+                    frm.road       = dyn_info.addr[tmp - 0x01].logic;
+                    frm.body[0x00] = tmp;
+                    ServerFrameCmdHandler(frm);
                     break;
                 case 'b':
                     sscanf(cmdhd1.optarg, "%d", &num);
                     tmp = num & 0xff;
-                    if (dyn_info.addr[tmp - 0x01].logic) 
-                    {
-                        sea_printf("\nsend reboot vehicle %d, logic address %d", tmp, dyn_info.addr[tmp - 0x01].logic);
-                        frm.cmd        = ICHP_SV_REBOOT;
-                        frm.len        = 0x01;
-                        frm.road       = dyn_info.addr[tmp - 0x01].logic;
-                        frm.body[0x00] = tmp;
-                        ServerFrameCmdHandler(frm);
-                    }
-                    else
-                        sea_printf("\nvehicle no logic address");
+                    frm.cmd        = ICHP_SV_REBOOT;
+                    frm.len        = 0x01;
+                    frm.road       = dyn_info.addr[tmp - 0x01].logic;
+                    frm.body[0x00] = tmp;
+                    ServerFrameCmdHandler(frm);
                     break;
                 case 'n':
                     sscanf(cmdhd1.optarg, "%d", &num);

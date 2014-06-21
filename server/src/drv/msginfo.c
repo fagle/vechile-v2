@@ -174,6 +174,7 @@ s8  sea_findindex ( ppath_t ptr, u8 card )
     return 0xff;
 }
 
+#if 0
 /*******************************************************************************
 * Function Name  : ppath_t sea_findsend ( void )
 * Description    : find send route table
@@ -190,6 +191,7 @@ ppath_t sea_findsend ( void )
     }
     return NULL;
 }
+#endif
 
 /*******************************************************************************
 * Function Name  : static u8 sea_routeadd ( u8 num, u8 index, u8 size, u8 * ptr ) 
@@ -244,9 +246,6 @@ static void sea_routeclear ( u8 num )
         if (msg_info.route[i].num == num)
         {
             msg_info.route[i].cnt    = 0x00;
-            msg_info.route[i].send   = 0x00;
-            msg_info.route[i].reboot = 0x00;
-            msg_info.route[i].status = 0x00;
             sea_memset(msg_info.route[i].line, 0x00, MAXPATH * sizeof(action_t));
             return;
         }
@@ -382,8 +381,6 @@ u8  sea_sendroutetable ( ppath_t ptr )
         w108frm1.put(&w108frm1, ICHP_SV_ROUTE, (size + 0x01) * 0x02, addr, buffer);
     }
     
-    if (ptr->send)
-        ptr->send = 0x00;
     return 0x01;
 }
 

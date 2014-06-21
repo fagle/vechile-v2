@@ -429,58 +429,6 @@ u8 sea_isopentime ( const systime_t * tm )
 void sea_timeventhandler ( void )
 {
 #ifdef VEHICLE_MODE
-//    u8 i;
-
-#if 0    
-    for (i = 0x00; i < sys_info.ctrl.car; i ++)
-    {
-        if (msg_info.route[i].cnt)
-        {
-            if (msg_info.route[i].cnt != rep_info.key[msg_info.route[i].num - 0x01].vehicle.count)
-            {
-                if (msg_info.route[i].status == CAR_START)
-                    msg_info.route[i].status = CAR_NONE;
-                msg_info.route[i].send = 0x01;
-            }
-            else
-                sea_deletemsg(&msg_info, ICHP_SV_ROUTE, msg_info.route[i].num);
-            
-            if (msg_info.route[i].status == CAR_START)
-            {
-                if (rep_info.key[msg_info.route[i].num - 0x01].vehicle.status == CAR_STOP && 
-                    dyn_info.addr[msg_info.route[i].num - 0x01].logic)
-                {
-                    if (!sea_ismsginlist(&msg_info, ICHP_SV_OPEN, msg_info.route[i].num))
-                    {
-                        sea_sendsinglecommand(ICHP_SV_OPEN, msg_info.route[i].num);
-                    }
-                }
-                else if (rep_info.key[msg_info.route[i].num - 0x01].vehicle.status != CAR_STOP)
-                {
-                    msg_info.route[i].status = CAR_NONE;
-                    sea_deletemsg(&msg_info, ICHP_SV_OPEN, msg_info.route[i].num);
-                }
-            }
-            else if (msg_info.route[i].status == CAR_PAUSE)
-            {
-                if (rep_info.key[msg_info.route[i].num - 0x01].vehicle.status != CAR_STOP && 
-                    dyn_info.addr[msg_info.route[i].num - 0x01].logic)
-                {
-                    if (!sea_ismsginlist(&msg_info, ICHP_SV_CLOSE, msg_info.route[i].num))
-                    {
-                        sea_sendsinglecommand(ICHP_SV_CLOSE, msg_info.route[i].num);
-                    }
-                }
-                else if (rep_info.key[msg_info.route[i].num - 0x01].vehicle.status == CAR_STOP)
-                {
-                    msg_info.route[i].status = CAR_NONE;
-                    sea_deletemsg(&msg_info, ICHP_SV_CLOSE, msg_info.route[i].num);
-                }
-            }
-        }
-    }
-#endif
-    
 #ifdef TRAFFIC_ENABLE
     sea_memset(&traffic_info.state, 0x00, msg_info.cardsize);
     for (i = 0x00; i < sys_info.ctrl.maxdev; i ++)
