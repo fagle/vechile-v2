@@ -558,14 +558,14 @@ void CoordFrameCmdHandler ( frame_t fr )
         }
         case ICHP_SV_RESPONSE: 
         {
-            sea_printf("\n%dth vehicle's response, command %02x, result %d, len %d", fr.body[0x00], fr.body[0x01], fr.body[0x02], fr.len);
+//            sea_printf("\n%dth vehicle's response, command %02x, result %d, len %d", fr.body[0x00], fr.body[0x01], fr.body[0x02], fr.len);
             switch (fr.body[0x01])
             {
                 case ICHP_SV_ASSIGN:
                     if (isCallDevice(CALLIDST, fr.body[0x00]))
                     {
                         pcall_t cal = (pcall_t)rep_info.goal[fr.body[0x00] - 0x01];
-                        sea_printf("\n%d caller's ICHP_SV_ASSIGN", fr.body[0x00]);
+//                        sea_printf("\n%d caller's ICHP_SV_ASSIGN", fr.body[0x00]);
                         if (cal->cnt)
                             cal->cnt --;
                         if (cal->state == fr.body[0x02] && cal->cnt == 0x00)  
@@ -582,12 +582,12 @@ void CoordFrameCmdHandler ( frame_t fr )
                                 break;
                             }
                         }
-                        sea_printf("\n%d vehicle's ICHP_SV_ASSIGN", fr.body[0x00]);
+//                        sea_printf("\n%d vehicle's ICHP_SV_ASSIGN", fr.body[0x00]);
                     }
                     break;
                 case ICHP_SV_CLOSE: 
                 case ICHP_SV_OPEN:  
-                    sea_printf("\n%dth vehicle is running or stopped, status %d", num, fr.body[0x02]);
+//                    sea_printf("\n%dth vehicle is running or stopped, status %d", num, fr.body[0x02]);
                     if (rut)
                     {
                         if (rut->status != CAR_NONE)
@@ -596,7 +596,7 @@ void CoordFrameCmdHandler ( frame_t fr )
                     sea_sendacknowledge(fr.body[0x01], fr.road, fr.body[0x00], fr.body[0x02]);
                     break;
                 case ICHP_SV_END:  
-                    sea_printf("\n%dth vehicle ends line, status %d", num, fr.body[0x02]);
+//                    sea_printf("\n%dth vehicle ends line, status %d", num, fr.body[0x02]);
                     if (rut)    msg_info.clear(num);
                     sea_sendacknowledge(fr.body[0x01], fr.road, fr.body[0x00], fr.body[0x02]);
                     break;
@@ -604,7 +604,7 @@ void CoordFrameCmdHandler ( frame_t fr )
                 {
                     u8 sum = 0x00;
 //                    u8 size = fr.body[0x03] + RTSENDSIZE < rut->cnt ? (RTSENDSIZE) : (rut->cnt - fr.body[0x03]);
-                    sea_printf("\n%dth vehicle route table, sum %d", num, fr.body[0x02]);
+//                    sea_printf("\n%dth vehicle route table, sum %d", num, fr.body[0x02]);
 //                    for (u8 i = 0x00; i < size; i ++)
 //                        sum += rut->line[i + fr.body[0x03]].id + rut->line[i + fr.body[0x03]].action;
                     for (u8 i = 0x00; i < rut->cnt; i ++)

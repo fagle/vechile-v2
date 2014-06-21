@@ -212,7 +212,8 @@ void vCommandTask ( void *pvParameters )
         
         if ((ticker % 0x200) == 0x00)           // ~4 second
         {
-	    for (ch = 0x01; ch <= sys_info.ctrl.car && client.send.len == 0x00; ch ++)
+//	    for (ch = 0x01; ch <= sys_info.ctrl.car && client.send.len == 0x00; ch ++)
+	    for (ch = 0x01; ch <= sys_info.ctrl.car; ch ++)
             {
                 ppath_t rut = msg_info.find(sys_info.ctrl.base + ch);
                 if (rut->update)
@@ -272,7 +273,8 @@ void vCommandTask ( void *pvParameters )
                 }
             }
             
-            for (ch = 0x00; ch < sys_info.ctrl.call && client.send.len == 0x00; ch ++)
+//            for (ch = 0x00; ch < sys_info.ctrl.call && client.send.len == 0x00; ch ++)
+            for (ch = 0x00; ch < sys_info.ctrl.call; ch ++)
             {
                 pcall_t cal = (pcall_t)rep_info.goal[ch];
                 if (cal->update)
