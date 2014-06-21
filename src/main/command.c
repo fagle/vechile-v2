@@ -621,6 +621,7 @@ static void printLampHelp ( void )
     DBG("\r\n  -r nnn, set debug/release mode.");
     DBG("\r\n  -c print current vehicle/beep status.");
     DBG("\r\n  -b nnn, set system configuration (0x00 for default value).");
+    DBG("\r\n  -p send current vehicle reoprt to server.");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -892,7 +893,7 @@ void sea_lampconfig  ( int argc, char * argv[] )
         return;
     }
     
-    while ((opt = sea_getopt(argc, argv, "ntjcaxklbr")) != -1) 
+    while ((opt = sea_getopt(argc, argv, "ntjcaxpklbr")) != -1) 
     {
         if (opt != 0x00 && cmdhd1.optarg != NULL)
         {
@@ -989,6 +990,9 @@ void sea_lampconfig  ( int argc, char * argv[] )
                         if (carInfo.key)
                             DBG("\r\n%dth vehicle will go to %dth station.", sys_info.dev.num, carInfo.key);
                     }
+                    break;
+                case 'p':
+                    set_lampmode(LAMP_CHANGE);
                     break;
                 case 'k':
                     sscanf(cmdhd1.optarg, "%d", &num);

@@ -665,9 +665,9 @@ void carClearRouteTable ( void )
     plc.fail          = NO_ERROR;
     carInfo.plc.fail  = NO_ERROR;
     single_info.lamp.vehicle.fail = NO_ERROR;
-#ifndef VEHICLE_RELEASE
+//    carInfo.route.count = 0x00;
     carInfo.plc.count = carInfo.route.count;
-#endif    
+    
     set_lampmode(LAMP_CHANGE);
 }
 
