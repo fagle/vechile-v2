@@ -24,7 +24,6 @@ typedef struct
     call_t call[CALLERDEVS];
     u8     state[(MAXCARDS >> 0x03) + 0x01];
     u8     garage[GARAGESIZE];
-    u8     act[(MOBILEDEVS >> 0x03) + 0x01];
     
     ppath_t   (*find)  ( u8 num );
     u8        (*add)   ( u8 num, u8 index, u8 size, u8 * ptr );

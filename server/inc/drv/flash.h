@@ -8,10 +8,16 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
-#define FLASH_SYSINFO_ADDRESS      0x08040000   //our program is growing fat, sysinfo should move backward
+#define FLASH_SYSINFO_ADDRESS      0x08040000   // our program is growing fat, sysinfo should move backward
 #define FLASH_PAGE_SIZE            0x0800
 #define FLASH_LOCATE_OFFSET        0x0800
-#define FLASH_SHRIMP_TIMESTAGES_OFFSET    (2*FLASH_PAGE_SIZE)//2k for time stages starting from this flash offset
+#define FLASH_ROUTE_ADDRESS        0x08042000   // save beeper's route table, max. router size = 0x20 * 2 = 0x40
+#define FLASH_ROUTE_SIZE           0x1000       // total size = 0x040 * 60(beepers) ~= 4KB
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+#define BEEPROUTESIZE              0x40
+#define EMPTYROUTE                 0xffff
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -78,6 +84,28 @@ u32 sea_flashlong ( u16 offset );
 //* 备注        : 无
 //*------------------------------------------------*/
 u16 sea_flashshort ( u16 offset );
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : void * sea_flashreadroute ( u8 beep )
+//* 功能        : read beeper's route table
+//* 输入参数    : u8 beep
+//* 输出参数    : pointer route table
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+void * sea_flashreadroute ( u8 beep );
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : FLASH_Status sea_flashwriteroute ( u8 beep, const void * table, u8 size )
+//* 功能        : write beeper's route table
+//* 输入参数    : u8 beep, const void * table, u8 size
+//* 输出参数    : 无
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+FLASH_Status sea_flashwriteroute ( u8 beep, const void * table, u8 size );
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //

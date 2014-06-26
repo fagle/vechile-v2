@@ -104,13 +104,11 @@ void vW108MsgTask ( void *pvParameters )
                     {
                         if (dyn_info.addr[sys_info.ctrl.base + ch].logic)
                         {
-                            if (isCarActive(sys_info.ctrl.base + ch + 0x01))
-                                set_bitmap(msg_info.act, ch);   // sea_printf("\n%dth vehicle is alive now.", sys_info.ctrl.base + ch + 0x01);
-                            else if (get_bitmap(msg_info.act, ch))
+                            if (!isCarActive(sys_info.ctrl.base + ch + 0x01))
                             {
                                 dyn_info.buffer[0x00] = sys_info.ctrl.base + ch + 0x01;
                                 w108frm1.put(&w108frm1, ICHP_SV_RPT, 0x01, 0x00, dyn_info.buffer);
-                                clr_bitmap(msg_info.act, ch);   // sea_printf("\n%dth vehicle is power off now.", sys_info.ctrl.base + ch + 0x01);
+                                rep_info.send[sys_info.ctrl.base + ch].active = 0x00;
                             }
                         }
                     }

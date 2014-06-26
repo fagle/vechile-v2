@@ -18,20 +18,12 @@ static void printCommandHelp ( void )
     sea_printf("\n  -u nn, print devices of wrong number or type.");
     sea_printf("\n  -o nn, open socket.");
     sea_printf("\n  -s sss, send string to server via socket.");
-    sea_printf("\n  -p nn, print nn vehicle route table.");
+    sea_printf("\n  -p nn, print nn vehicle and caller route table, 0x00 for all");
     sea_printf("\n  -r nn, set relase/debug mode.");
     sea_printf("\n  -i nnn.nnn.nnn:port domain_name, setting server ip address and domain name.");
     sea_printf("\n  -l nnn.nnn.nnn mmm.mmm.mmm ggg.ggg.ggg, setting host ip address, mask and gateway ip address.");
     sea_printf("\n  -w ss nn nn ..., clear or set card's map list, ss index of start, only ss=0 clear the list.");
-#if 0
-    sea_printf("\n  -o pp nn ..., open lamp list.");
-    sea_printf("\n  -c pp nn ..., close lamp list.");
-    sea_printf("\n  -t nn, setting control bit, other force network power even odd test auto.");
-    sea_printf("\n  -n nnnn node_name, setting landscape node id and name.");
-    sea_printf("\n  -w ssid security_key, setting wifi ssid and security key, none means no any keys.");
-    sea_printf("\n  -s idx name phone mesg, setting staff information.");
-    sea_printf("\n  -g month idx hh:mm:ss hh:mm:ss which_lamps, setting open/close lamp time stage.");
-#endif
+    sea_printf("\n  -b nn idx id act ..., set beeper's route table, nn beeper no, idx index, id act...");
 }
 
 void sea_landconfig  ( int argc, char * argv[] )
@@ -55,11 +47,7 @@ void sea_landconfig  ( int argc, char * argv[] )
         return;
     }
     
-#ifdef VEHICLE_MODE    
-    while ((opt = sea_getopt(argc, argv, "dvosiculprwf0")) != -1) 
-#else
-    while ((opt = sea_getopt(argc, argv, "doctnwilsg")) != -1) 
-#endif      
+    while ((opt = sea_getopt(argc, argv, "dvosicublprwf0")) != -1) 
     {
         if (opt != 0x00 && cmdhd1.optarg != NULL)
         {
@@ -161,6 +149,14 @@ void sea_landconfig  ( int argc, char * argv[] )
                         sea_updatesysinfo();
                     }
                     break; 
+                case 'b':
+                    sscanf(cmdhd1.optarg, "%d", &num);
+                    if (isCallDevice(CALLIDST, num))
+                    {
+                    }
+                    else
+                        sea_printf("\n%dth device is not beeper.");
+                    break; 
                 case 'c':
                     sscanf(cmdhd1.optarg, "%d", &num);
                     if (num && num <= CALLERDEVS)
@@ -181,7 +177,13 @@ void sea_landconfig  ( int argc, char * argv[] )
                     {
                         if (rep_info.key[i].vehicle.fail & LAMP_ER_NP)
                         {
-                            sea_printf("\nnumber %d, type %d.", rep_info.key[i].vehicle.number, rep_info.key[i].vehicle.type);
+                            sea_printf("\nnumber %d, type %d unknow device.", rep_info.key[i].vehicle.number, rep_info.key[i].vehicle.type);
+                            if (!(num --))
+                                break;
+                        }
+                        else if (rep_info.key[i].vehicle.status)
+                        {
+                            sea_printf("\nnumber %d, type %d active.", rep_info.key[i].vehicle.number, rep_info.key[i].vehicle.type);
                             if (!(num --))
                                 break;
                         }
@@ -191,6 +193,21 @@ void sea_landconfig  ( int argc, char * argv[] )
                     sscanf(cmdhd1.optarg, "%d", &num);
                     if (isCarDevice(CARIDST, num))
                         msg_info.print(num);
+                    else if (isCallDevice(CALLIDST, num))
+                    {
+                        if (msg_info.call[num - 0x01].route == NULL)
+                          sea_printf("\n%dth caller route table is empty.", num);
+                        else
+                        {
+                            u8 i;
+                            sea_printf("\ncaller %d, route size %d\n    id:", num, msg_info.call[num - 0x01].cnt);
+                            for (i = 0x00; i < msg_info.call[num - 0x01].cnt; i ++)
+                                sea_printf("%2x ", msg_info.call[num - 0x01].route[i].id);
+                            sea_printf("\naction:");
+                            for (i = 0x00; i < msg_info.call[num - 0x01].cnt; i ++)
+                                sea_printf("%2x ", msg_info.call[num - 0x01].route[i].action);
+                        }
+                    }
                     else if (!num)
                     {
                         for (u8 i = 0x01; i <= sys_info.ctrl.car; i ++)

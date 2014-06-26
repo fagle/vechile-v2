@@ -330,20 +330,22 @@ typedef struct
 //
 typedef struct
 {
-    u8       num;
-    u8       cnt:7;
-    u8       update:1;
-    action_t line[MAXPATH];
+    u8        num;
+    u8        cnt:7;
+    u8        update:1;
+    action_t  line[MAXPATH];
 } path_t, *ppath_t;
 
 typedef struct
 {
-    u8       num;
-    u8       state:7;
-    u8       update:1;
-    u8       type;
-    u8       vehicle;
-    u16      logic[0x02];
+    u8        num;
+    u8        state:7;
+    u8        update:1;
+    u8        type;
+    u8        vehicle;
+    u8        cnt;
+    u16       logic[0x02];
+    paction_t route;
 } call_t, *pcall_t;
 
 typedef union
@@ -355,7 +357,8 @@ typedef union
 typedef struct
 {
     u8       id;
-    u8       cnt;
+    u8       cnt:7;
+    u8       active:1;
     u8       buf[0x02];
 } msg_t, *pmsg_t;
 

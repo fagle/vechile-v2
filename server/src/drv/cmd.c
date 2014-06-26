@@ -543,6 +543,8 @@ void sea_parsereport ( plamp_t ptr, u16 road )
             }
             sea_memcpy(&rep_info.key[ptr->vehicle.number - 0x01], ptr, sizeof(lamp_t));
             sea_memcpy(&rep_info.time[ptr->vehicle.number - 0x01], sea_getcurtime(&tm), sizeof(time_t));
+            if (!rep_info.send[ptr->vehicle.number - 0x01].active)
+                rep_info.send[ptr->vehicle.number - 0x01].active = 0x01;
         }
     }
       

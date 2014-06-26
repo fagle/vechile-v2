@@ -284,6 +284,8 @@ static void sea_routeprint ( u8 num )
 *******************************************************************************/
 void sea_initmsg ( void )
 {
+    u8  i, j;
+    
     sea_memset(&msg_info, 0x00, sizeof(msg_info_t));
     msg_info.maxcard  = MAXCARDS;
       
@@ -296,12 +298,22 @@ void sea_initmsg ( void )
     sea_initraffic();
     sea_initreport();
     
-    for (u8 i = 0x00; i < MAXLAMPS; i ++)
+    for (i = 0x00; i < MAXLAMPS; i ++)
     {
         if (i < CALLERDEVS)
         {
-            msg_info.call[i].num = i + 0x01;
-            rep_info.goal[i] = &msg_info.call[i];
+            msg_info.call[i].num   = i + 0x01;
+            msg_info.call[i].route = (paction_t)sea_flashreadroute(i);
+            for (j = 0x00; j < BEEPROUTESIZE / 0x02; j ++)
+            {
+                if (msg_info.call[i].route == NULL)
+                    break;
+                if (msg_info.call[i].route[j].id == 0x00 || msg_info.call[i].route[j].action == 0x00 ||
+                    msg_info.call[i].route[j].id == 0xff || msg_info.call[i].route[j].action == 0xff)
+                    break;
+            }
+            msg_info.call[i].cnt = j >> 0x01;
+            rep_info.goal[i]     = &msg_info.call[i];
         }
         else if (i >= sys_info.ctrl.base && i < sys_info.ctrl.base + MOBILEDEVS)
         {
