@@ -688,6 +688,9 @@ void CoordFrameCmdHandler ( frame_t fr )
             }
             break;
         }
+        case ICHP_SV_END:  
+            msg_info.clear(num);
+            break;
         case ICHP_SV_RESPONSE: 
         {
 //            sea_printf("\n%dth vehicle's response, command %02x, result %d, len %d", fr.body[0x00], fr.body[0x01], fr.body[0x02], fr.len);
@@ -845,6 +848,9 @@ void CoordFrameCmdHandler ( frame_t fr )
             }
             break;
         }
+        case ICHP_SV_END:  
+            msg_info.clear(num);
+            break;
         case ICHP_SV_RESPONSE: 
             switch (fr.body[0x01])
             {
