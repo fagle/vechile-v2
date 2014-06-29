@@ -142,20 +142,11 @@ static int sea_createsocket ( void )
     u8  iptxt[20];
     u8  retry = 0x00;
     
-    sea_resetetherif();                                // reset enc28j60 chip.
+    sea_resetetherif();                                         // reset enc28j60 chip.
     server.sin_family      = AF_INET;
-#if 0
-#ifdef HOME_IPADDR    
-    server.sin_addr.s_addr = inet_addr("192.168.0.100");//test 192.168.1.19DEFDOMAIN
-#else
-    server.sin_addr.s_addr = inet_addr("192.168.1.100");//test 192.168.1.19DEFDOMAIN
-#endif
-    server.sin_port        = htons(8080);
-#else
     sprintf((char *)iptxt, "%d.%d.%d.%d", sys_info.ip[0x00], sys_info.ip[0x01], sys_info.ip[0x02], sys_info.ip[0x03]);
     server.sin_addr.s_addr = inet_addr((char *)iptxt);   
     server.sin_port        = htons(sys_info.port);
-#endif
     
     if ((sock = lwip_socket(AF_INET, SOCK_STREAM, 0x00)) == -1)   // IPPROTO_TCP)) == -1)
         return -1;     

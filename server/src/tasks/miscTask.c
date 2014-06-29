@@ -45,14 +45,14 @@ void vMiscellaneaTask ( void *pvParameters )
         if (consfrm1.get(&consfrm1, &frm) != NULL)
             ServerFrameCmdHandler(frm);
 
+        if (w108frm1.get(&w108frm1, &frm) != NULL)  
+             CoordFrameCmdHandler(frm);
+       
 #ifdef LWIP_ENABLE     
         if (tcpfrm1.get(&tcpfrm1, &frm) != NULL)
             ServerFrameCmdHandler(frm);
 #endif
-        
-        if (w108frm1.get(&w108frm1, &frm) != NULL)  
-             CoordFrameCmdHandler(frm);
-       
+
 #ifdef TRAFFIC_ENABLE
         if ((ticker % 0x800) == 0x00 && msg_info.update)
         {

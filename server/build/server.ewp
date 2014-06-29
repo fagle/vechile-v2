@@ -1605,6 +1605,9 @@
       <name>$PROJ_DIR$\..\src\drv\adc.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\src\drv\can.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\src\drv\cmd.c</name>
     </file>
     <file>

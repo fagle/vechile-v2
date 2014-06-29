@@ -371,9 +371,19 @@ void USB_HP_CAN_TX_IRQHandler(void)
 {
 }
 
-
+/*******************************************************************************
+* Function Name  : USB_LP_CAN_RX0_IRQHandler
+* Description    : This function handles USB Low Priority or CAN RX0 interrupts 
+*                  requests.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 void USB_LP_CAN_RX0_IRQHandler(void)
-{    
+{
+    extern void CAN_RxMessage ( void );
+
+    CAN_RxMessage();
 }
 
 void CAN_RX1_IRQHandler(void)

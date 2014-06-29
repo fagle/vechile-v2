@@ -471,6 +471,7 @@ int main ( void )
     KEY_Configuration();
     SYS_Configuration();
     ADC_Configuration();
+    CAN_Configuration();
     
 #ifdef LWIP_ENABLE     
     LWIP_Configuration();               // Initilaize the LwIP stack 

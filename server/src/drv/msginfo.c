@@ -312,7 +312,7 @@ void sea_initmsg ( void )
                     msg_info.call[i].route[j].id == 0xff || msg_info.call[i].route[j].action == 0xff)
                     break;
             }
-            msg_info.call[i].cnt = j >> 0x01;
+            msg_info.call[i].cnt = j;
             rep_info.goal[i]     = &msg_info.call[i];
         }
         else if (i >= sys_info.ctrl.base && i < sys_info.ctrl.base + MOBILEDEVS)
