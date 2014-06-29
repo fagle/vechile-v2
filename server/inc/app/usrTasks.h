@@ -45,21 +45,26 @@ void vWifiMsgTask ( void *pvParameters );
 *********************************************************/
 void vCommandTask ( void *pvParameters );
 
-void vArcTask ( void *pvParameters );
-
-void vGprsMsgTask( void *pvParameters );
-
-void vTestTask( void *pvParameters );
-
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
-//* 函数名      : void vTCPClientTask ( void *pvParameters )
+//* 函数名      : void vTCPRecvTask ( void *pvParameters )
 //* 功能        : tcp client task
 //* 输入参数    : void *pvParameters
 //* 输出参数    : 无
 //* 修改记录    : 无
 //* 备注        : 无
 //*------------------------------------------------*/
-void vTCPClientTask ( void *pvParameters );
+void vTCPRecvTask ( void *pvParameters );
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : void vTCPSendTask ( void *pvParameters )
+//* 功能        : tcp client task
+//* 输入参数    : void *pvParameters
+//* 输出参数    : 无
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+void vTCPSendTask ( void *pvParameters );
 
 #endif  // __USRTASK_H__

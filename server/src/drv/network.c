@@ -68,7 +68,7 @@ void sea_writedefaultsysinfo ( void )
     sys_info.ctrl.app     = eVehicle;                  // agv application, added 2013/12/14
     sys_info.ctrl.period  = DEFALUTPERIOD;             // report lamp information time(sec)  
     sys_info.ctrl.config  = LAMP_CF_OPEN;              // default config with auto mode
-    sys_info.ctrl.base    = MAXLAMPS - MOBILEDEVS;     // base number of vehicles
+    sys_info.ctrl.base    = MOBILEBASE;                // base number of vehicles
     sys_info.ctrl.car     = MOBILEDEVS;
     sys_info.ctrl.call    = CALLERDEVS;
     sys_info.ctrl.type    = 0x04;                      // 5,6,7,8 types

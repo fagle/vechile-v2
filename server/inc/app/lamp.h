@@ -23,7 +23,7 @@ typedef u8    EmberEUI64[EUI64_SIZE];          // @brief EUI 64-bit ID (an IEEE 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //the configuration infomation
 #define ROADID             (0x24)   // (36) (0x24)   // 邓实验
-#define MAXLAMPS           (250)    // 道路的总路灯数, max lamps on a road
+#define MAXLAMPS           (230)    // (250)    // 道路的总路灯数, max lamps on a road
 #define MAXCARDS           (0x80)
 
 #define DEFALUTPERIOD      (0x01)   // report single lamp information time 1 min.
@@ -110,8 +110,8 @@ typedef u8    EmberEUI64[EUI64_SIZE];          // @brief EUI 64-bit ID (an IEEE 
 #define SWITCH_LAMP_NUM      18
 
 #define MAXCARNUM                 0x02
-#define MOBILEDEVS                (50)     // max. devices of mobile vehicle
-#define MOBILEBASE                (MAXLAMPS - MOBILEDEVS)
+#define MOBILEDEVS                (30)     // (50)     // max. devices of mobile vehicle
+#define MOBILEBASE                (200)    // (MAXLAMPS - MOBILEDEVS)
 #define CALLERDEVS                (60)     // max. callers
 
 ///////////////////////////////////////////////////////////////////////////////////////

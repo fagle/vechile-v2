@@ -84,6 +84,17 @@ typedef struct frm_t
 //*------------------------------------------------*/
 void sea_initframe ( pframe_info_t ptr,  USART_TypeDef * uart );
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : void sea_initcpfrm ( pframe_info_t ptr,  USART_TypeDef * uart )
+//* 功能        : initialize tcp frame information structure body
+//* 输入参数    : pframe_info_t ptr,  USART_TypeDef * uart
+//* 输出参数    : 无
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+void sea_initcpfrm ( pframe_info_t ptr,  USART_TypeDef * uart );
+
 /************************************************
 * 函数名      : void FRAME_SendFrame ( u8 id, u8 size, u16 road_id, u8 * body )
 * 功能        : 向W108发送帧

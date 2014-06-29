@@ -1674,6 +1674,9 @@
       <name>$PROJ_DIR$\..\src\tasks\miscTask.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\src\tasks\sendTask.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\src\tasks\tcpTask.c</name>
     </file>
     <file>

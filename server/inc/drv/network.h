@@ -335,13 +335,10 @@ typedef struct                 // some information want to save in flash
     u8        config;          // configuration of device
     u8        serial;          // enable/disable serial, sea_printf
     u8        report;          // enable/disable report, put
-    u8        landstate;       // landscape state
     w108_t    w108;            // w108 system information body, the same with current zigbee module
     addr_t    addr[MAXLAMPS];  // device address include logic and physical address 
     xSemaphoreHandle semserial;    
-    xSemaphoreHandle semgprs;  // semaphore of gprs send
-    xSemaphoreHandle semw108;  // semaphore of w108 send
-    u8        buffer[0x80];    // buffer of command send
+    u8        buffer[0x50];    // buffer of command send
 } dyn_info_t, *pdyn_info_t;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -358,6 +355,8 @@ typedef struct
     int    sock;		  // socket 标识符 -1无效，>= 0 有效
     int    conn;		  // socket 是否连接成功，0 未连接，>= 1 连接
     int    retry;                 // connect times
+    u16    count;                 // count of send frames
+    u8     sem;
     sbuf_t recv;
     sbuf_t send;
 } client_info_t, *pclient_info_t;
