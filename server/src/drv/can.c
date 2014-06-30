@@ -88,8 +88,8 @@ void CAN_RxMessage ( void )
         in_frame.left  = (in_frame.left >> 0x08 | in_frame.left << 0x08) & 0xffff;
         in_frame.right = (in_frame.right >> 0x08 | in_frame.right << 0x08) & 0xffff;
         sea_printf("\nExtId, IDE: %04x, %04d", RxMessage.ExtId, RxMessage.IDE);
-        sea_printf("\ntype, cmd, control speed error: %02x, %02x, %04x, %04x, %04x", 
-                   in_frame.type, in_frame.cmd, in_frame.control, in_frame.speed, in_frame.error); 
+        sea_printf("\ntype, cmd, speed left and right: %02x, %02x, %04x, %04x, %04x", 
+                   in_frame.type, in_frame.cmd, in_frame.speed, in_frame.left, in_frame.right); 
     }        
 }
 
@@ -100,7 +100,7 @@ void CAN_RxMessage ( void )
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void CAN_TxMessage ( frame_t * ptr )
+void CAN_TxMessage ( canfrm_t * ptr )
 {
     CanTxMsg TxMessage;
     u16      retry = CANRETRY;
@@ -113,11 +113,34 @@ void CAN_TxMessage ( frame_t * ptr )
     sea_memcpy(TxMessage.Data, (char *)ptr, CANFRAMELEN);
     TxMessage.DLC   = CANFRAMELEN;
 
-    while (--retry)
+    sea_printf("\nsend frame ");
+    taskENTER_CRITICAL();
+    while (-- retry)
     {
         TransmitMailbox = CAN_Transmit(CAN1, &TxMessage);
         if (CAN_TransmitStatus(CAN1, TransmitMailbox) == CANTXOK)
             break;
     }
+    taskEXIT_CRITICAL();
+    sea_printf("%s.", retry ? "ok" : "fail");
 }
+
+/*******************************************************************************
+* Function Name  : void sea_canprint ( u8 cmd, u8 type, u16 speed, u16 left, u16 right )
+* Description    : can send frame massage.
+* Input          : u8 cmd, u8 type, u16 speed, u16 left, u16 right
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void sea_canprint ( u8 cmd, u8 type, u16 speed, u16 left, u16 right )
+{
+    out_frame.cmd   = cmd;
+    out_frame.type  = type;
+    out_frame.speed = speed;
+    out_frame.left  = left;
+    out_frame.right = right;
+    
+    CAN_TxMessage(&out_frame);
+}
+
 ////////////////////////////////////////////////////////////////////////////////

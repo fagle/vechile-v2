@@ -103,7 +103,7 @@ static void sea_tcprintframe ( struct frm_t * frm, const u8 * str, ... )
 void sea_initcpfrm ( pframe_info_t ptr,  USART_TypeDef * uart )
 {
 #ifdef LWIP_ENABLE     
-    sea_initframe(&tcpfrm1, TCP_COM);
+    sea_initframe(ptr, uart);
     tcpfrm1.put      = sea_tcpsendframe;      
     tcpfrm1.print    = sea_tcprintframe;            
     tcpfrm1.sendbyte = sea_tcpsendbyte;

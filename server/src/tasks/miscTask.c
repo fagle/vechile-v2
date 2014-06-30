@@ -78,7 +78,10 @@ void vMiscellaneaTask ( void *pvParameters )
             }
         }
 #endif
+        if ((ticker % 0x200) == 0x00)          
+            sea_canprint(0x00, 0x00, 0xf000, 0x00, 0x00);
 
+#ifdef LWIP_ENABLE
         if ((ticker % 0x200) == 0x00)           // ~1 second
         {
             report_t  report1;
@@ -95,6 +98,7 @@ void vMiscellaneaTask ( void *pvParameters )
             report1.magic    = 0x03f0;
             tcpfrm1.put(&tcpfrm1, ICHP_PC_RPTCAR, sizeof(report_t), sys_info.ctrl.road, (u8 *)&report1);
         }
+#endif
         
         if ((ticker % 0x200) == 0x00)           // ~0.5 second
         {

@@ -38,8 +38,8 @@ extern "C" {
 //#define RF_TEST                   // 射频测试
 //#define ENABLE_GATEWAY
 #define ENABLE_VEHICLE              // vehicle configuration
-//#define EMZ3118B                    // 新大功率模块配置,2013/12
-//#define VEHICLE_RELEASE            // debug/release version, 2014/01/12
+#define EMZ3118B                    // 新大功率模块配置,2013/12
+#define VEHICLE_RELEASE            // debug/release version, 2014/01/12
     
 #ifdef SINK_APP
   #define USE_HARDCODED_NETWORK_SETTINGS  // it is not recommended to ever hard code the network settings applications should always scan 

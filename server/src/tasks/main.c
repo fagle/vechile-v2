@@ -47,7 +47,9 @@ void SYS_Configuration ( void )
     
     sea_initframe(&consfrm1, CONSOLE_COM);
     sea_initframe(&w108frm1, W108_COM);
+#ifdef LWIP_ENABLE     
     sea_initcpfrm(&tcpfrm1, TCP_COM);
+#endif
     
     sea_initmsg();
     sea_printsysinfo();

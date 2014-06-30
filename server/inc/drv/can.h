@@ -45,8 +45,6 @@ typedef struct
     u16 speed;                     //running speed
     u16 left;                     
     u16 right;                     
-    u16 control;                     
-    u16 error;
 } canfrm_t, *pcanfrm_t;
 
 /*******************************************************************************
@@ -83,6 +81,15 @@ void CAN_RxMessage       ( void );      // called it from can rx interrupt proce
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void CAN_TxMessage ( frame_t * ptr );
+void CAN_TxMessage (  canfrm_t * ptr );
+
+/*******************************************************************************
+* Function Name  : void sea_canprint ( u8 cmd, u8 type, u16 speed, u16 left, u16 right )
+* Description    : can send frame massage.
+* Input          : u8 cmd, u8 type, u16 speed, u16 left, u16 right
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void sea_canprint ( u8 cmd, u8 type, u16 speed, u16 left, u16 right );
 
 #endif /* __CAN_H__ */
