@@ -78,8 +78,7 @@ void vMiscellaneaTask ( void *pvParameters )
             }
         }
 #endif
-        if ((ticker % 0x200) == 0x00)          
-            sea_canprint(0x00, 0x00, 0xf000, 0x00, 0x00);
+        sea_canhandler(ticker);
 
 #ifdef LWIP_ENABLE
         if ((ticker % 0x200) == 0x00)           // ~1 second
