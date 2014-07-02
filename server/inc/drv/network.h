@@ -294,7 +294,7 @@ typedef struct
 typedef struct
 {
     u8        cnt;             // count of cards
-    u8        list[MAXCARDS];  // map of cards
+    u16  *    list;            // map of cards
 } card_t, *pcard_t;
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -344,7 +344,7 @@ typedef struct                 // some information want to save in flash
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
-#define BUF_SIZE    (0x400)
+#define BUF_SIZE    (0x200)
 typedef struct
 {
     u8    buf[BUF_SIZE];

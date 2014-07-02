@@ -96,6 +96,7 @@ void sea_writedefaultsysinfo ( void )
         sea_stageinsert(DEFOPEN[i], DEFCLOSE[i], MAXPERCENT, i);
 #else
     sys_info.card.cnt   = 0x00;
+    sys_info.card.list  = (u16 *)FLASH_CARDS_ADDRESS;
 #endif    
     sea_flashwrite(0x00, &sys_info, sizeof(sys_info_t));    
 }
@@ -228,12 +229,14 @@ void sea_printsysinfo ( void )
         }
     }
 #else
+#ifdef CARD_ENABLE
     sea_printf("\ncontrol map of cards as following:\n");
     for (i = 0x00; i < sys_info.card.cnt; i ++)
     {
         if (sys_info.card.list[i] && sys_info.card.list[i] < 0x80)
             sea_printf("%02x ", sys_info.card.list[i]);
     }
+#endif
 #endif   // not VEHICLE_MODE    
 }
 

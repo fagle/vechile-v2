@@ -9,15 +9,17 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
 #define FLASH_SYSINFO_ADDRESS      0x08040000   // our program is growing fat, sysinfo should move backward
-#define FLASH_PAGE_SIZE            0x0800
-#define FLASH_LOCATE_OFFSET        0x0800
+#define FLASH_SYSINFO_SIZE         0x1000       // size of system information, size = 0x1000
+#define FLASH_CARDS_ADDRESS        0x08041000   // save rf_id table, max. cars size = 0x200, unsigned char
+#define FLASH_CARDS_SIZE           0x200        // total size = 0x200, short type
 #define FLASH_ROUTE_ADDRESS        0x08042000   // save beeper's route table, max. router size = 0x20 * 2 = 0x40
 #define FLASH_ROUTE_SIZE           0x1000       // total size = 0x040 * 60(beepers) ~= 4KB
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
+#define FLASH_PAGE_SIZE            0x0800
 #define BEEPROUTESIZE              0x40
-#define EMPTYROUTE                 0xffff
+#define EMPTYFLASH                 0xffff
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -98,6 +100,17 @@ void * sea_flashreadroute ( u8 beep );
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
+//* 函数名      : FLASH_Status sea_flashwriterouteshort ( u16 offset, u16 data )
+//* 功能        : write word to flash
+//* 输入参数    : u16 offset, u16 data
+//* 输出参数    : 无
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+FLASH_Status sea_flashwriterouteshort ( u16 offset, u16 data );
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
 //* 函数名      : FLASH_Status sea_flashwriteroute ( u8 beep, const void * table, u8 size )
 //* 功能        : write beeper's route table
 //* 输入参数    : u8 beep, const void * table, u8 size
@@ -106,6 +119,39 @@ void * sea_flashreadroute ( u8 beep );
 //* 备注        : 无
 //*------------------------------------------------*/
 FLASH_Status sea_flashwriteroute ( u8 beep, const void * table, u8 size );
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : void * sea_flashupdateroute ( u8 beep, void * rut, void * table, u8 size )
+//* 功能        : update beeper's route table
+//* 输入参数    : u8 beep, void * rut, void * table, u8 size
+//* 输出参数    : pointer route table
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+void * sea_flashupdateroute ( u8 beep, void * rut, void * table, u8 size );
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : void * sea_flashreadcards ( u16 index )
+//* 功能        : cards table
+//* 输入参数    : u16 index
+//* 输出参数    : pointer route table
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+void * sea_flashreadcards ( u16 index );
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+//* 函数名      : FLASH_Status sea_flashwritecards ( u16 index, u16 data )
+//* 功能        : write cards to flash
+//* 输入参数    : u16 index, u16 data
+//* 输出参数    : 无
+//* 修改记录    : 无
+//* 备注        : 无
+//*------------------------------------------------*/
+FLASH_Status sea_flashwritecards ( u16 index, u16 data );
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //

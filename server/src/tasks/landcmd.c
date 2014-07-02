@@ -3,8 +3,11 @@
 #include "semphr.h"
 #include "task.h"
 #include "network.h"
+#include "mem.h"
 #include "netconf.h"
 
+////////////////////////////////////////////////////////////////////////////////////
+//
 extern frame_info_t consfrm1, w108frm1;
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -40,81 +43,6 @@ static void sea_printcallroute ( u8 num )
     for (i = 0x00; i < msg_info.call[num - 0x01].cnt; i ++)
         sea_printf("%2x ", msg_info.call[num - 0x01].route[i].action);
 }
-
-#if 0
-/////////////////////////////////////////////////////////////////////////////////////////////
-//
-//* 函数名      : void * sea_flashreadroute ( u8 beep )
-//* 功能        : read beeper's route table
-//* 输入参数    : u8 beep
-//* 输出参数    : pointer route table
-//* 修改记录    : 无
-//* 备注        : 无
-//*------------------------------------------------*/
-void * sea_flashreadroute1 ( u8 beep )
-{
-    u16 * ptr = (void *)(beep * BEEPROUTESIZE + FLASH_ROUTE_ADDRESS);
-    
-    return (*ptr == EMPTYROUTE) ? NULL : (void *)ptr;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-//
-//* 函数名      : EmberStatus sea_flashwriteshort ( u16 offset, u16 data )
-//* 功能        : write word to flash
-//* 输入参数    : u16 offset, u16 data
-//* 输出参数    : 无
-//* 修改记录    : 无
-//* 备注        : 无
-//*------------------------------------------------*/
-FLASH_Status sea_flashwriteshort1 ( u16 offset, u16 data )
-{  
-    return FLASH_ProgramHalfWord(offset + FLASH_ROUTE_ADDRESS, data);
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-//
-//* 函数名      : FLASH_Status sea_flashwriteroute ( u8 beep, const void * table, u8 size )
-//* 功能        : write beeper's route table
-//* 输入参数    : u8 beep, const void * table, u8 size
-//* 输出参数    : 无
-//* 修改记录    : 无
-//* 备注        : 无
-//*------------------------------------------------*/
-FLASH_Status sea_flashwriteroute1 ( u8 beep, const void * table, u8 size )
-{
-    u16 * ptr = (u16 *)table;
-    u16   i;
-    u16   offset = beep * BEEPROUTESIZE;
-    FLASH_Status ret = FLASH_COMPLETE;
-    
-    if (size & 0x01 || !size)
-        return FLASH_ERROR_PG;
-    size >>= 0x01;
-    
-    FLASH_Unlock();
-    taskENTER_CRITICAL();
-    for (i = 0x00; i < size; i ++, offset += 0x02)
-    {
-        if (((offset + FLASH_ROUTE_ADDRESS) % FLASH_PAGE_SIZE) == 0x00)
-        {
-            if (FLASH_ErasePage(offset + FLASH_ROUTE_ADDRESS) != FLASH_COMPLETE)
-            {
-                ret = FLASH_ERROR_PG;  
-                break;
-            }
-        }
-        if (sea_flashwriteshort1(offset, ptr[i]) != FLASH_COMPLETE)
-        {
-            ret = FLASH_ERROR_PG;  
-            break;
-        }
-    }
-    taskEXIT_CRITICAL();
-    FLASH_Lock();
-    return ret;
-}
-#endif
 
 void sea_landconfig  ( int argc, char * argv[] )
 {
@@ -224,7 +152,6 @@ void sea_landconfig  ( int argc, char * argv[] )
                             sea_printf("\nclear card's list.");
                             sys_info.card.cnt = 0x00;
                             sea_memset(sys_info.card.list, 0x00, MAXCARDS >> 0x01);
-                            sea_updatesysinfo();
                         }
                     }
                     else if (argc > 0x03)
@@ -235,7 +162,6 @@ void sea_landconfig  ( int argc, char * argv[] )
                             if (num)
                                 sys_info.card.list[sys_info.card.cnt ++] = num;
                         }
-                        sea_updatesysinfo();
                     }
                     break; 
                 case 'b':
@@ -251,14 +177,10 @@ void sea_landconfig  ( int argc, char * argv[] )
                             sscanf(argv[0x04 + i], "%d", &tmp);
                             dyn_info.buffer[i + idx * 2] = tmp & 0xff;
                         }
-                        if (msg_info.call[num - 0x01].route == NULL)
-                        {
-                            sea_printf("\nupdate %dth caller route table.\n", num);
-                            idx = idx * 2 + argc - 0x04;
-                            sea_flashwriteroute(num - 0x01, dyn_info.buffer, idx);
-                            msg_info.call[num - 0x01].route = (paction_t)sea_flashreadroute(num - 0x01);
-                            msg_info.call[num - 0x01].cnt = idx / 0x02;
-                        }
+                        idx = idx * 0x02 + argc - 0x04;
+                        msg_info.call[num - 0x01].route = (paction_t)sea_flashupdateroute(num - 0x01, msg_info.call[num - 0x01].route, 
+                                                                                          dyn_info.buffer, idx);
+                        msg_info.call[num - 0x01].cnt = idx / 0x02;
                         sea_printcallroute(num);
                     }
                     else

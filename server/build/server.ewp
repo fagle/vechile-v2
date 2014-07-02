@@ -290,6 +290,7 @@
           <state>$PROJ_DIR$\..\inc\lwip</state>
           <state>$PROJ_DIR$\..\inc\lwip\arch</state>
           <state>$PROJ_DIR$\..\inc\lwip\ipv4</state>
+          <state>$PROJ_DIR$\..\inc\lwip\lwip</state>
           <state>$PROJ_DIR$\..\src\lwip</state>
         </option>
         <option>
