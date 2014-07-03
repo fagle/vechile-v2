@@ -863,6 +863,8 @@ void CoordFrameCmdHandler ( frame_t fr )
                          msg_info.clear(num);
                     sea_sendacknowledge(fr.body[0x01], fr.road, fr.body[0x00], fr.body[0x02]);
                     break;
+                case ICHP_SV_DATE:    // nothing to do
+                    break;   
                 default:
                     sea_printf("\n[coord]received unknow response %02x", fr.body[0x01]);
                     break;

@@ -13,6 +13,7 @@ can_info_t can_info;
 *******************************************************************************/
 void CAN_Configuration ( void )
 {
+#ifdef CAN_ENABLE
     GPIO_InitTypeDef GPIO_InitStructure;
     
     GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_11;     // Configure CAN pin: RX 
@@ -28,6 +29,7 @@ void CAN_Configuration ( void )
     can_info.speed = 0xf000;
     
     CAN_INIT(); 
+#endif
 }
 
 /*******************************************************************************
@@ -81,6 +83,7 @@ void CAN_INIT ( void )
 *******************************************************************************/
 void CAN_RxMessage ( void ) 
 {
+#ifdef CAN_ENABLE
     CanRxMsg RxMessage;
     pcanfrm_t ptr = &can_info.list[can_info.in ++];
 
@@ -96,34 +99,11 @@ void CAN_RxMessage ( void )
         sea_printf("\nExtId, IDE: %04x, %04d", RxMessage.ExtId, RxMessage.IDE);
         sea_printf("\ntype, cmd, speed left and right: %02x, %02x, %04x, %04x, %04x", 
                    ptr->type, ptr->cmd, ptr->speed, ptr->left, ptr->right); 
-    }        
+    }    
+#endif    
 }
 
-/*******************************************************************************
-* Function Name  : void CAN_TxMessage ( frame_t * ptr ) 
-* Description    : can send frame massage.
-* Input          : frame_t * ptr
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void CAN_TxMessage ( u16 id, canfrm_t * ptr )
-{
-    CanTxMsg TxMessage;
-    u8       TransmitMailbox;
-  
-    TxMessage.StdId = id;             // STDSENDID;      // 0x01e0;
-    TxMessage.ExtId = CANSENDID;      // 0x5a5;
-    TxMessage.RTR   = CAN_RTR_DATA;
-    TxMessage.IDE   = CAN_ID_STD;       //2014Äê6ÔÂ27ÈÕ 14:41:40   CAN_ID_EXT
-    sea_memcpy(TxMessage.Data, (char *)ptr, CANFRAMELEN);
-    TxMessage.DLC   = CANFRAMELEN;
-
-    taskENTER_CRITICAL();
-    TransmitMailbox = CAN_Transmit(CAN1, &TxMessage);
-    CAN_TransmitStatus(CAN1, TransmitMailbox);
-    taskEXIT_CRITICAL();
-}
-
+#ifdef CAN_ENABLE
 /*******************************************************************************
 * Function Name  : void sea_canprint ( u8 cmd, u8 type, u16 speed, u16 left, u16 right )
 * Description    : can send frame massage.
@@ -155,6 +135,7 @@ static void sea_canprint ( u16 id, u8 cmd, u8 type, u16 speed, u16 left, u16 rig
     CAN_TransmitStatus(CAN1, TransmitMailbox);
     taskEXIT_CRITICAL();
 }
+#endif
 
 /*******************************************************************************
 * Function Name  : void sea_canhandler ( u32 ticker )
@@ -165,6 +146,7 @@ static void sea_canprint ( u16 id, u8 cmd, u8 type, u16 speed, u16 left, u16 rig
 *******************************************************************************/
 void sea_canhandler ( u32 ticker )
 {
+#ifdef CAN_ENABLE
     switch (can_info.status)
     {
         case CANSTART:
@@ -188,6 +170,7 @@ void sea_canhandler ( u32 ticker )
             can_info.status = CANSTART;
             break;
     }
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////

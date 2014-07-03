@@ -25,6 +25,7 @@
 //#define MACINT_ENABLE
 //#ifdef CARD_ENABLE                  // card check enable
 //#define WIFI_ENABLE                 // wifi enable/disable
+//#define CAN_ENABLE                  // can enable/disable
 
 //#define LANDSCAPE_MODE              // ¾°¹ÛµÆ¿ØÖÆ
 #define VEHICLE_MODE                // vehicle mode

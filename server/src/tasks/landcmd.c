@@ -145,22 +145,14 @@ void sea_landconfig  ( int argc, char * argv[] )
                     break; 
                 case 'w':
                     sscanf(cmdhd1.optarg, "%d", &num);
-                    if (argc == 0x03 && num == 0x00)
+                    if (argc > 0x03)
                     {
-                        if (sys_info.card.cnt)
-                        {
-                            sea_printf("\nclear card's list.");
-                            sys_info.card.cnt = 0x00;
-                            sea_memset(sys_info.card.list, 0x00, MAXCARDS >> 0x01);
-                        }
-                    }
-                    else if (argc > 0x03)
-                    {
+                        sys_info.card.cnt = num;
                         for (u8 i = 0x00; i < argc - 0x03; i ++)
                         {
                             sscanf(argv[0x03 + i], "%d", &num);
                             if (num)
-                                sys_info.card.list[sys_info.card.cnt ++] = num;
+                                sea_printf("%d ", num);   // sys_info.card.list[sys_info.card.cnt ++] = num;
                         }
                     }
                     break; 

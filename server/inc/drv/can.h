@@ -21,16 +21,14 @@
 #define STDSENDP0      0x0268
 #define STDSENDP1      0x0260
 
-#define CANNONE        0x00
-#define CANINIT        0x01
-#define CANSTART       0x02
-#define CANRUN         0x03
-#define CANSTOP        0x04
+#define CANMAXSPEED    0xf000
+#define CANMINSPEED    0x0000
+#define CANSTEPSPD     0x20
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // commands types
 //
-typedef enum { ECOMMAND = 0x01, ECONTROL, EMESSAGE, EINTERRUPT, ERESPONSE, ESTATUS } eCmd;
+typedef enum { CANNONE = 0x00, CANINIT, CANSTART, CANRUN, CANSTOP } eCmd;
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // types
