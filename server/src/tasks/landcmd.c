@@ -14,18 +14,17 @@ extern frame_info_t consfrm1, w108frm1;
 //
 static void printCommandHelp ( void )
 {
-    sea_printf("\nland Usage: land -[dvosiculprwf0] nnnn ...");
+    sea_printf("\nland Usage: land -[dviculprwfb] nnnn ...");
     sea_printf("\n  -d yy-mm-dd hh:mm:ss, setting landscape system date and time.");
     sea_printf("\n  -v nn, set max. vehicles in application.");
     sea_printf("\n  -c nn, set max. callers in application.");
     sea_printf("\n  -u nn, print devices of wrong number or type.");
-    sea_printf("\n  -o nn, open socket.");
-    sea_printf("\n  -s sss, send string to server via socket.");
+    sea_printf("\n  -f nn, set system configuration.");
     sea_printf("\n  -p nn, print nn vehicle and caller route table, 0x00 for all");
     sea_printf("\n  -r nn, set relase/debug mode.");
     sea_printf("\n  -i nnn.nnn.nnn:port domain_name, setting server ip address and domain name.");
     sea_printf("\n  -l nnn.nnn.nnn mmm.mmm.mmm ggg.ggg.ggg, setting host ip address, mask and gateway ip address.");
-    sea_printf("\n  -w ss nn nn ..., clear or set card's map list, ss index of start, only ss=0 clear the list.");
+    sea_printf("\n  -w ss nn nn ..., set card's map list, ss index of start, nn cards number.");
     sea_printf("\n  -b nn idx id act ..., set beeper's route table, nn beeper no, idx index, id act...");
 }
 
@@ -64,7 +63,7 @@ void sea_landconfig  ( int argc, char * argv[] )
         return;
     }
     
-    while ((opt = sea_getopt(argc, argv, "dvosicublprwf0")) != -1) 
+    while ((opt = sea_getopt(argc, argv, "dvicublprwf0")) != -1) 
     {
         if (opt != 0x00 && cmdhd1.optarg != NULL)
         {
@@ -114,26 +113,6 @@ void sea_landconfig  ( int argc, char * argv[] )
                         }
                     }
                     break; 
-                case 'o':
-                    sscanf(cmdhd1.optarg, "%x", &num);
-#ifdef LWIP_ENABLE
-                    if (client.conn)
-                    {
-                        extern void sea_resetetherif ( void );
-                        client.conn = 0x00;
-                        sea_printf("\nopen socket again.");
-                    }
-#endif                    
-                    break; 
-                case 's':
-#ifdef LWIP_ENABLE
-                    if (client.conn)
-                    {
-                        client.send.len = strlen(cmdhd1.optarg);
-                        sea_memcpy(client.send.buf, cmdhd1.optarg, client.send.len);
-                    }
-#endif                    
-                    break; 
                 case 'f':
                     sscanf(cmdhd1.optarg, "%x", &num);
                     if (num)
@@ -146,14 +125,19 @@ void sea_landconfig  ( int argc, char * argv[] )
                 case 'w':
                     sscanf(cmdhd1.optarg, "%d", &num);
                     if (argc > 0x03)
-                    {
+                    {  
+                        u8 i;
                         sys_info.card.cnt = num;
-                        for (u8 i = 0x00; i < argc - 0x03; i ++)
+                        for (i = 0x00; i < argc - 0x03; i ++)
                         {
                             sscanf(argv[0x03 + i], "%d", &num);
                             if (num)
-                                sea_printf("%d ", num);   // sys_info.card.list[sys_info.card.cnt ++] = num;
+                                sea_flashwritecards(sys_info.card.cnt ++, num);  // sea_printf("%d ", num);  
                         }
+                        sea_printf("\ncards: ");
+                        i = 0x00;
+                        while (*((u16 *)sea_flashreadcards(i)) != EMPTYFLASH)
+                            sea_printf("%02x ",  *((u16 *)sea_flashreadcards(i ++)));
                     }
                     break; 
                 case 'b':
@@ -167,7 +151,7 @@ void sea_landconfig  ( int argc, char * argv[] )
                         for (u8 i = 0x00; i < argc - 0x04; i ++)
                         {
                             sscanf(argv[0x04 + i], "%d", &tmp);
-                            dyn_info.buffer[i + idx * 2] = tmp & 0xff;
+                            dyn_info.buffer[i + idx * 0x02] = tmp & 0xff;
                         }
                         idx = idx * 0x02 + argc - 0x04;
                         msg_info.call[num - 0x01].route = (paction_t)sea_flashupdateroute(num - 0x01, msg_info.call[num - 0x01].route, 
@@ -284,112 +268,6 @@ void sea_landconfig  ( int argc, char * argv[] )
                         sea_updatenetaddr();
                     }
                     break;
-#if 0
-                case 'o':
-                {
-                    int  num;
-                    sea_printf("\npercent and open lamp: ");
-                    sscanf(cmdhd1.optarg, "%d", &num);
-                    frm.body[0x00] = num & 0xff;
-                    frm.cmd = ICHP_SV_OPEN;
-		    frm.len = 0x03;
-                    frm.road = sys_info.ctrl.road;
-                    for (u8 i = 0x03; i < argc; i ++)
-                    {
-                        sscanf(argv[i], "%d", &num);
-                        frm.body[0x01] = (num & 0xff); 
-                        frm.body[0x02] = (num >> 0x08) & 0xff; 
-                        ServerFrameCmdHandler(frm);
-                    }
-                    break;
-                }
-                case 'c':
-                {
-                    int  num;
-                    sea_printf("\npercent and close lamp: ");
-                    sscanf(cmdhd1.optarg, "%d", &num);
-                    frm.body[0x00] = num & 0xff;
-                    frm.cmd = ICHP_SV_CLOSE;
-		    frm.len = 0x03;
-                    frm.road = sys_info.ctrl.road;
-                    for (u8 i = 0x03; i < argc; i ++)
-                    {
-                        sscanf(argv[i], "%d", &num);
-                        frm.body[0x01] = (num & 0xff); 
-                        frm.body[0x02] = (num >> 0x08) & 0xff; 
-                        ServerFrameCmdHandler(frm);
-                    }
-                    break;
-                }
-                case 't':
-                {
-                    int  control;
-                    sscanf(cmdhd1.optarg, "%2x", (int *)&control);
-                    sys_info.ctrl.config = control & 0xff;
-                    break;
-                }
-                case 'n':
-                    if (argc == 0x04)
-                    {
-                        sscanf(cmdhd1.optarg, "%2d", (int *)&sys_info.ctrl.road);
-                        sea_memset(sys_info.name, 0x00, NAMESIZE);
-                        sea_memcpy(sys_info.name, argv[0x03], strlen(argv[0x03]));
-                    }
-                    break;
-#ifndef VEHICLE_MODE    
-                case 'w':
-                    if (argc == 0x04)
-                    {
-                        sea_memset(sys_info.route.ssid, 0x00, SSIDLEN);
-                        sea_memcpy(sys_info.route.ssid, cmdhd1.optarg, strlen(cmdhd1.optarg));
-                        if (!(sea_memcomp(argv[0x03], "none", 0x04) == 0x00 ||
-                            sea_memcomp(argv[0x03], "NONE", 0x04) == 0x00))
-                            sea_memcpy(sys_info.route.key, argv[0x03], strlen(argv[0x03]));
-                    }
-                    break;
-                case 's':
-                    if (argc == 0x06)
-                    {
-                        int idx, group;
-                        sscanf(cmdhd1.optarg, "%d", &idx);
-                        if (idx < PHSIZE)
-                        {
-                            sea_memset(sys_info.staff[idx].name, 0x00, STNAMESIZE);
-                            sea_memcpy(sys_info.staff[idx].name, argv[0x03], strlen(argv[0x03]));
-                            sea_memset(sys_info.staff[idx].phone, 0x00, STPHONESIZE);
-                            sea_memcpy(sys_info.staff[idx].phone, argv[0x04], strlen(argv[0x04]));
-                            sscanf(argv[0x05], "%d", &group);
-                            sys_info.staff[idx].group = group & 0xff;
-                        }
-                    }
-                    break;
-                case 'g':
-                    if (argc == 0x07)
-                    {
-                        int idx, mon;
-                        sscanf(cmdhd1.optarg, "%d", &mon);
-                        if (mon < MAXMONTH)
-                        {
-                            sscanf(argv[0x03], "%d", &idx);
-                            if (idx < MAXSTAGE)
-                            {
-                                int hh, mm, ss, percent;
-                                sscanf(argv[0x04], "%2d:%2d:%2d", &hh, &mm, &ss);
-                                sys_info.stage[mon].sect[idx].open.hour = hh & 0xff;
-                                sys_info.stage[mon].sect[idx].open.min  = mm & 0xff;
-                                sys_info.stage[mon].sect[idx].open.sec  = ss & 0xff;
-                                sscanf(argv[0x05], "%2d:%2d:%2d", &hh, &mm, &ss);
-                                sys_info.stage[mon].sect[idx].close.hour = hh & 0xff;
-                                sys_info.stage[mon].sect[idx].close.min  = mm & 0xff;
-                                sys_info.stage[mon].sect[idx].close.sec  = ss & 0xff;
-                                sscanf(argv[0x06], "%d", &percent);
-                                sys_info.stage[mon].sect[idx].percent = percent & 0xff;
-                            }
-                        }
-                    }
-                    break;
-#endif                    
-#endif
                 default:
                     printCommandHelp();
                     return;

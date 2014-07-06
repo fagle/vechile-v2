@@ -23,7 +23,7 @@
 //#define PCF8365T_ENABLE             // enable pcf8365t       
 //#define LWIP_ENABLE                 // enable/disable
 //#define MACINT_ENABLE
-//#ifdef CARD_ENABLE                  // card check enable
+//#define CARD_ENABLE                 // card check enable
 //#define WIFI_ENABLE                 // wifi enable/disable
 //#define CAN_ENABLE                  // can enable/disable
 

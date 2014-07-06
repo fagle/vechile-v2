@@ -1,5 +1,5 @@
 [DebugChecksum]
-Checksum=290513271
+Checksum=1044674395
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 1
@@ -19,6 +19,10 @@ UseTrigger=1
 TriggerName=main
 LimitSize=0
 ByteLimit=50
+[Disassemble mode]
+mode=1
+[Breakpoints]
+Count=0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -26,14 +30,6 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
-[DriverProfiling]
-Enabled=0
-Source=2
-Graph=0
-[Disassemble mode]
-mode=1
-[Breakpoints]
-Count=0
 [Aliases]
 A0=_ "G:\Workshops\renovate\server\sealib\lwip\core\mem.c" ""
 A1=_ "G:\Workshops\renovate\server\sealib\os\queue.c" ""
@@ -43,3 +39,7 @@ A4=_ "G:\Workshops\renovate_nv_full\server\sealib\st_lib\stm32f10x_rcc.c" ""
 A5=_ "G:\Workshops\seavehicle\server\sealib\st_lib\stm32f10x_rcc.c" ""
 Count=6
 SuppressDialog=1
+[DriverProfiling]
+Enabled=0
+Source=2
+Graph=0

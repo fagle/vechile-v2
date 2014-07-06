@@ -229,14 +229,12 @@ void sea_printsysinfo ( void )
         }
     }
 #else
-#ifdef CARD_ENABLE
-    sea_printf("\ncontrol map of cards as following:\n");
-    for (i = 0x00; i < sys_info.card.cnt; i ++)
+    if (sys_info.card.cnt)
     {
-        if (sys_info.card.list[i] && sys_info.card.list[i] < 0x80)
-            sea_printf("%02x ", sys_info.card.list[i]);
+        sea_printf("\ncontrol map of cards, size %d as following:\n", sys_info.card.cnt);
+        for (i = 0x00; i < sys_info.card.cnt; i ++)
+            sea_printf("%02x ",  *((u16 *)sea_flashreadcards(i)));
     }
-#endif
 #endif   // not VEHICLE_MODE    
 }
 

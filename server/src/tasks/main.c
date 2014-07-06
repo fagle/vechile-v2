@@ -45,6 +45,11 @@ void SYS_Configuration ( void )
     for (u16 i = 0x00; i < sys_info.ctrl.maxdev; i ++)
         dyn_info.addr[i].dev.num = i + 0x01;
     
+    sys_info.card.cnt = 0x00;
+    while (*((u16 *)sea_flashreadcards(sys_info.card.cnt ++)) != EMPTYFLASH && sys_info.card.cnt < 0x80) ;
+    sys_info.card.cnt --;
+
+    
     sea_initframe(&consfrm1, CONSOLE_COM);
     sea_initframe(&w108frm1, W108_COM);
 #ifdef LWIP_ENABLE     
