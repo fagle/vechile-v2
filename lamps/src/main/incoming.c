@@ -192,6 +192,8 @@ void ezspRouterIncomingMessageHandler ( EmberIncomingMessageType type, EmberApsF
                     else
                         carInfo.key = 0x00;
                     table[0x02] = 0x00;
+                    call.type = ptr[1];
+                    call.station = ptr[0];
                 }
             }
             sea_sendmsg(&send1, UNICAST, COORDID, ICHP_SV_RESPONSE, 0x03, table); 

@@ -10,7 +10,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
-#define SYSMARK                 (0x55aa)         // mark in flash information
+
 #define SWVERSION               (0x0102)         // software version
 #define MAXCHANNEL              (0x10)
 
@@ -59,11 +59,16 @@
 #define DEFALUTLAMPNUM          (0x05)
 #define DEFALUTPERIOD           (0x01)          // report single lamp information time 1 min.
 #define DEFALUTOPEN             (0x04380258)    // 18:00 last 10 hour
-#define DEFALUTMASK             (0x0000ffff)    // total 0x10(MAXCHANNEL) channels for lamp system
-#define DEFALUTGWCH             (0x00008000)    // gateway default channel
-#define DEFALUTCOORDCH          (0x0000000f)    // router default channel
+
+#define CHANNAL_INDEX           (0x00)
+
+#define DEFALUTMASK             (0x0001 << CHANNAL_INDEX)    // total 0x10(MAXCHANNEL) channels for lamp system
+#define DEFALUTGWCH             (0x8000)    // gateway default channel
+#define DEFALUTCOORDCH          (0x000f)    // router default channel
 #define DEFALUTLOTI             (0x00)
 #define DEFALUTLATI             (0x00)
+
+#define SYSMARK                 ( (u16)(0x55aa ))//+ CHANNAL_INDEX) )         // mark in flash information
 
 enum { eLights = 0x01, eVehicle, eCondition };  // type of application, such as staightlights, vehicle, air condition etc. 2013/12/14
 

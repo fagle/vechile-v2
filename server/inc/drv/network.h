@@ -50,7 +50,7 @@
 #define MULTICAST_TABLE_INDEX  (0x00)
 #define MULTICAST_ID           (0x1111)
 
-#define SYSMARK                (0x55a0)         // mark in flash information 0x55a0
+#define SYSMARK                (0x55aa)         // mark in flash information 0x55a0
 #define NAMESIZE               (0x20)
 #define DOSIZE                 (0x30)
 #define IPSIZE                 (0x04)

@@ -47,10 +47,10 @@ dyn_info_t  dyn_info;
 *************************************************/  
 void sea_writedefaultsysinfo ( void )
 {
-//   const u8 DEFIP[IPSIZE] = { 10, 1, 130, 168 };     // ecs.hdu.edu.cn
-     const u8 DEFIP[IPSIZE]      = { 210, 32, 34, 139 };      // lamp.dnsd.info:6181
+     const u8 DEFIP[IPSIZE] = { 192, 168, 1, 105 };     // ecs.hdu.edu.cn
+     //const u8 DEFIP[IPSIZE]      = { 210, 32, 34, 139 };      // lamp.dnsd.info:6181
      
-     const u8 DEFLOCIP[IPSIZE]   = { 192, 168, 1, 105 };   // local ip address
+     const u8 DEFLOCIP[IPSIZE]   = { 192, 168, 1, 106 };   // local ip address
      const u8 DEFLOCMK[IPSIZE]   = { 255, 255, 255, 0 };   // local mask
      const u8 DEFLOCGW[IPSIZE]   = { 192, 168, 1, 1 };     // local gateway ip
      const u8 DEFLOCMAC[MACSIZE] = { 0x54, 0x55, 0x58, 0x10, 0x00, 0x24 };     // mac physic address

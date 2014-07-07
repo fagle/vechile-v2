@@ -362,6 +362,15 @@ void ADC_Configuration ( void )
 #endif  // ADC_ENABLE
 }
 
+void ethResetInit(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;    
+    GPIO_Init(GPIOC, &GPIO_InitStructure);  
+    GPIO_WriteBit(GPIOC, GPIO_Pin_15, Bit_SET);;
+}
 
 /*******************************************************************************
 * Function Name  : void SPI2_Configuration ( void )

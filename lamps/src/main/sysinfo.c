@@ -30,10 +30,10 @@ void sea_defaultconfig ( void )
     #else    
         type  = CENTERIDST;                // CENTERID;
         mask  = DEFALUTCOORDCH;            // 0x000000001, coordinator radio channel
-        index = 0x00;
+        index = CHANNAL_INDEX;
     #endif  // ENABLE_GATEWAY    
 #else
-    index = 0x00;
+    index = CHANNAL_INDEX;
     #ifdef ENABLE_GATEWAY
         type  = GWIDST;                    // GATEWAYID;
         mask  = DEFALUTGWCH;               // ~0x00008000, gateway'router radio channel
