@@ -8,12 +8,13 @@
 #include "vehicle.h"
 #include "serial.h"
 
-#define SNEDTIMES     (0x08)
+#define SNEDTIMES     (0x04)
 #define getime(m, s)  (m * 60 + s)
 
 ////////////////////////////////////////////////////////////////////////////////////
 //
 car_info_t carInfo = { 0x00, 0x00, 0x00, };
+call_info_t call = {0};
 #ifdef SENSOR_APP
 static rs485_cmd_t rs485_cmd;
 static vehicle_t   plc;
@@ -42,8 +43,8 @@ static void rs485Init ( void )
     halGpioConfig(GPIO_485_TX, GPIOCFG_OUT);         // ?PA2??????
     halClearGPIO(GPIO_485_TX);
 }
+         
 
-#ifdef VEHICLE_RELEASE            
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
 //* º¯ÊýÃû      : static void delay ( void )
@@ -70,12 +71,14 @@ static void rs485delay ( void )
 //*------------------------------------------------*/
 static void rs485sendbyte ( u8 ch )
 {
+#ifdef  VEHICLE_RELEASE
     u8 retry = 0x05;
     
     halSetGPIO(GPIO_485_TX);
     rs485delay(); 
     while (!sea_uartsendbyte(ch) && retry --)  ;
     halClearGPIO(GPIO_485_TX);    
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,10 +97,18 @@ static void rs485sendstring ( prs485_t ptr )
     
     rs485sendbyte(ptr->prefix);
     rs485sendbyte(ptr->cmd);
-    for (u8 i = 0x00; i < CARPLCCMDLEN - 0x02; i ++)
-        rs485sendbyte(ptr->buf[i]);
+    for (u8 i = 0x00; i < CARPLCCMDLEN - 1; i ++)
+    {
+        rs485sendbyte(ptr->buf[i]);        
+    }
+    
+    DBG("\r\n%2x %2x", ptr->prefix, ptr->cmd);    
+    for (u8 i = 0x00; i < CARPLCCMDLEN - 1; i ++)
+    {        
+        DBG(" %2x", ptr->buf[i]);
+    }
 }
-#endif
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -114,7 +125,10 @@ static void sea_putrs485 ( u8 cmd, u16 left, u16 right )
     rs485_cmd.list[rs485_cmd.in].cmd    = cmd;
     sea_memcpy(rs485_cmd.list[rs485_cmd.in].buf, &left, 0x02);
     sea_memcpy(rs485_cmd.list[rs485_cmd.in].buf + 0x02, &right, 0x02);
-    
+    rs485_cmd.list[rs485_cmd.in].buf[4] = carInfo.plc.number;
+    rs485_cmd.list[rs485_cmd.in].buf[5] = call.type;
+    rs485_cmd.list[rs485_cmd.in].buf[6] = call.station;
+      
     rs485_cmd.in ++;
     if (rs485_cmd.in >= RS485CMDSIZE)
         rs485_cmd.in = 0x00;
@@ -256,6 +270,7 @@ static void sea_stopcar ( void * ptr )
 static void sea_turncar ( void * ptr )
 {
     pturn_t tmp = (pturn_t)ptr;
+    u8  sendtimes = 1;
     
     if (ptr == NULL)
         return;
@@ -264,12 +279,16 @@ static void sea_turncar ( void * ptr )
         DBG("\r\n[car]car turn left");
     else if (tmp->cmd == CAR_RIGHT) 
         DBG("\r\n[car]car turn right");
-    else
-        DBG("\r\n[car]car run");
+    else if(tmp->cmd == CAR_STRAIGHT)
+        DBG("\r\n[car]car go straight");
 
-    for (u8 i = 0x00; i < SNEDTIMES; i ++)
+    if(tmp->cmd != CAR_REQ_MSG)
+    {
+        carInfo.status = tmp->cmd; 
+        sendtimes = SNEDTIMES;
+    }
+    for (u8 i = 0x00; i < sendtimes; i ++)
         carInfo.put(tmp->cmd, tmp->left, tmp->right);
-    carInfo.status = tmp->cmd;
     set_lampmode(LAMP_UPDATE);
 #ifndef VEHICLE_RELEASE 
     if (carInfo.plc.status != carInfo.status)
@@ -342,6 +361,9 @@ void vehicleInit ( void )
     plc.number          = sys_info.dev.num;
     plc.type            = sys_info.dev.type;
     
+    call.station = 123;
+    call.type   = 111;    
+        
     rs485Init();
     sea_configprint();
 
@@ -634,6 +656,7 @@ static void carReportHandler ( void )
                 {
                     sea_memcpy(&single_info.lamp, &carInfo.plc, sizeof(vehicle_t));
                     DBG("\r\n[plc]send report");
+                    DBG("\r\ncard %d step %d count %d", carInfo.plc.card, carInfo.plc.index, carInfo.plc.count);
                     sea_sendmsg(&send1, UNICAST, 0x00, ICHP_SV_RPT, sizeof(lamp_t), &single_info.lamp); 
                 }
                 else if ((single_info.time.sec % sys_info.ctrl.period) == 0x00 && single_info.sec != single_info.time.sec)
@@ -976,11 +999,21 @@ void vehicleMsEventHandler ( void )
         if (carInfo.ms >= carInfo.delay)
         {
             prs485_t ptr = carInfo.get();
-            carInfo.ms = 0x00;
-#ifdef VEHICLE_RELEASE   
+               
             if (ptr)
+            {   
                 rs485sendstring(ptr);
-#endif
+                carInfo.ms = 0x00;
+            }
+            else
+            {
+                carInfo.turn->cmd = CAR_REQ_MSG;                   
+                carInfo.turn->left = left;
+                carInfo.turn->right = right;
+                left++;
+                right--;    
+                single_info.toggle(carInfo.turn);
+            }
         }
 #ifndef VEHICLE_RELEASE   
         if ((single_info.time.tick % PLCPERIOD) == 0x00)

@@ -16,7 +16,7 @@
 #include "frame.h"
 
 #define MAXCARNUM                 0x02
-#define DEFMSTICK                 0x08           // 10  // 32 ms send command to plc
+#define DEFMSTICK                 0x24           // 10  // 32 ms send command to plc
 #define MAGICSIZE                 0x10
 #define HOMESIZE                  0x05
 
@@ -32,7 +32,7 @@
 #define CAR_REQ_MSG               0x60
 
 /*the command len*/
-#define CARPLCCMDLEN              (0x06)
+#define CARPLCCMDLEN              (0x09)
 #define MAXROUTERTABLEN           (20)
 #define RS485CMDSIZE              (0x20)
 #define MAXPATH                   (MAXCARDS >> 0x01)     // (0x80 / 2)
@@ -119,7 +119,7 @@ typedef struct
 {
     u8 prefix;                   // protocol prefix
     u8 cmd;                      // command to plc
-    u8 buf[CARPLCCMDLEN - 0x02]; // message to plc
+    u8 buf[CARPLCCMDLEN];        // message to plc
 } rs485_t, *prs485_t;
 
 typedef struct
@@ -206,6 +206,11 @@ typedef struct
     void        (*toggle) ( void );
     pmagic_t    (*magic)  ( u16 magic, pmagic_t ptr );
 } car_info_t;
+
+typedef struct{
+    u8 type;
+    u8 station;
+} call_info_t;
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
@@ -391,7 +396,7 @@ void vehicleMsEventHandler ( void );
 /////////////////////////////////////////////////////////////////////////////////////////
 //
 extern car_info_t carInfo;
-
+extern call_info_t call;
 ///////////////////////////////////////////////////////////////////////////////////////
 //
 #endif //  __VEHICLE_H__
