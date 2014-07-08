@@ -1008,10 +1008,6 @@ void vehicleMsEventHandler ( void )
             else
             {
                 carInfo.turn->cmd = CAR_REQ_MSG;                   
-                carInfo.turn->left = left;
-                carInfo.turn->right = right;
-                left++;
-                right--;    
                 single_info.toggle(carInfo.turn);
             }
         }
