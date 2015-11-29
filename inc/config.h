@@ -11,9 +11,10 @@ extern "C" {
   
 //////////////////////////////////////////////////////////////////////////////////////////////
 //
-#define NULL_BTL                                   // 是否用em3xx-converter生成btl文件
+//#define NULL_BTL                                   // 是否用em3xx-converter生成btl文件
 #define CORTEXM3
-#define CORTEXM3_STM32W108
+//#define CORTEXM3_STM32W108
+//#define CORTEXM3_EM357
 #define PHY_EM3XX
 #define BOARD_MB851
 #define __SOURCEFILE__                   "$FILE_FNAME$"
