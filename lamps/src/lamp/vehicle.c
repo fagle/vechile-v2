@@ -1007,8 +1007,10 @@ void vehicleMsEventHandler ( void )
             }
             else
             {
+               #ifdef VEHICLE_RELEASE
                 carInfo.turn->cmd = CAR_REQ_MSG;                   
                 single_info.toggle(carInfo.turn);
+               #endif
             }
         }
 #ifndef VEHICLE_RELEASE   

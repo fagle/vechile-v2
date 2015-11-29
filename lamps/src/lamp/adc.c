@@ -37,22 +37,24 @@ static int16u adcStaticConfig;
 
 void halAdcSetClock ( boolean slow )
 {
-    slow ? (adcStaticConfig |= ADC_1MHZCLK_MASK) : (adcStaticConfig &= ~ADC_1MHZCLK_MASK);
+    //slow ? (adcStaticConfig |= ADC_1MHZCLK_MASK) : (adcStaticConfig &= ~ADC_1MHZCLK_MASK);
 }
 
 void halAdcSetRange ( boolean high )
 {
-    high ? (adcStaticConfig |= (ADC_HVSELP_MASK | ADC_HVSELN_MASK)) : (adcStaticConfig &= ~(ADC_HVSELP_MASK | ADC_HVSELN_MASK));
+    //high ? (adcStaticConfig |= (ADC_HVSELP_MASK | ADC_HVSELN_MASK)) : (adcStaticConfig &= ~(ADC_HVSELP_MASK | ADC_HVSELN_MASK));
 }
 
 boolean halAdcGetClock ( void )
 {
-    return (adcStaticConfig & ADC_1MHZCLK_MASK) ? TRUE : FALSE;
+    //return (adcStaticConfig & ADC_1MHZCLK_MASK) ? TRUE : FALSE;
+    return TRUE;
 }
 
 boolean halAdcGetRange ( void )
 {
-    return (adcStaticConfig & ((ADC_HVSELP_MASK | ADC_HVSELN_MASK))) ? TRUE : FALSE;
+    //return (adcStaticConfig & ((ADC_HVSELP_MASK | ADC_HVSELN_MASK))) ? TRUE : FALSE;
+    return TRUE;
 }
 
 // Define a channel field that combines ADC_MUXP and ADC_MUXN
