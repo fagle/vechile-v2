@@ -1,0 +1,111 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:28
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\form-and-join-node-callbacks.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\form-and-join-node-callbacks.c
+#        -D ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\form-and-join-node-callbacks.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\form-and-join-node-callbacks.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\util\form-and-join-node-callbacks.c
+      1          
+      2          #include "config.h"
+      3          #include "ember.h"
+      4          #include "form-and-join.h"
+      5          #include "network.h"
+      6          
+
+   \                                 In section .text, align 2, keep-with-next
+      7          void emberNetworkFoundHandler ( EmberZigbeeNetwork *networkFound )
+      8          {
+   \                     emberNetworkFoundHandler: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0xB082             SUB      SP,SP,#+8
+   \   00000004   0x4604             MOV      R4,R0
+      9              int8u lqi;
+     10              int8s rssi;
+     11              
+     12              emberGetLastHopLqi(&lqi);
+   \   00000006   0xF10D 0x0001      ADD      R0,SP,#+1
+   \   0000000A   0x.... 0x....      BL       emberGetLastHopLqi
+     13              emberGetLastHopRssi(&rssi);
+   \   0000000E   0xA800             ADD      R0,SP,#+0
+   \   00000010   0x.... 0x....      BL       emberGetLastHopRssi
+     14              emberFormAndJoinNetworkFoundHandler(networkFound, lqi, rssi);
+   \   00000014   0xF99D 0x2000      LDRSB    R2,[SP, #+0]
+   \   00000018   0xF89D 0x1001      LDRB     R1,[SP, #+1]
+   \   0000001C   0x4620             MOV      R0,R4
+   \   0000001E   0x.... 0x....      BL       emberFormAndJoinNetworkFoundHandler
+     15          }
+   \   00000022   0xBD13             POP      {R0,R1,R4,PC}    ;; return
+     16          
+
+   \                                 In section .text, align 2, keep-with-next
+     17          void emberScanCompleteHandler ( int8u channel, EmberStatus status )
+     18          {
+     19              emberFormAndJoinScanCompleteHandler(channel, status);
+   \                     emberScanCompleteHandler: (+1)
+   \   00000000   0x.... 0x....      B.W      emberFormAndJoinScanCompleteHandler
+     20          }
+     21          
+
+   \                                 In section .text, align 2, keep-with-next
+     22          void emberEnergyScanResultHandler ( int8u channel, int8s rssi )
+     23          {
+     24              emberFormAndJoinEnergyScanResultHandler(channel, rssi);
+   \                     emberEnergyScanResultHandler: (+1)
+   \   00000000   0x.... 0x....      B.W      emberFormAndJoinEnergyScanResultHandler
+     25          }
+     26          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   emberEnergyScanResultHandler
+         0   -> emberFormAndJoinEnergyScanResultHandler
+      16   emberNetworkFoundHandler
+        16   -> emberFormAndJoinNetworkFoundHandler
+        16   -> emberGetLastHopLqi
+        16   -> emberGetLastHopRssi
+       0   emberScanCompleteHandler
+         0   -> emberFormAndJoinScanCompleteHandler
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  emberEnergyScanResultHandler
+      36  emberNetworkFoundHandler
+       4  emberScanCompleteHandler
+
+ 
+ 44 bytes in section .text
+ 
+ 44 bytes of CODE memory
+
+Errors: none
+Warnings: none

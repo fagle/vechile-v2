@@ -1,0 +1,13 @@
+"C:\Program Files\IAR Systems\Embedded Workbench 7.2\arm\bin\armproc.dll" 
+
+"C:\Program Files\IAR Systems\Embedded Workbench 7.2\arm\bin\armjlink.dll" 
+
+"D:\projects\VehicleV2\trunk\lamps\lib\sealib.a" 
+
+--plugin "C:\Program Files\IAR Systems\Embedded Workbench 7.2\arm\bin\armbat.dll" 
+
+--flash_loader "C:\Program Files\IAR Systems\Embedded Workbench 7.2\arm\config\flashloader\" 
+
+
+
+

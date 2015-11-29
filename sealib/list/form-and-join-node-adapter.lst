@@ -1,0 +1,319 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:27
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\form-and-join-node-adapter.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\form-and-join-node-adapter.c
+#        -D ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\form-and-join-node-adapter.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\form-and-join-node-adapter.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\util\form-and-join-node-adapter.c
+      1          
+      2          #include "config.h"
+      3          #include "ember.h"
+      4          #include "form-and-join-adapter.h"
+      5          #include "serial.h"
+      6          
+      7          extern void halReboot();
+      8          
+      9          //////////////////////////////////////////////////////////////////////////////////////////
+     10          // We use message buffers for caching energy scan results,
+     11          // pan id candidates, and joinable beacons.
+
+   \                                 In section .data, align 1
+     12          static EmberMessageBuffer dataCache = EMBER_NULL_MESSAGE_BUFFER;
+   \                     dataCache:
+   \   00000000   0xFF               DC8 255
+     13          
+
+   \                                 In section .bss, align 4
+     14          static EmberEventControl cleanupEvent = {0x00, 0x00};
+   \                     cleanupEvent:
+   \   00000000                      DS8 4
+
+   \                                 In section .bss, align 4
+     15          static EmberEventControl scanTimeOutEvent = {0x00, 0x00};
+   \                     scanTimeOutEvent:
+   \   00000000                      DS8 4
+     16          #define CLEANUP_TIMEOUT_QS    (120)
+     17          
+     18          //////////////////////////////////////////////////////////////////////////////////////////
+
+   \                                 In section .text, align 2, keep-with-next
+     19          int8u formAndJoinStackProfile ( void )
+     20          {
+     21              return emberStackProfile();
+   \                     formAndJoinStackProfile: (+1)
+   \   00000000   0x....             LDR.N    R0,??DataTable10
+   \   00000002   0x7800             LDRB     R0,[R0, #+0]
+   \   00000004   0x4770             BX       LR               ;; return
+     22          }
+     23          
+     24          ///////////////////////////////////////////////////////////////////////////////////////////
+     25          // We're relying on the fact that message buffers are a multiple of 16 bytes 
+     26          // in size, so that NetworkInfo records do not cross buffer boundaries.
+
+   \                                 In section .text, align 2, keep-with-next
+     27          NetworkInfo *formAndJoinGetNetworkPointer ( int8u index )
+     28          {
+     29              return (NetworkInfo *)emberGetLinkedBuffersPointer(dataCache, index << 0x04);
+   \                     formAndJoinGetNetworkPointer: (+1)
+   \   00000000   0x0101             LSLS     R1,R0,#+4
+   \   00000002   0x....             LDR.N    R0,??DataTable10_1
+   \   00000004   0x7800             LDRB     R0,[R0, #+0]
+   \   00000006   0xB2C9             UXTB     R1,R1
+   \   00000008   0x.... 0x....      B.W      emberGetLinkedBuffersPointer
+     30          }
+     31          
+     32          ///////////////////////////////////////////////////////////////////////////////////////////
+
+   \                                 In section .text, align 2, keep-with-next
+     33          void formAndJoinSetCleanupTimeout ( void )
+     34          {
+     35              emberEventControlSetDelayQS(cleanupEvent, CLEANUP_TIMEOUT_QS);
+   \                     formAndJoinSetCleanupTimeout: (+1)
+   \   00000000   0x2178             MOVS     R1,#+120
+   \   00000002   0x....             LDR.N    R0,??DataTable10_2
+   \   00000004   0x.... 0x....      B.W      emEventControlSetDelayQS
+     36          }
+     37          
+
+   \                                 In section .text, align 2, keep-with-next
+     38          void scanOpenTimeOutEvent( void )
+     39          {
+     40              Debug("\r\nscanTimeOutEvent.status = %d,scanTimeOutEvent.timeToExcute = %d",scanTimeOutEvent.status,scanTimeOutEvent.timeToExecute);
+     41              emberEventControlSetDelayQS(scanTimeOutEvent,40);  //10s
+   \                     scanOpenTimeOutEvent: (+1)
+   \   00000000   0x2128             MOVS     R1,#+40
+   \   00000002   0x....             LDR.N    R0,??DataTable10_3
+   \   00000004   0x.... 0x....      B.W      emEventControlSetDelayQS
+     42              Debug("\r\nscanTimeOutEvent.status = %d,scanTimeOutEvent.timeToExcute = %d",scanTimeOutEvent.status,scanTimeOutEvent.timeToExecute);
+     43          }
+     44          
+
+   \                                 In section .text, align 2, keep-with-next
+     45          void scanCloseTimeOutEvent( void )
+     46          {
+     47              Debug("\r\nscanTimeOutEvent.status = %d,scanTimeOutEvent.timeToExcute = %d",scanTimeOutEvent.status,scanTimeOutEvent.timeToExecute);
+     48              emberEventControlSetInactive(scanTimeOutEvent);
+   \                     scanCloseTimeOutEvent: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable10_3
+   \   00000002   0x2000             MOVS     R0,#+0
+   \   00000004   0x7008             STRB     R0,[R1, #+0]
+     49              Debug("\r\nscanTimeOutEvent.status = %d,scanTimeOutEvent.timeToExcute = %d",scanTimeOutEvent.status,scanTimeOutEvent.timeToExecute);
+     50          }
+   \   00000006   0x4770             BX       LR               ;; return
+     51          
+     52          ///////////////////////////////////////////////////////////////////////////////////////////
+
+   \                                 In section .text, align 2, keep-with-next
+     53          int8u *formAndJoinAllocateBuffer ( void )
+     54          {
+   \                     formAndJoinAllocateBuffer: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     55              dataCache = emberAllocateStackBuffer();
+   \   00000002   0x2001             MOVS     R0,#+1
+   \   00000004   0x.... 0x....      BL       emberAllocateLinkedBuffers
+   \   00000008   0x....             LDR.N    R1,??DataTable10_1
+   \   0000000A   0x7008             STRB     R0,[R1, #+0]
+     56              return (dataCache == EMBER_NULL_MESSAGE_BUFFER ? NULL : emberMessageBufferContents(dataCache));
+   \   0000000C   0x28FF             CMP      R0,#+255
+   \   0000000E   0xBF1C             ITT      NE 
+   \   00000010   0xE8BD 0x4002      POPNE    {R1,LR}
+   \   00000014   0x.... 0x....      BNE.W    emberMessageBufferContents
+   \   00000018   0x2000             MOVS     R0,#+0
+   \   0000001A   0xBD02             POP      {R1,PC}
+     57          }
+     58          
+     59          ///////////////////////////////////////////////////////////////////////////////////////////
+     60          // Set the dataCache length in terms of the number of NetworkInfo entries.
+
+   \                                 In section .text, align 2, keep-with-next
+     61          EmberStatus formAndJoinSetBufferLength ( int8u entryCount )
+     62          {
+     63              return emberSetLinkedBuffersLength(dataCache, entryCount << 0x04);
+   \                     formAndJoinSetBufferLength: (+1)
+   \   00000000   0x0101             LSLS     R1,R0,#+4
+   \   00000002   0x....             LDR.N    R0,??DataTable10_1
+   \   00000004   0x7800             LDRB     R0,[R0, #+0]
+   \   00000006   0xB2C9             UXTB     R1,R1
+   \   00000008   0x.... 0x....      B.W      emberSetLinkedBuffersLength
+     64          }
+     65          
+     66          ///////////////////////////////////////////////////////////////////////////////////////////
+
+   \                                 In section .text, align 2, keep-with-next
+     67          void formAndJoinReleaseBuffer ( void )
+     68          {
+   \                     formAndJoinReleaseBuffer: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+     69              if (dataCache != EMBER_NULL_MESSAGE_BUFFER) 
+   \   00000002   0x....             LDR.N    R4,??DataTable10_1
+   \   00000004   0x7820             LDRB     R0,[R4, #+0]
+   \   00000006   0x28FF             CMP      R0,#+255
+   \   00000008   0xD003             BEQ.N    ??formAndJoinReleaseBuffer_0
+     70              {
+     71                  emberReleaseMessageBuffer(dataCache);
+   \   0000000A   0x.... 0x....      BL       emReleaseMessageBuffer
+     72                  dataCache = EMBER_NULL_MESSAGE_BUFFER;
+   \   0000000E   0x20FF             MOVS     R0,#+255
+   \   00000010   0x7020             STRB     R0,[R4, #+0]
+     73              }
+     74          }
+   \                     ??formAndJoinReleaseBuffer_0: (+1)
+   \   00000012   0xBD10             POP      {R4,PC}          ;; return
+     75          
+     76          ///////////////////////////////////////////////////////////////////////////////////////////
+
+   \                                 In section .text, align 2, keep-with-next
+     77          static void cleanupEventHandler ( void )
+     78          {
+     79              emberEventControlSetInactive(cleanupEvent);
+   \                     cleanupEventHandler: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable10_2
+   \   00000002   0x2000             MOVS     R0,#+0
+   \   00000004   0x7008             STRB     R0,[R1, #+0]
+     80              emberFormAndJoinCleanup(EMBER_SUCCESS);
+   \   00000006   0x.... 0x....      B.W      emberFormAndJoinCleanup
+     81          }
+     82          
+
+   \                                 In section .text, align 2, keep-with-next
+     83          static void scanTimeOutEventHandler ( void )
+     84          {
+     85              emberEventControlSetInactive(scanTimeOutEvent);
+   \                     scanTimeOutEventHandler: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable10_3
+   \   00000002   0x2000             MOVS     R0,#+0
+   \   00000004   0x7008             STRB     R0,[R1, #+0]
+     86              Debug("\r\n[scan]goto scanTimeOutEventHandler");
+     87              halReboot();
+   \   00000006   0x.... 0x....      B.W      halReboot
+     88          }
+     89          
+
+   \                                 In section .text, align 4, keep-with-next
+     90          static EmberEventData formAndJoinEvents[] =
+   \                     formAndJoinEvents:
+   \   00000000   0x........         DC32 cleanupEvent, cleanupEventHandler, scanTimeOutEvent
+   \              0x........   
+   \              0x........   
+   \   0000000C   0x........         DC32 scanTimeOutEventHandler, 0H, 0H
+   \              0x00000000   
+   \              0x00000000   
+     91            { { &cleanupEvent, cleanupEventHandler },
+     92              { &scanTimeOutEvent, scanTimeOutEventHandler },
+     93              { NULL, NULL } };       // terminator
+     94          
+     95          ///////////////////////////////////////////////////////////////////////////////////////////
+
+   \                                 In section .text, align 2, keep-with-next
+     96          void emberFormAndJoinTick ( void )
+     97          {
+     98              emberRunEvents(formAndJoinEvents);
+   \                     emberFormAndJoinTick: (+1)
+   \   00000000   0x.... 0x....      ADR.W    R0,formAndJoinEvents
+   \   00000004   0x.... 0x....      B.W      emberRunEvents
+     99          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable10:
+   \   00000000   0x........         DC32     emStackProfile
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable10_1:
+   \   00000000   0x........         DC32     dataCache
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable10_2:
+   \   00000000   0x........         DC32     cleanupEvent
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable10_3:
+   \   00000000   0x........         DC32     scanTimeOutEvent
+    100          
+    101          ///////////////////////////////////////////////////////////////////////////////////////////
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   cleanupEventHandler
+         0   -> emberFormAndJoinCleanup
+       0   emberFormAndJoinTick
+         0   -> emberRunEvents
+       8   formAndJoinAllocateBuffer
+         8   -> emberAllocateLinkedBuffers
+         8   -> emberMessageBufferContents
+       0   formAndJoinGetNetworkPointer
+         0   -> emberGetLinkedBuffersPointer
+       8   formAndJoinReleaseBuffer
+         8   -> emReleaseMessageBuffer
+       0   formAndJoinSetBufferLength
+         0   -> emberSetLinkedBuffersLength
+       0   formAndJoinSetCleanupTimeout
+         0   -> emEventControlSetDelayQS
+       0   formAndJoinStackProfile
+       0   scanCloseTimeOutEvent
+       0   scanOpenTimeOutEvent
+         0   -> emEventControlSetDelayQS
+       0   scanTimeOutEventHandler
+         0   -> halReboot
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable10
+       4  ??DataTable10_1
+       4  ??DataTable10_2
+       4  ??DataTable10_3
+       4  cleanupEvent
+      10  cleanupEventHandler
+       1  dataCache
+       8  emberFormAndJoinTick
+      28  formAndJoinAllocateBuffer
+      24  formAndJoinEvents
+      12  formAndJoinGetNetworkPointer
+      20  formAndJoinReleaseBuffer
+      12  formAndJoinSetBufferLength
+       8  formAndJoinSetCleanupTimeout
+       6  formAndJoinStackProfile
+       8  scanCloseTimeOutEvent
+       8  scanOpenTimeOutEvent
+       4  scanTimeOutEvent
+      10  scanTimeOutEventHandler
+
+ 
+   8 bytes in section .bss
+   1 byte  in section .data
+ 170 bytes in section .text
+ 
+ 170 bytes of CODE memory
+   9 bytes of DATA memory
+
+Errors: none
+Warnings: none

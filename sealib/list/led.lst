@@ -1,0 +1,243 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:30
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\hal\led.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\hal\led.c -D ENABLE_GATEWAY
+#        -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\led.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\led.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\hal\led.c
+      1          
+      2          #include "config.h"
+      3          #include "ember.h"
+      4          #include "hal.h"
+      5          
+
+   \                                 In section .text, align 2, keep-with-next
+      6          void halSetLed(HalBoardLed led)
+      7          {
+      8            static volatile int32u *const clrRegs[] = 
+      9              { (volatile int32u *)GPIO_PACLR_ADDR,
+     10                (volatile int32u *)GPIO_PBCLR_ADDR,
+     11                (volatile int32u *)GPIO_PCCLR_ADDR };
+     12            if(led/8 < 3) {
+   \                     halSetLed: (+1)
+   \   00000000   0x08C1             LSRS     R1,R0,#+3
+   \   00000002   0x2903             CMP      R1,#+3
+   \   00000004   0xDA09             BGE.N    ??halSetLed_0
+     13              *clrRegs[led/8] = BIT(led&7);
+   \   00000006   0x2101             MOVS     R1,#+1
+   \   00000008   0xF000 0x0207      AND      R2,R0,#0x7
+   \   0000000C   0x4091             LSLS     R1,R1,R2
+   \   0000000E   0x.... 0x....      ADR.W    R2,??clrRegs
+   \   00000012   0x08C0             LSRS     R0,R0,#+3
+   \   00000014   0xF852 0x0020      LDR      R0,[R2, R0, LSL #+2]
+   \   00000018   0x6001             STR      R1,[R0, #+0]
+     14            }
+     15          }
+   \                     ??halSetLed_0: (+1)
+   \   0000001A   0x4770             BX       LR               ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??clrRegs:
+   \   00000000   0x4000B014         DC32 4000B014H, 4000B414H, 4000B814H
+   \              0x4000B414   
+   \              0x4000B814   
+     16          
+
+   \                                 In section .text, align 2, keep-with-next
+     17          void halClearLed(HalBoardLed led)
+     18          {
+     19            static volatile int32u *const setRegs[] = 
+     20              { (volatile int32u *)GPIO_PASET_ADDR,
+     21                (volatile int32u *)GPIO_PBSET_ADDR,
+     22                (volatile int32u *)GPIO_PCSET_ADDR };
+     23            if(led/8 < 3) {
+   \                     halClearLed: (+1)
+   \   00000000   0x08C1             LSRS     R1,R0,#+3
+   \   00000002   0x2903             CMP      R1,#+3
+   \   00000004   0xDA09             BGE.N    ??halClearLed_0
+     24              *setRegs[led/8] = BIT(led&7);
+   \   00000006   0x2101             MOVS     R1,#+1
+   \   00000008   0xF000 0x0207      AND      R2,R0,#0x7
+   \   0000000C   0x4091             LSLS     R1,R1,R2
+   \   0000000E   0x.... 0x....      ADR.W    R2,??setRegs
+   \   00000012   0x08C0             LSRS     R0,R0,#+3
+   \   00000014   0xF852 0x0020      LDR      R0,[R2, R0, LSL #+2]
+   \   00000018   0x6001             STR      R1,[R0, #+0]
+     25            }
+     26          }
+   \                     ??halClearLed_0: (+1)
+   \   0000001A   0x4770             BX       LR               ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??setRegs:
+   \   00000000   0x4000B010         DC32 4000B010H, 4000B410H, 4000B810H
+   \              0x4000B410   
+   \              0x4000B810   
+     27          
+
+   \                                 In section .text, align 2, keep-with-next
+     28          void halToggleLed(HalBoardLed led)
+     29          {
+   \                     halToggleLed: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x4604             MOV      R4,R0
+     30            static volatile int32u *const outRegs[] = 
+     31              { (volatile int32u *)GPIO_PAOUT_ADDR,
+     32                (volatile int32u *)GPIO_PBOUT_ADDR,
+     33                (volatile int32u *)GPIO_PCOUT_ADDR };
+     34            //to avoid contention with other code using the other pins for other
+     35            //purposes, we disable interrupts
+     36            ATOMIC(
+     37              if(led/8 < 3) {
+     38                *outRegs[led/8] ^= BIT(led&7);
+     39              }
+     40            )
+   \   00000004   0x.... 0x....      BL       _disableBasePri
+   \   00000008   0x08E1             LSRS     R1,R4,#+3
+   \   0000000A   0x2903             CMP      R1,#+3
+   \   0000000C   0xDA0B             BGE.N    ??halToggleLed_0
+   \   0000000E   0x.... 0x....      ADR.W    R1,??outRegs
+   \   00000012   0x08E2             LSRS     R2,R4,#+3
+   \   00000014   0xF851 0x1022      LDR      R1,[R1, R2, LSL #+2]
+   \   00000018   0x2301             MOVS     R3,#+1
+   \   0000001A   0x680A             LDR      R2,[R1, #+0]
+   \   0000001C   0xF004 0x0407      AND      R4,R4,#0x7
+   \   00000020   0x40A3             LSLS     R3,R3,R4
+   \   00000022   0x405A             EORS     R2,R3,R2
+   \   00000024   0x600A             STR      R2,[R1, #+0]
+   \                     ??halToggleLed_0: (+1)
+   \   00000026   0xE8BD 0x4010      POP      {R4,LR}
+   \   0000002A   0x.... 0x....      B.W      _writeBasePri
+     41          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??outRegs:
+   \   00000000   0x4000B00C         DC32 4000B00CH, 4000B40CH, 4000B80CH
+   \              0x4000B40C   
+   \              0x4000B80C   
+     42          
+
+   \                                 In section .text, align 2, keep-with-next
+     43          void halStackIndicateActivity(boolean turnOn)
+     44          {
+     45            if(turnOn) {
+   \                     halStackIndicateActivity: (+1)
+   \   00000000   0x2800             CMP      R0,#+0
+   \   00000002   0xBF1C             ITT      NE 
+     46              halSetLed(BOARD_ACTIVITY_LED);
+   \   00000004   0x2000             MOVNE    R0,#+0
+   \   00000006   0x.... 0x....      BNE.W    halSetLed
+     47            } else {
+     48              halClearLed(BOARD_ACTIVITY_LED);
+   \   0000000A   0x....             B.N      halClearLed
+     49            }
+     50          }
+     51          
+     52          // when app is not joined, the LEDs are
+     53          // 1: ON
+     54          // 2: ON
+     55          // 3: OFF
+
+   \                                 In section .text, align 2, keep-with-next
+     56          void appSetLEDsToInitialState(void)
+     57          {
+   \                     appSetLEDsToInitialState: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     58          #ifndef NO_LED
+     59            halSetLed(BOARDLED1);
+   \   00000002   0x200E             MOVS     R0,#+14
+   \   00000004   0x.... 0x....      BL       halSetLed
+     60            halSetLed(BOARDLED3);
+   \   00000008   0x200E             MOVS     R0,#+14
+   \   0000000A   0x.... 0x....      BL       halSetLed
+     61            halClearLed(BOARDLED2);
+   \   0000000E   0xE8BD 0x4002      POP      {R1,LR}
+   \   00000012   0x200D             MOVS     R0,#+13
+   \   00000014   0x....             B.N      halClearLed
+     62          #endif//NO_LED
+     63          }
+     64          
+     65          // when app is joined, the LEDs are
+     66          // 1: ON
+     67          // 2: alternating ON/OFF with 3
+     68          // 3: alternating ON/OFF with 2
+
+   \                                 In section .text, align 2, keep-with-next
+     69          void appSetLEDsToRunningState(void)
+     70          {
+   \                     appSetLEDsToRunningState: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     71          #ifndef NO_LED
+     72            halToggleLed(BOARDLED3);
+   \   00000002   0x200E             MOVS     R0,#+14
+   \   00000004   0x.... 0x....      BL       halToggleLed
+     73            halToggleLed(BOARDLED2);
+   \   00000008   0xE8BD 0x4002      POP      {R1,LR}
+   \   0000000C   0x200D             MOVS     R0,#+13
+   \   0000000E   0x....             B.N      halToggleLed
+     74          #endif//NO_LED
+     75          }
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   appSetLEDsToInitialState
+         0   -> halClearLed
+         8   -> halSetLed
+       8   appSetLEDsToRunningState
+         0   -> halToggleLed
+         8   -> halToggleLed
+       0   halClearLed
+       0   halSetLed
+       0   halStackIndicateActivity
+         0   -> halClearLed
+         0   -> halSetLed
+       8   halToggleLed
+         8   -> _disableBasePri
+         0   -> _writeBasePri
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      22  appSetLEDsToInitialState
+      16  appSetLEDsToRunningState
+      12  clrRegs
+      28  halClearLed
+      28  halSetLed
+      12  halStackIndicateActivity
+      46  halToggleLed
+      12  outRegs
+      12  setRegs
+
+ 
+ 188 bytes in section .text
+ 
+ 188 bytes of CODE memory
+
+Errors: none
+Warnings: none

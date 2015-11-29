@@ -1,0 +1,644 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:31
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\lamp\mem.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\lamp\mem.c -D ENABLE_GATEWAY
+#        -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\mem.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\mem.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\lamp\mem.c
+      1          #include "mem.h"
+      2          
+      3          /*******************************************************************************
+      4          * Function Name  : void sea_memcpy ( const void * dest, void * src, u16 bytes )
+      5          * Description    : A version of memcopy that can handle overlapping source and
+      6                             destination regions.
+      7          * Input          : input data: val; number of bytes: bytes
+      8          * Output         : destination: dest
+      9          * Return         : None
+     10          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     11          void sea_memcpy ( const void * dest, void * src, u16 bytes )
+     12          {
+     13              u8 *d = (u8 *)dest;
+     14              u8 *s = (u8 *)src;
+     15          
+     16              if (d > s)
+   \                     sea_memcpy: (+1)
+   \   00000000   0x4281             CMP      R1,R0
+   \   00000002   0xD233             BCS.N    ??sea_memcpy_0
+     17              {
+     18                  d += bytes - 0x01;
+   \   00000004   0x1810             ADDS     R0,R2,R0
+     19                  s += bytes - 0x01;
+   \   00000006   0x1851             ADDS     R1,R2,R1
+   \   00000008   0x1E40             SUBS     R0,R0,#+1
+   \   0000000A   0x1E49             SUBS     R1,R1,#+1
+   \   0000000C   0xE010             B.N      ??sea_memcpy_1
+     20                  while (bytes >= 0x04)
+     21                  {
+     22                      bytes -= 4;
+     23                      *d-- = *s--;
+   \                     ??sea_memcpy_2: (+1)
+   \   0000000E   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   00000012   0xF800 0x3901      STRB     R3,[R0], #-1
+   \   00000016   0x1F12             SUBS     R2,R2,#+4
+     24                      *d-- = *s--;
+   \   00000018   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   0000001C   0xF800 0x3901      STRB     R3,[R0], #-1
+     25                      *d-- = *s--;
+   \   00000020   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   00000024   0xF800 0x3901      STRB     R3,[R0], #-1
+     26                      *d-- = *s--;
+   \   00000028   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   0000002C   0xF800 0x3901      STRB     R3,[R0], #-1
+     27                  }
+   \                     ??sea_memcpy_1: (+1)
+   \   00000030   0xB292             UXTH     R2,R2
+   \   00000032   0x2A04             CMP      R2,#+4
+   \   00000034   0xDAEB             BGE.N    ??sea_memcpy_2
+     28                  for (; bytes; bytes --)
+   \                     ??sea_memcpy_3: (+1)
+   \   00000036   0xB292             UXTH     R2,R2
+   \   00000038   0x2A00             CMP      R2,#+0
+   \   0000003A   0xBF1E             ITTT     NE 
+   \   0000003C   0xF811 0x3901      LDRBNE   R3,[R1], #-1
+   \   00000040   0xF800 0x3901      STRBNE   R3,[R0], #-1
+   \   00000044   0x1E52             SUBNE    R2,R2,#+1
+     29                      *d-- = *s--;
+   \   00000046   0xD1F6             BNE.N    ??sea_memcpy_3
+   \   00000048   0x4770             BX       LR
+     30              } 
+     31              else
+     32              {
+     33                  while (bytes >= 0x04) 
+     34                  {
+     35                      bytes -= 0x04;
+     36          	    *d++ = *s++;
+   \                     ??sea_memcpy_4: (+1)
+   \   0000004A   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   0000004E   0xF800 0x3B01      STRB     R3,[R0], #+1
+   \   00000052   0x1F12             SUBS     R2,R2,#+4
+     37          	    *d++ = *s++;
+   \   00000054   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000058   0xF800 0x3B01      STRB     R3,[R0], #+1
+     38          	    *d++ = *s++;
+   \   0000005C   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000060   0xF800 0x3B01      STRB     R3,[R0], #+1
+     39          	    *d++ = *s++;
+   \   00000064   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000068   0xF800 0x3B01      STRB     R3,[R0], #+1
+     40                  }
+   \                     ??sea_memcpy_0: (+1)
+   \   0000006C   0xB292             UXTH     R2,R2
+   \   0000006E   0x2A04             CMP      R2,#+4
+   \   00000070   0xDAEB             BGE.N    ??sea_memcpy_4
+     41                  for (; bytes; bytes --) 
+   \                     ??sea_memcpy_5: (+1)
+   \   00000072   0xB292             UXTH     R2,R2
+   \   00000074   0x2A00             CMP      R2,#+0
+   \   00000076   0xBF1E             ITTT     NE 
+   \   00000078   0xF811 0x3B01      LDRBNE   R3,[R1], #+1
+   \   0000007C   0xF800 0x3B01      STRBNE   R3,[R0], #+1
+   \   00000080   0x1E52             SUBNE    R2,R2,#+1
+     42                      *d++ = *s++;
+   \   00000082   0xD1F6             BNE.N    ??sea_memcpy_5
+     43              }
+     44          }
+   \   00000084   0x4770             BX       LR               ;; return
+     45          
+     46          /*******************************************************************************
+     47          * Function Name  : void sea_memset ( void * dest, u8 val, u16 bytes )
+     48          * Description    : Set memory
+     49          * Input          : input data: val; number of bytes: bytes
+     50          * Output         : destination: dest
+     51          * Return         : None
+     52          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     53          void sea_memset ( void * dest, u8 val, u16 bytes )
+     54          {
+   \                     sea_memset: (+1)
+   \   00000000   0x0013             MOVS     R3,R2
+     55              u8 *d = (u8 *)dest;
+     56          
+     57              for (; bytes; bytes --)
+   \   00000002   0xD000             BEQ.N    ??sea_memset_0
+     58                  *d++ = val;
+   \   00000004   0x....             B.N      ?Subroutine0
+     59          }
+   \                     ??sea_memset_0: (+1)
+   \   00000006   0x4770             BX       LR               ;; return
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine0: (+1)
+   \   00000000   0x460A             MOV      R2,R1
+   \   00000002   0x4619             MOV      R1,R3
+   \   00000004   0x.... 0x....      B.W      __aeabi_memset
+     60          
+     61          /*******************************************************************************
+     62          * Function Name  : s8 sea_memcomp ( const void * str1, const void * str2, u16 bytes )
+     63          * Description    : Compare memory
+     64          * Input          : data to be compared: source0, source1;
+     65                             number of bytes: bytes
+     66          * Output         : 0: equal;
+     67                             else: source are different.
+     68          * Return         : None
+     69          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     70          s8 sea_memcomp ( const void * str1, const void * str2, u16 bytes )
+     71          {
+   \                     sea_memcomp: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+     72              u8 *s1 = (u8 *)str1;
+     73              u8 *s2 = (u8 *)str2;
+   \   00000002   0xE002             B.N      ??sea_memcomp_0
+     74          
+     75              for (; bytes > 0x00; bytes --, s1 ++, s2 ++)
+   \                     ??sea_memcomp_1: (+1)
+   \   00000004   0x1E52             SUBS     R2,R2,#+1
+   \   00000006   0x1C40             ADDS     R0,R0,#+1
+   \   00000008   0x1C49             ADDS     R1,R1,#+1
+   \                     ??sea_memcomp_0: (+1)
+   \   0000000A   0xB292             UXTH     R2,R2
+   \   0000000C   0xB132             CBZ.N    R2,??sea_memcomp_2
+     76              {
+     77                  if (*s1 != *s2)
+   \   0000000E   0x780B             LDRB     R3,[R1, #+0]
+   \   00000010   0x7804             LDRB     R4,[R0, #+0]
+   \   00000012   0x429C             CMP      R4,R3
+   \   00000014   0xD0F6             BEQ.N    ??sea_memcomp_1
+     78          	    return *s1 - *s2;
+   \   00000016   0x1AE0             SUBS     R0,R4,R3
+   \   00000018   0xB240             SXTB     R0,R0
+   \   0000001A   0xBD10             POP      {R4,PC}
+     79              }
+     80              return 0x00;
+   \                     ??sea_memcomp_2: (+1)
+   \   0000001C   0x2000             MOVS     R0,#+0
+   \   0000001E   0xBD10             POP      {R4,PC}          ;; return
+     81          }
+     82          
+     83          /*******************************************************************************
+     84          * Function Name  : s8 sea_memstr (const void * str1, const void * str2, u16 bytes )
+     85          * Description    : Compare two strings
+     86          * Input          : data to be compared: source0, source1;
+     87                             number of bytes: bytes
+     88          * Output         : 0: equal;
+     89                             else: source are different.
+     90          * Return         : None
+     91          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     92          s8 sea_memstr ( const void * str1, const void * str2, u16 bytes )
+     93          {
+   \                     sea_memstr: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0x460D             MOV      R5,R1
+     94              u8 *s1 = (u8 *)str1;
+     95              u8 *s2 = (u8 *)str2;
+   \   00000006   0xE001             B.N      ??sea_memstr_0
+     96              
+     97              for (; bytes > 0x00; bytes --, s1 ++)
+   \                     ??sea_memstr_1: (+1)
+   \   00000008   0x1E52             SUBS     R2,R2,#+1
+   \   0000000A   0x1C64             ADDS     R4,R4,#+1
+   \                     ??sea_memstr_0: (+1)
+   \   0000000C   0xB292             UXTH     R2,R2
+   \   0000000E   0xB162             CBZ.N    R2,??sea_memstr_2
+     98              {
+     99                  if (*s1 == *s2)   break;
+   \   00000010   0x7820             LDRB     R0,[R4, #+0]
+   \   00000012   0x7829             LDRB     R1,[R5, #+0]
+   \   00000014   0x4288             CMP      R0,R1
+   \   00000016   0xD1F7             BNE.N    ??sea_memstr_1
+    100              }
+    101              
+    102              if (bytes) 
+    103                  return sea_memcomp(s1, s2, strlen(str2));
+   \   00000018   0x4628             MOV      R0,R5
+   \   0000001A   0x.... 0x....      BL       strlen
+   \   0000001E   0xB282             UXTH     R2,R0
+   \   00000020   0x4629             MOV      R1,R5
+   \   00000022   0x4620             MOV      R0,R4
+   \   00000024   0xE8BD 0x4038      POP      {R3-R5,LR}
+   \   00000028   0x....             B.N      sea_memcomp
+    104              
+    105              return 0xff;
+   \                     ??sea_memstr_2: (+1)
+   \   0000002A   0xF04F 0x30FF      MOV      R0,#-1
+   \   0000002E   0xBD32             POP      {R1,R4,R5,PC}    ;; return
+    106          }
+    107          
+    108          /*******************************************************************************
+    109          * Function Name  : s8 sea_memstr (const void * str1, const void * str2, u16 bytes )
+    110          * Description    : Compare two strings
+    111          * Input          : data to be compared: source0, source1;
+    112                             number of bytes: bytes
+    113          * Output         : 0: equal;
+    114                             else: source are different.
+    115          * Return         : None
+    116          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    117          u16 sea_strlen ( const void * str1 )
+    118          {
+    119              u16 i;
+    120              u8 *s1 = (u8 *)str1;
+    121              
+    122              for (i = 0x00; i < 0xffff; i ++, s1 ++)
+   \                     sea_strlen: (+1)
+   \   00000000   0x2200             MOVS     R2,#+0
+   \   00000002   0xF64F 0x71FF      MOVW     R1,#+65535
+    123                  if (*s1 == '\0')   
+   \                     ??sea_strlen_0: (+1)
+   \   00000006   0xF810 0x3B01      LDRB     R3,[R0], #+1
+   \   0000000A   0xB90B             CBNZ.N   R3,??sea_strlen_1
+    124                    return i;
+   \   0000000C   0x4610             MOV      R0,R2
+   \   0000000E   0x4770             BX       LR
+   \                     ??sea_strlen_1: (+1)
+   \   00000010   0x1C52             ADDS     R2,R2,#+1
+   \   00000012   0xB292             UXTH     R2,R2
+   \   00000014   0x428A             CMP      R2,R1
+   \   00000016   0xD1F6             BNE.N    ??sea_strlen_0
+    125              return 0xffff;
+   \   00000018   0x4608             MOV      R0,R1
+   \   0000001A   0x4770             BX       LR               ;; return
+    126          }
+    127          
+    128          ///////////////////////////////////////////////////////////////////////////////////////
+    129          #if 0   // the codes for ads_alloc, iar define heap in stm*.icf file to link 
+    130          // memory allocate
+    131          //
+    132          static u8 mem_allocate[4096];
+    133          void MEM_Configuration ( void ) 
+    134          {
+    135              u32 start = (u32)mem_allocate; 
+    136              
+    137              _init_alloc(start, start + 4096);
+    138          }
+    139          #endif
+    140          
+    141          #if !defined(XAP2B) && !defined(UNIX)
+    142          // A version of memcopy that can handle overlapping source and
+    143          // destination regions.
+
+   \                                 In section .text, align 2, keep-with-next
+    144          void halCommonMemCopy(void *dest, const void *source, int8u bytes)
+    145          {
+    146            int8u *d = (int8u *)dest;
+    147            int8u *s = (int8u *)source;
+    148          
+    149            if (d > s) {
+   \                     halCommonMemCopy: (+1)
+   \   00000000   0x4281             CMP      R1,R0
+   \   00000002   0xD233             BCS.N    ??halCommonMemCopy_0
+    150              d += bytes - 1;
+   \   00000004   0x1810             ADDS     R0,R2,R0
+    151              s += bytes - 1;
+   \   00000006   0x1851             ADDS     R1,R2,R1
+   \   00000008   0x1E40             SUBS     R0,R0,#+1
+   \   0000000A   0x1E49             SUBS     R1,R1,#+1
+   \   0000000C   0xE010             B.N      ??halCommonMemCopy_1
+    152              while(bytes >= 4) {
+    153                bytes -= 4;
+    154                *d-- = *s--;
+   \                     ??halCommonMemCopy_2: (+1)
+   \   0000000E   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   00000012   0xF800 0x3901      STRB     R3,[R0], #-1
+   \   00000016   0x1F12             SUBS     R2,R2,#+4
+    155                *d-- = *s--;
+   \   00000018   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   0000001C   0xF800 0x3901      STRB     R3,[R0], #-1
+    156                *d-- = *s--;
+   \   00000020   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   00000024   0xF800 0x3901      STRB     R3,[R0], #-1
+    157                *d-- = *s--;
+   \   00000028   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   0000002C   0xF800 0x3901      STRB     R3,[R0], #-1
+    158              }
+   \                     ??halCommonMemCopy_1: (+1)
+   \   00000030   0xB2D2             UXTB     R2,R2
+   \   00000032   0x2A04             CMP      R2,#+4
+   \   00000034   0xDAEB             BGE.N    ??halCommonMemCopy_2
+    159              for(; bytes; bytes--) {
+   \                     ??halCommonMemCopy_3: (+1)
+   \   00000036   0xB2D2             UXTB     R2,R2
+   \   00000038   0x2A00             CMP      R2,#+0
+   \   0000003A   0xBF1E             ITTT     NE 
+   \   0000003C   0xF811 0x3901      LDRBNE   R3,[R1], #-1
+   \   00000040   0xF800 0x3901      STRBNE   R3,[R0], #-1
+   \   00000044   0x1E52             SUBNE    R2,R2,#+1
+    160                *d-- = *s--;
+   \   00000046   0xD1F6             BNE.N    ??halCommonMemCopy_3
+   \   00000048   0x4770             BX       LR
+    161              }
+    162            } else {
+    163              while(bytes >= 4) {
+    164                bytes -= 4;
+    165                *d++ = *s++;
+   \                     ??halCommonMemCopy_4: (+1)
+   \   0000004A   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   0000004E   0xF800 0x3B01      STRB     R3,[R0], #+1
+   \   00000052   0x1F12             SUBS     R2,R2,#+4
+    166                *d++ = *s++;
+   \   00000054   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000058   0xF800 0x3B01      STRB     R3,[R0], #+1
+    167                *d++ = *s++;
+   \   0000005C   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000060   0xF800 0x3B01      STRB     R3,[R0], #+1
+    168                *d++ = *s++;
+   \   00000064   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000068   0xF800 0x3B01      STRB     R3,[R0], #+1
+    169              }
+   \                     ??halCommonMemCopy_0: (+1)
+   \   0000006C   0xB2D2             UXTB     R2,R2
+   \   0000006E   0x2A04             CMP      R2,#+4
+   \   00000070   0xDAEB             BGE.N    ??halCommonMemCopy_4
+    170              for(; bytes; bytes--) {
+   \                     ??halCommonMemCopy_5: (+1)
+   \   00000072   0xB2D2             UXTB     R2,R2
+   \   00000074   0x2A00             CMP      R2,#+0
+   \   00000076   0xBF1E             ITTT     NE 
+   \   00000078   0xF811 0x3B01      LDRBNE   R3,[R1], #+1
+   \   0000007C   0xF800 0x3B01      STRBNE   R3,[R0], #+1
+   \   00000080   0x1E52             SUBNE    R2,R2,#+1
+    171                *d++ = *s++;
+   \   00000082   0xD1F6             BNE.N    ??halCommonMemCopy_5
+    172              }
+    173            }
+    174          }
+   \   00000084   0x4770             BX       LR               ;; return
+    175          
+    176          // Same as above except copies from Program space to RAM.
+
+   \                                 In section .text, align 2, keep-with-next
+    177          void halCommonMemPGMCopy(void* dest, void PGM *source, int8u bytes)
+    178          {
+    179            int8u *d = (int8u *)dest;
+    180            PGM_PU s = (PGM_PU)source;
+    181          
+    182            if (d > s) {
+   \                     halCommonMemPGMCopy: (+1)
+   \   00000000   0x4281             CMP      R1,R0
+   \   00000002   0xD233             BCS.N    ??halCommonMemPGMCopy_0
+    183              d += bytes - 1;
+   \   00000004   0x1810             ADDS     R0,R2,R0
+    184              s += bytes - 1;
+   \   00000006   0x1851             ADDS     R1,R2,R1
+   \   00000008   0x1E40             SUBS     R0,R0,#+1
+   \   0000000A   0x1E49             SUBS     R1,R1,#+1
+   \   0000000C   0xE010             B.N      ??halCommonMemPGMCopy_1
+    185              while(bytes >= 4) {
+    186                bytes -= 4;
+    187                *d-- = *s--;
+   \                     ??halCommonMemPGMCopy_2: (+1)
+   \   0000000E   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   00000012   0xF800 0x3901      STRB     R3,[R0], #-1
+   \   00000016   0x1F12             SUBS     R2,R2,#+4
+    188                *d-- = *s--;
+   \   00000018   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   0000001C   0xF800 0x3901      STRB     R3,[R0], #-1
+    189                *d-- = *s--;
+   \   00000020   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   00000024   0xF800 0x3901      STRB     R3,[R0], #-1
+    190                *d-- = *s--;
+   \   00000028   0xF811 0x3901      LDRB     R3,[R1], #-1
+   \   0000002C   0xF800 0x3901      STRB     R3,[R0], #-1
+    191              }
+   \                     ??halCommonMemPGMCopy_1: (+1)
+   \   00000030   0xB2D2             UXTB     R2,R2
+   \   00000032   0x2A04             CMP      R2,#+4
+   \   00000034   0xDAEB             BGE.N    ??halCommonMemPGMCopy_2
+    192              for(; bytes; bytes--) {
+   \                     ??halCommonMemPGMCopy_3: (+1)
+   \   00000036   0xB2D2             UXTB     R2,R2
+   \   00000038   0x2A00             CMP      R2,#+0
+   \   0000003A   0xBF1E             ITTT     NE 
+   \   0000003C   0xF811 0x3901      LDRBNE   R3,[R1], #-1
+   \   00000040   0xF800 0x3901      STRBNE   R3,[R0], #-1
+   \   00000044   0x1E52             SUBNE    R2,R2,#+1
+    193                *d-- = *s--;
+   \   00000046   0xD1F6             BNE.N    ??halCommonMemPGMCopy_3
+   \   00000048   0x4770             BX       LR
+    194              }
+    195            } else {
+    196              while(bytes >= 4) {
+    197                bytes -= 4;
+    198                *d++ = *s++;
+   \                     ??halCommonMemPGMCopy_4: (+1)
+   \   0000004A   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   0000004E   0xF800 0x3B01      STRB     R3,[R0], #+1
+   \   00000052   0x1F12             SUBS     R2,R2,#+4
+    199                *d++ = *s++;
+   \   00000054   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000058   0xF800 0x3B01      STRB     R3,[R0], #+1
+    200                *d++ = *s++;
+   \   0000005C   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000060   0xF800 0x3B01      STRB     R3,[R0], #+1
+    201                *d++ = *s++;
+   \   00000064   0xF811 0x3B01      LDRB     R3,[R1], #+1
+   \   00000068   0xF800 0x3B01      STRB     R3,[R0], #+1
+    202              }
+   \                     ??halCommonMemPGMCopy_0: (+1)
+   \   0000006C   0xB2D2             UXTB     R2,R2
+   \   0000006E   0x2A04             CMP      R2,#+4
+   \   00000070   0xDAEB             BGE.N    ??halCommonMemPGMCopy_4
+    203              for(; bytes; bytes--) {
+   \                     ??halCommonMemPGMCopy_5: (+1)
+   \   00000072   0xB2D2             UXTB     R2,R2
+   \   00000074   0x2A00             CMP      R2,#+0
+   \   00000076   0xBF1E             ITTT     NE 
+   \   00000078   0xF811 0x3B01      LDRBNE   R3,[R1], #+1
+   \   0000007C   0xF800 0x3B01      STRBNE   R3,[R0], #+1
+   \   00000080   0x1E52             SUBNE    R2,R2,#+1
+    204                *d++ = *s++;
+   \   00000082   0xD1F6             BNE.N    ??halCommonMemPGMCopy_5
+    205              }
+    206            }
+    207          }
+   \   00000084   0x4770             BX       LR               ;; return
+    208          
+
+   \                                 In section .text, align 2, keep-with-next
+    209          void halCommonMemSet(void *dest, int8u val, int16u bytes)
+    210          {
+   \                     halCommonMemSet: (+1)
+   \   00000000   0x0013             MOVS     R3,R2
+    211            int8u *d=(int8u *)dest;
+    212          
+    213            for(;bytes;bytes--) {
+   \   00000002   0xD000             BEQ.N    ??halCommonMemSet_0
+    214              *d++ = val;
+   \   00000004   0x....             B.N      ?Subroutine0
+    215            }
+    216          }
+   \                     ??halCommonMemSet_0: (+1)
+   \   00000006   0x4770             BX       LR               ;; return
+    217          
+
+   \                                 In section .text, align 2, keep-with-next
+    218          int8s halCommonMemCompare(const void *source0, const void *source1, int8u bytes)
+    219          {
+   \                     halCommonMemCompare: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    220            int8u *s0 = (int8u *)source0;
+    221            int8u *s1 = (int8u *)source1;
+   \   00000002   0xE000             B.N      ??halCommonMemCompare_0
+    222          
+    223            for(; 0 < bytes; bytes--, s0++, s1++) {
+   \                     ??halCommonMemCompare_1: (+1)
+   \   00000004   0x1E52             SUBS     R2,R2,#+1
+   \                     ??halCommonMemCompare_0: (+1)
+   \   00000006   0xB2D2             UXTB     R2,R2
+   \   00000008   0xB11A             CBZ.N    R2,??halCommonMemCompare_2
+    224              int8u b0 = *s0;
+   \   0000000A   0x.... 0x....      BL       ?Subroutine2
+    225              int8u b1 = *s1;
+    226              if (b0 != b1)
+   \                     ??CrossCallReturnLabel_0: (+1)
+   \   0000000E   0xD0F9             BEQ.N    ??halCommonMemCompare_1
+    227                return b0 - b1;
+   \   00000010   0x....             B.N      ?Subroutine1
+    228            }
+    229            return 0;
+   \                     ??halCommonMemCompare_2: (+1)
+   \   00000012   0x2000             MOVS     R0,#+0
+   \   00000014   0xBD10             POP      {R4,PC}          ;; return
+    230          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine2: (+1)
+   \   00000000   0xF810 0x3B01      LDRB     R3,[R0], #+1
+   \   00000004   0xF811 0x4B01      LDRB     R4,[R1], #+1
+   \   00000008   0x42A3             CMP      R3,R4
+   \   0000000A   0x4770             BX       LR
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine1: (+1)
+   \   00000000   0x1B18             SUBS     R0,R3,R4
+   \   00000002   0xB240             SXTB     R0,R0
+   \   00000004   0xBD10             POP      {R4,PC}
+    231          
+    232          // Test code for halCommonMemCompare().  There is no good place for unit tests
+    233          // for this file.  If you change the function you should probably rerun the
+    234          // test.
+    235          //  {
+    236          //    int8u s0[3] = { 0, 0, 0};
+    237          //    int8u s1[3] = { 0, 0, 0};
+    238          //    int8u i;
+    239          //    assert(halCommonMemCompare(s0, s1, 0) == 0);
+    240          //    assert(halCommonMemCompare(s0, s1, 3) == 0);
+    241          //    for (i = 0; i < 3; i++) {
+    242          //      s0[i] = 1;
+    243          //      assert(halCommonMemCompare(s0, s1, 3) > 0);
+    244          //      s1[i] = 2;
+    245          //      assert(halCommonMemCompare(s0, s1, 3) < 0);
+    246          //      s0[i] = 2;
+    247          //    }
+    248          //  }
+    249          
+    250          // Same again, except that the second source is in program space.
+    251          
+
+   \                                 In section .text, align 2, keep-with-next
+    252          int8s halCommonMemPGMCompare(const void *source0, void PGM *source1, int8u bytes)
+    253          {
+   \                     halCommonMemPGMCompare: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    254            int8u *s0 = (int8u *)source0;
+    255            int8u PGM *s1 = (int8u PGM *)source1;
+   \   00000002   0xE000             B.N      ??halCommonMemPGMCompare_0
+    256          
+    257            for(; 0 < bytes; bytes--, s0++, s1++) {
+   \                     ??halCommonMemPGMCompare_1: (+1)
+   \   00000004   0x1E52             SUBS     R2,R2,#+1
+   \                     ??halCommonMemPGMCompare_0: (+1)
+   \   00000006   0xB2D2             UXTB     R2,R2
+   \   00000008   0xB11A             CBZ.N    R2,??halCommonMemPGMCompare_2
+    258              int8u b0 = *s0;
+   \   0000000A   0x.... 0x....      BL       ?Subroutine2
+    259              int8u b1 = *s1;
+    260              if (b0 != b1)
+   \                     ??CrossCallReturnLabel_1: (+1)
+   \   0000000E   0xD0F9             BEQ.N    ??halCommonMemPGMCompare_1
+    261                return b0 - b1;
+   \   00000010   0x....             B.N      ?Subroutine1
+    262            }
+    263            return 0;
+   \                     ??halCommonMemPGMCompare_2: (+1)
+   \   00000012   0x2000             MOVS     R0,#+0
+   \   00000014   0xBD10             POP      {R4,PC}          ;; return
+    264          }
+    265          #endif
+    266          
+    267          /////////////////////////////////////////////////////////////////////////////////////////////////
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   halCommonMemCompare
+       0   halCommonMemCopy
+       8   halCommonMemPGMCompare
+       0   halCommonMemPGMCopy
+       0   halCommonMemSet
+         0   -> __aeabi_memset
+       8   sea_memcomp
+       0   sea_memcpy
+       0   sea_memset
+         0   -> __aeabi_memset
+      16   sea_memstr
+        16   -> strlen
+       0   sea_strlen
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       8  ?Subroutine0
+       6  ?Subroutine1
+      12  ?Subroutine2
+      22  halCommonMemCompare
+     134  halCommonMemCopy
+      22  halCommonMemPGMCompare
+     134  halCommonMemPGMCopy
+       8  halCommonMemSet
+      32  sea_memcomp
+     134  sea_memcpy
+       8  sea_memset
+      48  sea_memstr
+      28  sea_strlen
+
+ 
+ 596 bytes in section .text
+ 
+ 596 bytes of CODE memory
+
+Errors: none
+Warnings: none

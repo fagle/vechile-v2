@@ -1,0 +1,403 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:27
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\lamp\flash.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\lamp\flash.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\flash.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\flash.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\lamp\flash.c
+      1          #include "network.h"
+      2          #include "common.h"
+      3          #include "flash.h"
+      4          #include "mem.h"
+      5          
+      6          /////////////////////////////////////////////////////////////////////////////////////////////
+      7          //
+      8          //* 函数名      : EmberStatus sea_flashwritelong ( u16 offset, u32 data )
+      9          //* 功能        : write word to flash
+     10          //* 输入参数    : u16 offset, u32 data
+     11          //* 输出参数    : 无
+     12          //* 修改记录    : 无
+     13          //* 备注        : 无
+     14          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     15          EmberStatus sea_flashwritelong ( u16 offset, u32 data )
+     16          {  
+   \                     sea_flashwritelong: (+1)
+   \   00000000   0xB502             PUSH     {R1,LR}
+     17              return sea_flashwrite(offset, (u16 *)&data, sizeof(u32));
+   \   00000002   0x2204             MOVS     R2,#+4
+   \   00000004   0x....             B.N      ?Subroutine0
+     18          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine0: (+1)
+   \   00000000   0xA900             ADD      R1,SP,#+0
+   \   00000002   0x.... 0x....      BL       sea_flashwrite
+   \   00000006   0xBD02             POP      {R1,PC}          ;; return
+     19          
+     20          /////////////////////////////////////////////////////////////////////////////////////////////
+     21          //
+     22          //* 函数名      : EmberStatus sea_flashwriteshort ( u16 offset, u16 data )
+     23          //* 功能        : write word to flash
+     24          //* 输入参数    : u16 offset, u16 data
+     25          //* 输出参数    : 无
+     26          //* 修改记录    : 无
+     27          //* 备注        : 无
+     28          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     29          EmberStatus sea_flashwriteshort ( u16 offset, u16 data )
+     30          {  
+   \                     sea_flashwriteshort: (+1)
+   \   00000000   0xB502             PUSH     {R1,LR}
+     31              return sea_flashwrite(offset, &data, sizeof(u16));
+   \   00000002   0x2202             MOVS     R2,#+2
+   \   00000004                      REQUIRE ?Subroutine0
+   \   00000004                      ;; // Fall through to label ?Subroutine0
+     32          }
+     33          
+     34          /////////////////////////////////////////////////////////////////////////////////////////////
+     35          //
+     36          //* 函数名      : EmberStatus sea_flashwrite ( u16 offset, void * data, u16 size )
+     37          //* 功能        : write data flash
+     38          //* 输入参数    : u16 offset, u16 * data, u16 size
+     39          //* 输出参数    : EmberStatus status
+     40          //* 修改记录    : 无
+     41          //* 备注        : 无
+     42          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     43          EmberStatus sea_flashwrite ( u16 offset, void * data, u16 size )
+     44          {
+   \                     sea_flashwrite: (+1)
+   \   00000000   0xB5F8             PUSH     {R3-R7,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0x4615             MOV      R5,R2
+     45          #if 0
+     46              if (((offset + STUSERADDR) % PAGESIZE) == 0x00)
+     47              {
+     48                  if (halInternalFlashErase(MFB_PAGE_ERASE, offset + STUSERADDR) != EMBER_SUCCESS)
+     49                      return EMBER_ERR_FLASH_PROG_FAIL;  
+     50              }
+     51              if (halInternalFlashWrite(offset + STUSERADDR, data, size) != EMBER_SUCCESS)
+     52                  return EMBER_ERR_FLASH_PROG_FAIL;  
+     53          #else
+     54              u16 * ptr = (u16 *)data;
+     55              
+     56              if (size & 0x01)  
+   \   00000006   0x07E8             LSLS     R0,R5,#+31
+   \   00000008   0x460E             MOV      R6,R1
+   \   0000000A   0xD504             BPL.N    ??sea_flashwrite_0
+     57                  size ++;
+   \   0000000C   0x1C6D             ADDS     R5,R5,#+1
+   \   0000000E   0xE002             B.N      ??sea_flashwrite_0
+     58              while (size)
+     59              {
+     60                  if (((offset + STUSERADDR) % PAGESIZE) == 0x00)
+     61                  {
+     62                      if (halInternalFlashErase(MFB_PAGE_ERASE, offset + STUSERADDR) != EMBER_SUCCESS)
+     63                          return EMBER_ERR_FLASH_PROG_FAIL;  
+     64                  }
+     65                  if (halInternalFlashWrite(offset + STUSERADDR, ptr, 0x01) != EMBER_SUCCESS)
+     66                      return EMBER_ERR_FLASH_PROG_FAIL;  
+     67                  offset += 0x02;
+   \                     ??sea_flashwrite_1: (+1)
+   \   00000010   0x1CA4             ADDS     R4,R4,#+2
+     68                  size   -= 0x02;
+   \   00000012   0x1EAD             SUBS     R5,R5,#+2
+     69                  ptr ++;
+   \   00000014   0x1CB6             ADDS     R6,R6,#+2
+   \                     ??sea_flashwrite_0: (+1)
+   \   00000016   0xB2AD             UXTH     R5,R5
+   \   00000018   0xB1CD             CBZ.N    R5,??sea_flashwrite_2
+   \   0000001A   0xB2A4             UXTH     R4,R4
+   \   0000001C   0xF104 0x6700      ADD      R7,R4,#+134217728
+   \   00000020   0xF507 0x37E0      ADD      R7,R7,#+114688
+   \   00000024   0x1278             ASRS     R0,R7,#+9
+   \   00000026   0xEB07 0x5090      ADD      R0,R7,R0, LSR #+22
+   \   0000002A   0x1280             ASRS     R0,R0,#+10
+   \   0000002C   0xEBB7 0x2080      SUBS     R0,R7,R0, LSL #+10
+   \   00000030   0xD104             BNE.N    ??sea_flashwrite_3
+   \   00000032   0x4639             MOV      R1,R7
+   \   00000034   0x2002             MOVS     R0,#+2
+   \   00000036   0x.... 0x....      BL       halInternalFlashErase
+   \   0000003A   0xB930             CBNZ.N   R0,??sea_flashwrite_4
+   \                     ??sea_flashwrite_3: (+1)
+   \   0000003C   0x2201             MOVS     R2,#+1
+   \   0000003E   0x4631             MOV      R1,R6
+   \   00000040   0x4638             MOV      R0,R7
+   \   00000042   0x.... 0x....      BL       halInternalFlashWrite
+   \   00000046   0x2800             CMP      R0,#+0
+   \   00000048   0xD0E2             BEQ.N    ??sea_flashwrite_1
+   \                     ??sea_flashwrite_4: (+1)
+   \   0000004A   0x204B             MOVS     R0,#+75
+   \   0000004C   0xBDF2             POP      {R1,R4-R7,PC}
+     70              }
+     71          #endif
+     72              return EMBER_SUCCESS;
+   \                     ??sea_flashwrite_2: (+1)
+   \   0000004E   0x2000             MOVS     R0,#+0
+   \   00000050   0xBDF2             POP      {R1,R4-R7,PC}    ;; return
+     73          }
+     74          
+     75          /////////////////////////////////////////////////////////////////////////////////////////////
+     76          //
+     77          //* 函数名      : EmberStatus sea_tableflasherase ( u32 addr )
+     78          //* 功能        : erase data flash
+     79          //* 输入参数    : u32 addre
+     80          //* 输出参数    : EmberStatus status
+     81          //* 修改记录    : 无
+     82          //* 备注        : 无
+     83          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     84          EmberStatus sea_tableflasherase ( u32 addr )
+     85          {
+   \                     sea_tableflasherase: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     86              if ((addr % PAGESIZE) == 0x00)
+   \   00000002   0x0581             LSLS     R1,R0,#+22
+   \   00000004   0xD106             BNE.N    ??sea_tableflasherase_0
+     87              {
+     88                  if (halInternalFlashErase(MFB_PAGE_ERASE, addr) != EMBER_SUCCESS)
+   \   00000006   0x4601             MOV      R1,R0
+   \   00000008   0x2002             MOVS     R0,#+2
+   \   0000000A   0x.... 0x....      BL       halInternalFlashErase
+   \   0000000E   0xB108             CBZ.N    R0,??sea_tableflasherase_0
+     89                      return EMBER_ERR_FLASH_PROG_FAIL;  
+   \   00000010   0x204B             MOVS     R0,#+75
+   \   00000012   0xBD02             POP      {R1,PC}
+     90              }
+     91              return EMBER_SUCCESS;
+   \                     ??sea_tableflasherase_0: (+1)
+   \   00000014   0x2000             MOVS     R0,#+0
+   \   00000016   0xBD02             POP      {R1,PC}          ;; return
+     92          }
+     93          
+     94          /////////////////////////////////////////////////////////////////////////////////////////////
+     95          //
+     96          //* 函数名      : EmberStatus sea_tableflashwrite ( u32 offset, void * data, u16 size )
+     97          //* 功能        : write data flash
+     98          //* 输入参数    : u32 offset, u16 * data, u16 size
+     99          //* 输出参数    : EmberStatus status
+    100          //* 修改记录    : 无
+    101          //* 备注        : 无
+    102          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    103          EmberStatus sea_tableflashwrite ( u32 addr, void * data, u16 size )
+    104          {
+   \                     sea_tableflashwrite: (+1)
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0x4616             MOV      R6,R2
+    105              u16 * ptr = (u16 *)data;
+    106              
+    107              if (size & 0x01)  
+   \   00000006   0x07F0             LSLS     R0,R6,#+31
+   \   00000008   0x460D             MOV      R5,R1
+   \   0000000A   0xD504             BPL.N    ??sea_tableflashwrite_0
+    108                  size ++;
+   \   0000000C   0x1C76             ADDS     R6,R6,#+1
+   \   0000000E   0xE002             B.N      ??sea_tableflashwrite_0
+    109              while (size)
+    110              {
+    111                  if (sea_tableflasherase(addr) != EMBER_SUCCESS)
+    112                      return EMBER_ERR_FLASH_PROG_FAIL;  
+    113                  if (halInternalFlashWrite(addr, ptr, 0x01) != EMBER_SUCCESS)
+    114                      return EMBER_ERR_FLASH_PROG_FAIL;  
+    115                  addr += 0x02;
+   \                     ??sea_tableflashwrite_1: (+1)
+   \   00000010   0x1CA4             ADDS     R4,R4,#+2
+    116                  size -= 0x02;
+   \   00000012   0x1EB6             SUBS     R6,R6,#+2
+    117                  ptr ++;
+   \   00000014   0x1CAD             ADDS     R5,R5,#+2
+   \                     ??sea_tableflashwrite_0: (+1)
+   \   00000016   0xB2B6             UXTH     R6,R6
+   \   00000018   0xB166             CBZ.N    R6,??sea_tableflashwrite_2
+   \   0000001A   0x4620             MOV      R0,R4
+   \   0000001C   0x.... 0x....      BL       sea_tableflasherase
+   \   00000020   0xB930             CBNZ.N   R0,??sea_tableflashwrite_3
+   \   00000022   0x2201             MOVS     R2,#+1
+   \   00000024   0x4629             MOV      R1,R5
+   \   00000026   0x4620             MOV      R0,R4
+   \   00000028   0x.... 0x....      BL       halInternalFlashWrite
+   \   0000002C   0x2800             CMP      R0,#+0
+   \   0000002E   0xD0EF             BEQ.N    ??sea_tableflashwrite_1
+   \                     ??sea_tableflashwrite_3: (+1)
+   \   00000030   0x204B             MOVS     R0,#+75
+   \   00000032   0xBD70             POP      {R4-R6,PC}
+    118              }
+    119              return EMBER_SUCCESS;
+   \                     ??sea_tableflashwrite_2: (+1)
+   \   00000034   0x2000             MOVS     R0,#+0
+   \   00000036   0xBD70             POP      {R4-R6,PC}       ;; return
+    120          }
+    121          
+    122          /////////////////////////////////////////////////////////////////////////////////////////////
+    123          //
+    124          //* 函数名      : void sea_tableflashread ( u32 offset, u16 size, void * ptr )
+    125          //* 功能        : read data from flash
+    126          //* 输入参数    : u32 offset, u16 size, void * ptr
+    127          //* 输出参数    : void pointer
+    128          //* 修改记录    : 无
+    129          //* 备注        : 无
+    130          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    131          void sea_tableflashread ( u32 addr, u16 size, void * ptr )
+    132          {
+   \                     sea_tableflashread: (+1)
+   \   00000000   0x4613             MOV      R3,R2
+    133              sea_memcpy(ptr, (void *)addr, size);
+   \   00000002   0x460A             MOV      R2,R1
+   \   00000004   0x4601             MOV      R1,R0
+   \   00000006   0x....             B.N      ?Subroutine1
+    134          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine1: (+1)
+   \   00000000   0x4618             MOV      R0,R3
+   \   00000002   0x.... 0x....      B.W      sea_memcpy
+    135          
+    136          /////////////////////////////////////////////////////////////////////////////////////////////
+    137          //
+    138          //* 函数名      : void sea_flashread ( u16 offset, u16 size, void * ptr )
+    139          //* 功能        : read data from flash
+    140          //* 输入参数    : u16 offset, u16 size, void * ptr
+    141          //* 输出参数    : void pointer
+    142          //* 修改记录    : 无
+    143          //* 备注        : 无
+    144          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    145          void sea_flashread ( u16 offset, u16 size, void * ptr )
+    146          {
+   \                     sea_flashread: (+1)
+   \   00000000   0x4613             MOV      R3,R2
+    147              sea_memcpy(ptr, (void *)(offset + STUSERADDR), size);
+   \   00000002   0x460A             MOV      R2,R1
+   \   00000004   0xF100 0x6100      ADD      R1,R0,#+134217728
+   \   00000008   0xF501 0x31E0      ADD      R1,R1,#+114688
+   \   0000000C                      REQUIRE ?Subroutine1
+   \   0000000C                      ;; // Fall through to label ?Subroutine1
+    148          }
+    149          
+    150          /////////////////////////////////////////////////////////////////////////////////////////////
+    151          //
+    152          //* 函数名      : void * sea_flashreadshort ( u16 offset )
+    153          //* 功能        : read short from flash
+    154          //* 输入参数    : u16 offset
+    155          //* 输出参数    : value
+    156          //* 修改记录    : 无
+    157          //* 备注        : 无
+    158          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    159          u16 sea_flashreadshort ( u16 offset )
+    160          {
+    161              return *((u16 *)(offset + STUSERADDR));
+   \                     sea_flashreadshort: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable1  ;; 0x801c000
+   \   00000002   0x5A08             LDRH     R0,[R1, R0]
+   \   00000004   0x4770             BX       LR               ;; return
+    162          }
+    163          
+    164          /////////////////////////////////////////////////////////////////////////////////////////////
+    165          //
+    166          //* 函数名      : void * sea_flashreadlong ( u16 offset )
+    167          //* 功能        : read long from flash
+    168          //* 输入参数    : u16 offset, u16 size
+    169          //* 输出参数    : value
+    170          //* 修改记录    : 无
+    171          //* 备注        : 无
+    172          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    173          u32 sea_flashreadlong ( u16 offset )
+    174          {
+    175              return *((u32 *)(offset + STUSERADDR));
+   \                     sea_flashreadlong: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable1  ;; 0x801c000
+   \   00000002   0x5808             LDR      R0,[R1, R0]
+   \   00000004   0x4770             BX       LR               ;; return
+    176          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1:
+   \   00000000   0x0801C000         DC32     0x801c000
+    177          
+    178          /////////////////////////////////////////////////////////////////////////////////////////////
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   sea_flashread
+         0   -> sea_memcpy
+       0   sea_flashreadlong
+       0   sea_flashreadshort
+      24   sea_flashwrite
+        24   -> halInternalFlashErase
+        24   -> halInternalFlashWrite
+       8   sea_flashwritelong
+         8   -> sea_flashwrite
+       8   sea_flashwriteshort
+         8   -> sea_flashwrite
+       8   sea_tableflasherase
+         8   -> halInternalFlashErase
+       0   sea_tableflashread
+         0   -> sea_memcpy
+      16   sea_tableflashwrite
+        16   -> halInternalFlashWrite
+        16   -> sea_tableflasherase
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable1
+       8  ?Subroutine0
+       6  ?Subroutine1
+      12  sea_flashread
+       6  sea_flashreadlong
+       6  sea_flashreadshort
+      82  sea_flashwrite
+       6  sea_flashwritelong
+       4  sea_flashwriteshort
+      24  sea_tableflasherase
+       8  sea_tableflashread
+      56  sea_tableflashwrite
+
+ 
+ 222 bytes in section .text
+ 
+ 222 bytes of CODE memory
+
+Errors: none
+Warnings: none

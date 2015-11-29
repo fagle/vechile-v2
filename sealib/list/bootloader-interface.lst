@@ -1,0 +1,126 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:22
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\arch\bootloader-interface.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\arch\bootloader-interface.c
+#        -D ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\bootloader-interface.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\bootloader-interface.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\arch\bootloader-interface.c
+      1          
+      2          #include "config.h"
+      3          #include "ember-types.h"
+      4          #include "bootloader-interface.h"
+      5          #include "memmap.h"
+      6          #include "bootloader-common.h"
+      7          
+      8          ///////////////////////////////////////////////////////////////////////////////////////////
+      9          // Generic bootloader functionality
+     10          //
+     11          
+     12          ///////////////////////////////////////////////////////////////////////////////////////////
+     13          /** @description Returns the bootloader type the application was
+     14           *  built for.
+     15           *
+     16           * @return BL_TYPE_NULL, BL_TYPE_STANDALONE or BL_TYPE_APPLICATION
+     17           */
+
+   \                                 In section .text, align 2, keep-with-next
+     18          BlBaseType halBootloaderGetType ( void )
+     19          {
+     20          #ifdef NULL_BTL      // Important distinction: this returns what bootloader the app was built for
+     21              BLDEBUG_PRINT("built for NULL bootloader\r\n");
+     22              return BL_TYPE_NULL;
+   \                     halBootloaderGetType: (+1)
+   \   00000000   0x2000             MOVS     R0,#+0
+   \   00000002   0x4770             BX       LR               ;; return
+     23          #elif defined APP_BTL
+     24              BLDEBUG_PRINT("built for APP bootloader\r\n");
+     25              return BL_TYPE_APPLICATION;
+     26          #elif defined SERIAL_UART_BTL
+     27              BLDEBUG_PRINT("built for SERIAL UART bootloader\r\n");
+     28              return BL_TYPE_APPLICATION;
+     29          #else
+     30              BLDEBUG_PRINT("built for Standalone bootloader\r\n");
+     31              return BL_TYPE_STANDALONE;
+     32          #endif
+     33          }
+     34          
+     35          ///////////////////////////////////////////////////////////////////////////////////////////
+     36          // Returns the extended type of 
+
+   \                                 In section .text, align 2, keep-with-next
+     37          BlExtendedType halBootloaderGetInstalledType ( void )
+     38          {
+     39              // Important distinction:   this returns what bootloader is actually present on the chip
+     40              return halBootloaderAddressTable.bootloaderType;
+   \                     halBootloaderGetInstalledType: (+1)
+   \   00000000   0x....             LDR.N    R0,??DataTable1
+   \   00000002   0x8B00             LDRH     R0,[R0, #+24]
+   \   00000004   0x4770             BX       LR               ;; return
+     41          }
+     42          
+     43          ///////////////////////////////////////////////////////////////////////////////////////////
+
+   \                                 In section .text, align 2, keep-with-next
+     44          int16u halGetBootloaderVersion ( void )
+     45          {
+     46              return halBootloaderAddressTable.bootloaderVersion;
+   \                     halGetBootloaderVersion: (+1)
+   \   00000000   0x....             LDR.N    R0,??DataTable1
+   \   00000002   0x8B40             LDRH     R0,[R0, #+26]
+   \   00000004   0x4770             BX       LR               ;; return
+     47          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1:
+   \   00000000   0x........         DC32     halBootloaderAddressTable
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   halBootloaderGetInstalledType
+       0   halBootloaderGetType
+       0   halGetBootloaderVersion
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable1
+       6  halBootloaderGetInstalledType
+       4  halBootloaderGetType
+       6  halGetBootloaderVersion
+
+ 
+ 20 bytes in section .text
+ 
+ 20 bytes of CODE memory
+
+Errors: none
+Warnings: none

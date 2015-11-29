@@ -1,0 +1,112 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:26
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\hal\endian.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\hal\endian.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\endian.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\endian.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\hal\endian.c
+      1          
+      2          #include "config.h"
+      3          #include "endian.h"
+      4          #include "ember-types.h"
+      5          
+      6          // Endian conversion APIs.  
+      7          // Network byte order is big endian, so these APIs are only necessary on 
+      8          //  platforms which have a natural little endian byte order.  On big-endian
+      9          //  platforms, the APIs are macro'd away to nothing
+     10          
+     11          // Network to Host Short
+
+   \                                 In section .text, align 2, keep-with-next
+     12          int16u NTOHS ( int16u val )
+     13          {
+   \                     NTOHS: (+1)
+   \   00000000   0xB401             PUSH     {R0}
+     14              int8u *fldPtr;
+     15          
+     16              fldPtr = (int8u *)&val;
+     17              return (HIGH_LOW_TO_INT(*fldPtr, *(fldPtr+1)));
+   \   00000002   0xF89D 0x0000      LDRB     R0,[SP, #+0]
+   \   00000006   0xF89D 0x1001      LDRB     R1,[SP, #+1]
+   \   0000000A   0xEB01 0x2000      ADD      R0,R1,R0, LSL #+8
+   \   0000000E   0xB280             UXTH     R0,R0
+   \   00000010   0xB001             ADD      SP,SP,#+4
+   \   00000012   0x4770             BX       LR               ;; return
+     18          }
+     19          
+     20          // Network to Host Long
+
+   \                                 In section .text, align 2, keep-with-next
+     21          int32u NTOHL ( int32u val )
+     22          {
+   \                     NTOHL: (+1)
+   \   00000000   0xB401             PUSH     {R0}
+     23              int8u *fldPtr;
+     24              int16u field;
+     25              int16u field2;
+     26          
+     27              fldPtr = (int8u *)&val;
+     28              field = HIGH_LOW_TO_INT(*fldPtr, *(fldPtr+1));
+     29              field2 = HIGH_LOW_TO_INT(*(fldPtr+2), *(fldPtr+3));
+     30              return ((int32u)field << 16) | ((int32u)field2);
+   \   00000002   0xF89D 0x0000      LDRB     R0,[SP, #+0]
+   \   00000006   0xF89D 0x1001      LDRB     R1,[SP, #+1]
+   \   0000000A   0xF89D 0x2003      LDRB     R2,[SP, #+3]
+   \   0000000E   0xEB01 0x2000      ADD      R0,R1,R0, LSL #+8
+   \   00000012   0xF89D 0x1002      LDRB     R1,[SP, #+2]
+   \   00000016   0xEB02 0x2101      ADD      R1,R2,R1, LSL #+8
+   \   0000001A   0xB280             UXTH     R0,R0
+   \   0000001C   0xB289             UXTH     R1,R1
+   \   0000001E   0xEA41 0x4000      ORR      R0,R1,R0, LSL #+16
+   \   00000022   0xB001             ADD      SP,SP,#+4
+   \   00000024   0x4770             BX       LR               ;; return
+     31          }
+     32          
+     33          //////////////////////////////////////////////////////////////////////////////////////////
+     34          
+     35          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       4   NTOHL
+       4   NTOHS
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      38  NTOHL
+      20  NTOHS
+
+ 
+ 58 bytes in section .text
+ 
+ 58 bytes of CODE memory
+
+Errors: none
+Warnings: none

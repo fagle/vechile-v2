@@ -1,0 +1,420 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:30
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\lamp\lamp.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\lamp\lamp.c -D ENABLE_GATEWAY
+#        -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\lamp.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\lamp.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\lamp\lamp.c
+      1          #include "network.h"
+      2          
+      3          /////////////////////////////////////////////////////////////////////////////////////////////
+      4          // 常量和全局变量
+
+   \                                 In section .text, align 4, keep-with-next
+      5          const systime_t  def_time = { 2013, 0x0c, 0x10, 0x00, 0x00, 0x00, 0x00L};
+   \                     def_time:
+   \   00000000   0x07DD             DC16 2013
+   \   00000002   0x0C 0x10          DC8 12, 16, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \   00000008   0x00000000         DC32 0
+
+   \                                 In section .bss, align 4
+      6          single_t single_info; 
+   \                     single_info:
+   \   00000000                      DS8 68
+      7          
+      8          /////////////////////////////////////////////////////////////////////////////////////////////
+      9          //ray:以下是本地化代码
+     10          //start:开/关灯、更新时间、更新灯号、调整输出百分比
+     11          /////////////////////////////////////////////////////////////////////////////////////////////
+     12          //
+     13          //* 函数名      : void sea_openlamp ( void )
+     14          //* 功能        : 路由实现开灯功能;开完后要修改自己的数据
+     15          //* 输入参数    : 无
+     16          //* 输出参数    : 无
+     17          //* 修改记录    : 无
+     18          //* 备注        : 无
+     19          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     20          static void sea_openlamp ( void * ptr )
+     21          {
+     22              if (single_info.lamp.light.status == LAMP_OPEN)
+   \                     sea_openlamp: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable6
+   \   00000002   0x7F0A             LDRB     R2,[R1, #+28]
+   \   00000004   0x07D3             LSLS     R3,R2,#+31
+   \   00000006   0xD407             BMI.N    ??sea_openlamp_0
+     23                  return;
+     24            
+     25              single_info.lamp.light.percent = ptr == NULL ? MAXPERCENT : *((u8 *)ptr);
+   \   00000008   0x2800             CMP      R0,#+0
+   \   0000000A   0xBF0C             ITE      EQ 
+   \   0000000C   0x2064             MOVEQ    R0,#+100
+   \   0000000E   0x7800             LDRBNE   R0,[R0, #+0]
+   \   00000010   0x7748             STRB     R0,[R1, #+29]
+     26              single_info.lamp.light.status = LAMP_OPEN;
+   \   00000012   0xF042 0x0001      ORR      R0,R2,#0x1
+   \   00000016   0x....             B.N      ?Subroutine0
+   \                     ??sea_openlamp_0: (+1)
+   \   00000018   0x4770             BX       LR               ;; return
+     27              sea_updatepercent(single_info.lamp.light.percent);       //  GPIO_PACLR_REG = (1<<PA4_BIT);  
+     28          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine0: (+1)
+   \   00000000   0x7708             STRB     R0,[R1, #+28]
+   \   00000002   0x7F48             LDRB     R0,[R1, #+29]
+   \   00000004   0x....             B.N      sea_updatepercent
+     29          
+     30          /////////////////////////////////////////////////////////////////////////////////////////////
+     31          //
+     32          //* 函数名      : void sea_closelamp ( void )
+     33          //* 功能        : 路由实现关灯功能
+     34          //* 输入参数    : 无
+     35          //* 输出参数    : 无
+     36          //* 修改记录    : 无
+     37          //* 备注        : 无
+     38          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     39          static void sea_closelamp ( void * ptr )
+     40          {
+     41              if (single_info.lamp.light.status == LAMP_CLOSE)
+   \                     sea_closelamp: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable6
+   \   00000002   0x7F0A             LDRB     R2,[R1, #+28]
+   \   00000004   0x07D3             LSLS     R3,R2,#+31
+   \   00000006   0xD505             BPL.N    ??sea_closelamp_0
+     42                  return;
+     43              
+     44              single_info.lamp.light.percent = ptr == NULL ? 0x00 : *((u8 *)ptr);
+   \   00000008   0xB100             CBZ.N    R0,??sea_closelamp_1
+   \   0000000A   0x7800             LDRB     R0,[R0, #+0]
+   \                     ??sea_closelamp_1: (+1)
+   \   0000000C   0x7748             STRB     R0,[R1, #+29]
+     45              single_info.lamp.light.status  = LAMP_CLOSE;
+   \   0000000E   0xF002 0x00FE      AND      R0,R2,#0xFE
+   \   00000012   0x....             B.N      ?Subroutine0
+   \                     ??sea_closelamp_0: (+1)
+   \   00000014   0x4770             BX       LR               ;; return
+     46              sea_updatepercent(single_info.lamp.light.percent);       //  GPIO_PACLR_REG = (1<<PA4_BIT);  
+     47          }
+     48          
+     49          /////////////////////////////////////////////////////////////////////////////////////////////
+     50          //
+     51          //* 函数名      : static void sea_togglelamp ( void )
+     52          //* 功能        : 
+     53          //* 输入参数    : 无
+     54          //* 输出参数    : 无
+     55          //* 修改记录    : 无
+     56          //* 备注        : 无
+     57          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     58          static void sea_togglelamp ( void * ptr )
+     59          {
+     60              (single_info.lamp.light.status == LAMP_CLOSE) ? (sea_openlamp(ptr)) : (sea_closelamp(ptr)); 
+   \                     sea_togglelamp: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable6
+   \   00000002   0x7F09             LDRB     R1,[R1, #+28]
+   \   00000004   0x07C9             LSLS     R1,R1,#+31
+   \   00000006   0xBF58             IT       PL 
+   \   00000008   0x.... 0x....      BPL.W    sea_openlamp
+   \   0000000C   0x....             B.N      sea_closelamp
+     61          }
+     62          
+     63          /////////////////////////////////////////////////////////////////////////////////////////////
+     64          //
+     65          //* 函数名      : void sea_updatetime ( psystime_t tm )
+     66          //* 功能        : update time of lamp
+     67          //* 输入参数    : psystime_t ptm
+     68          //* 输出参数    : 无
+     69          //* 修改记录    : 无
+     70          //* 备注        : 无
+     71          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     72          void sea_updatetime ( psystime_t ptm )
+     73          {
+   \                     sea_updatetime: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+     74              sea_memcpy(&single_info.time, ptm, sizeof(systime_t));
+   \   00000002   0x....             LDR.N    R4,??DataTable6
+   \   00000004   0x4601             MOV      R1,R0
+   \   00000006   0x220C             MOVS     R2,#+12
+   \   00000008   0x1D20             ADDS     R0,R4,#+4
+   \   0000000A   0x.... 0x....      BL       sea_memcpy
+     75              
+     76              if (single_info.fail(GETFAILBIT, LAMP_ER_TM))
+   \   0000000E   0x6B62             LDR      R2,[R4, #+52]
+   \   00000010   0x2120             MOVS     R1,#+32
+   \   00000012   0x2003             MOVS     R0,#+3
+   \   00000014   0x4790             BLX      R2
+   \   00000016   0xB128             CBZ.N    R0,??sea_updatetime_0
+     77                  single_info.fail(CLRFAILBIT, LAMP_ER_TM); 
+   \   00000018   0x6B62             LDR      R2,[R4, #+52]
+   \   0000001A   0xE8BD 0x4010      POP      {R4,LR}
+   \   0000001E   0x2120             MOVS     R1,#+32
+   \   00000020   0x2002             MOVS     R0,#+2
+   \   00000022   0x4710             BX       R2
+     78          }
+   \                     ??sea_updatetime_0: (+1)
+   \   00000024   0xBD10             POP      {R4,PC}          ;; return
+     79          
+     80          /////////////////////////////////////////////////////////////////////////////////////////////
+     81          //
+     82          //* 函数名      : void sea_updatepercent ( u8 percent )
+     83          //* 功能        : update output percent of lamp
+     84          //* 输入参数    : u8 percent
+     85          //* 输出参数    : 无
+     86          //* 修改记录    : 无
+     87          //* 备注        : 无
+     88          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+     89          void sea_updatepercent ( u8 percent )
+     90          {
+   \                     sea_updatepercent: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+     91              single_info.lamp.light.percent = (percent >= MAXPERCENT) ? (MAXPERCENT) : (percent <= MINPERCENT ? (0x00) : (percent));
+   \   00000002   0x2864             CMP      R0,#+100
+   \   00000004   0xBFA8             IT       GE 
+   \   00000006   0x2064             MOVGE    R0,#+100
+   \   00000008   0xDA02             BGE.N    ??sea_updatepercent_0
+   \   0000000A   0x281F             CMP      R0,#+31
+   \   0000000C   0xBFB8             IT       LT 
+   \   0000000E   0x2000             MOVLT    R0,#+0
+   \                     ??sea_updatepercent_0: (+1)
+   \   00000010   0x....             LDR.N    R4,??DataTable6
+   \   00000012   0x7760             STRB     R0,[R4, #+29]
+     92              adjustPWM(single_info.lamp.light.percent * 10);
+   \   00000014   0x210A             MOVS     R1,#+10
+   \   00000016   0x7F60             LDRB     R0,[R4, #+29]
+   \   00000018   0x4348             MULS     R0,R1,R0
+   \   0000001A   0x.... 0x....      BL       adjustPWM
+     93              set_lampmode(LAMP_CHANGE);
+   \   0000001E   0x8AA0             LDRH     R0,[R4, #+20]
+   \   00000020   0xF040 0x0010      ORR      R0,R0,#0x10
+   \   00000024   0x82A0             STRH     R0,[R4, #+20]
+     94          }
+   \   00000026   0xBD10             POP      {R4,PC}          ;; return
+     95          
+     96          /////////////////////////////////////////////////////////////////////////////////////////////
+     97          //
+     98          //* 函数名      : void init_singleinfo ( void )
+     99          //* 功能        : 初始化本地的状态信息
+    100          //* 输入参数    : 无
+    101          //* 输出参数    : 无
+    102          //* 修改记录    : 无
+    103          //* 备注        : 无
+    104          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    105          void init_singleinfo ( void )
+    106          {
+   \                     init_singleinfo: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    107              sea_memset(&single_info, 0x00, sizeof(single_t));
+   \   00000002   0x....             LDR.N    R4,??DataTable6
+   \   00000004   0x2244             MOVS     R2,#+68
+   \   00000006   0x2100             MOVS     R1,#+0
+   \   00000008   0x4620             MOV      R0,R4
+   \   0000000A   0x.... 0x....      BL       sea_memset
+    108              if (network_info.type == EMBER_COORDINATOR && network_info.devid == COORDID)
+   \   0000000E   0x....             LDR.N    R0,??DataTable6_1
+   \   00000010   0x7C81             LDRB     R1,[R0, #+18]
+   \   00000012   0x2901             CMP      R1,#+1
+   \   00000014   0xBF04             ITT      EQ 
+   \   00000016   0x7CC0             LDRBEQ   R0,[R0, #+19]
+   \   00000018   0x2800             CMPEQ    R0,#+0
+   \   0000001A   0xD106             BNE.N    ??init_singleinfo_0
+    109                  sea_memcpy(&single_info.time, (void *)&def_time, sizeof(systime_t));
+   \   0000001C   0x220C             MOVS     R2,#+12
+   \   0000001E   0x.... 0x....      ADR.W    R1,def_time
+   \   00000022   0x1D20             ADDS     R0,R4,#+4
+   \   00000024   0x.... 0x....      BL       sea_memcpy
+   \   00000028   0xE004             B.N      ??init_singleinfo_1
+    110              else
+    111                  sea_memset(&single_info.time, 0x00, sizeof(systime_t));
+   \                     ??init_singleinfo_0: (+1)
+   \   0000002A   0x220C             MOVS     R2,#+12
+   \   0000002C   0x2100             MOVS     R1,#+0
+   \   0000002E   0x1D20             ADDS     R0,R4,#+4
+   \   00000030   0x.... 0x....      BL       sea_memset
+    112              
+    113              single_info.avail                        = 0x06;    
+   \                     ??init_singleinfo_1: (+1)
+   \   00000034   0x2006             MOVS     R0,#+6
+   \   00000036   0x7020             STRB     R0,[R4, #+0]
+    114              single_info.address                      = 0x01;                        // 短地址    
+   \   00000038   0x2001             MOVS     R0,#+1
+   \   0000003A   0x8320             STRH     R0,[R4, #+24]
+    115              single_info.ctrl                         = 0x00;                        // control mode
+   \   0000003C   0x2000             MOVS     R0,#+0
+   \   0000003E   0x82A0             STRH     R0,[R4, #+20]
+    116              single_info.min                          = sys_info.ctrl.period;  
+    117              single_info.sec                          = sys_info.ctrl.period;  
+    118              single_info.count                        = 0x00;
+    119              single_info.retry                        = 0x00;
+    120              single_info.on                           = sea_openlamp;
+   \   00000040   0x....             LDR.N    R2,??DataTable6_2
+   \   00000042   0x....             LDR.N    R0,??DataTable6_3
+   \   00000044   0x7A81             LDRB     R1,[R0, #+10]
+   \   00000046   0x74A1             STRB     R1,[R4, #+18]
+   \   00000048   0x74E1             STRB     R1,[R4, #+19]
+   \   0000004A   0x2100             MOVS     R1,#+0
+   \   0000004C   0x8221             STRH     R1,[R4, #+16]
+   \   0000004E   0xF104 0x0128      ADD      R1,R4,#+40
+   \   00000052   0x600A             STR      R2,[R1, #+0]
+    121              single_info.off                          = sea_closelamp;
+   \   00000054   0x....             LDR.N    R2,??DataTable6_4
+   \   00000056   0x604A             STR      R2,[R1, #+4]
+    122              single_info.toggle                       = sea_togglelamp;
+   \   00000058   0x....             LDR.N    R2,??DataTable6_5
+   \   0000005A   0x618A             STR      R2,[R1, #+24]
+    123              
+    124              single_info.lamp.light.manual            = TRUE;                        // 初始化为手动状态
+    125              single_info.lamp.light.percent           = MAXPERCENT;
+    126              single_info.lamp.light.cost              = 0x10;                        // 每小时耗1.2度电
+    127              single_info.lamp.light.factor            = 0x08;
+    128              single_info.lamp.light.voltage.in        = 200;                         // 电压值      
+    129              single_info.lamp.light.voltage.out       = 200;
+   \   0000005C   0x22C8             MOVS     R2,#+200
+   \   0000005E   0x7FA1             LDRB     R1,[R4, #+30]
+   \   00000060   0xF041 0x0101      ORR      R1,R1,#0x1
+   \   00000064   0x77A1             STRB     R1,[R4, #+30]
+   \   00000066   0x2164             MOVS     R1,#+100
+   \   00000068   0x7761             STRB     R1,[R4, #+29]
+   \   0000006A   0x2110             MOVS     R1,#+16
+   \   0000006C   0x77E1             STRB     R1,[R4, #+31]
+   \   0000006E   0x2111             MOVS     R1,#+17
+   \   00000070   0x77A1             STRB     R1,[R4, #+30]
+   \   00000072   0x21C8             MOVS     R1,#+200
+   \   00000074   0xF884 0x1020      STRB     R1,[R4, #+32]
+   \   00000078   0xF104 0x0121      ADD      R1,R4,#+33
+   \   0000007C   0x700A             STRB     R2,[R1, #+0]
+    130              single_info.lamp.light.current.in        = 0x0c;                        // 电流值
+    131              single_info.lamp.light.current.out       = 0x0c;
+   \   0000007E   0x22CC             MOVS     R2,#+204
+   \   00000080   0x704A             STRB     R2,[R1, #+1]
+    132              single_info.lamp.light.temperature.light = 0x36;
+   \   00000082   0x2236             MOVS     R2,#+54
+   \   00000084   0x708A             STRB     R2,[R1, #+2]
+    133              single_info.lamp.light.temperature.trans = 0x0c;
+    134              single_info.lamp.light.temperature.env   = 0x08;
+   \   00000086   0x228C             MOVS     R2,#+140
+   \   00000088   0x70CA             STRB     R2,[R1, #+3]
+    135              single_info.lamp.light.temperature.lux   = 0x30;
+   \   0000008A   0x2230             MOVS     R2,#+48
+   \   0000008C   0x710A             STRB     R2,[R1, #+4]
+    136              single_info.lamp.light.fail              = LAMP_ER_NO;                  // no errors 
+   \   0000008E   0x7F21             LDRB     R1,[R4, #+28]
+   \   00000090   0xF001 0x0101      AND      R1,R1,#0x1
+   \   00000094   0x7721             STRB     R1,[R4, #+28]
+    137              single_info.lamp.light.number            = sys_info.dev.num;            // read from flash
+   \   00000096   0xF890 0x003A      LDRB     R0,[R0, #+58]
+   \   0000009A   0x8360             STRH     R0,[R4, #+26]
+    138          }
+   \   0000009C   0xBD10             POP      {R4,PC}          ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6:
+   \   00000000   0x........         DC32     single_info
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_1:
+   \   00000000   0x........         DC32     network_info
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_2:
+   \   00000000   0x........         DC32     sea_openlamp
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_3:
+   \   00000000   0x........         DC32     sys_info
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_4:
+   \   00000000   0x........         DC32     sea_closelamp
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_5:
+   \   00000000   0x........         DC32     sea_togglelamp
+    139          
+    140          /////////////////////////////////////////////////////////////////////////////////////
+    141          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       8   init_singleinfo
+         8   -> sea_memcpy
+         8   -> sea_memset
+       0   sea_closelamp
+         0   -> sea_updatepercent
+       0   sea_openlamp
+         0   -> sea_updatepercent
+       0   sea_togglelamp
+         0   -> sea_closelamp
+         0   -> sea_openlamp
+       8   sea_updatepercent
+         8   -> adjustPWM
+       8   sea_updatetime
+         8   -- Indirect call
+         8   -> sea_memcpy
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable6
+       4  ??DataTable6_1
+       4  ??DataTable6_2
+       4  ??DataTable6_3
+       4  ??DataTable6_4
+       4  ??DataTable6_5
+       6  ?Subroutine0
+      12  def_time
+     158  init_singleinfo
+      22  sea_closelamp
+      26  sea_openlamp
+      14  sea_togglelamp
+      40  sea_updatepercent
+      38  sea_updatetime
+      68  single_info
+
+ 
+  68 bytes in section .bss
+ 340 bytes in section .text
+ 
+ 340 bytes of CODE memory
+  68 bytes of DATA memory
+
+Errors: none
+Warnings: none

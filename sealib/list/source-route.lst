@@ -1,0 +1,139 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:36
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\source-route.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\source-route.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\source-route.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\source-route.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\util\source-route.c
+      1          
+      2          #include "config.h"
+      3          
+      4          #ifdef SINK_APP
+      5          
+      6          #include "ember.h"
+      7          #include "security.h"
+      8          #include "source-route-common.h"
+      9          
+     10          /////////////////////////////////////////////////////////////////////////////////////////////
+     11          // AppBuilder includes this file and uses the define below to turn off source routing. This doesnt affect non-AppBuilder applications.
+     12          #ifndef ZA_NO_SOURCE_ROUTING
+     13          
+     14          /////////////////////////////////////////////////////////////////////////////////////////////
+     15          // ZigBee protocol limitations effectively constrain us to a 11-hop source route in the worst case scenario (for a 12-hop 
+     16          // delivery in total), so we enforce a threshold value on the relayCount and ignore source route operations beyond
+     17          // this threshold.  See explanatory comment in emberAppendSourceRouteHandler() for more details about this.
+     18          // This value could be reduced at the designer's discretion, but not increased beyond 11 without causing routing problems.
+     19          #define MAX_RELAY_COUNT    (11)
+     20             
+     21          #ifndef EXTERNAL_TABLE
+     22          static SourceRouteTableEntry table[EMBER_SOURCE_ROUTE_TABLE_SIZE];
+     23          int8u sourceRouteTableSize = EMBER_SOURCE_ROUTE_TABLE_SIZE;
+     24          SourceRouteTableEntry *sourceRouteTable = table;
+     25          #endif
+     26          
+     27          void emberIncomingRouteRecordHandler ( EmberNodeId source,
+     28                                                 EmberEUI64 sourceEui,
+     29                                                 int8u relayCount,
+     30                                                 EmberMessageBuffer header,
+     31                                                 int8u relayListIndex )
+     32          {
+     33              int8u previous;
+     34              int8u i;
+     35          
+     36              if (sourceRouteTableSize == 0x00 || relayCount > MAX_RELAY_COUNT) 
+     37                  return;                                          // Ignore over-sized source routes, since we can't reuse them reliably anyway.
+     38          
+     39              previous = sourceRouteAddEntry(source, NULL_INDEX);  // The source of the route record is furthest from the gateway. We start there and work closer.
+     40              for (i = 0x00; i < relayCount; i ++)                 // Go through the relay list and add them to the source route table.
+     41              {
+     42                  int8u    index = relayListIndex + (i << 0x01);
+     43                  EmberNodeId id = emberGetLinkedBuffersLowHighInt16u(header, index);
+     44                  previous = sourceRouteAddEntry(id, previous);    // We pass the index of the previous entry to link the route together.
+     45              }
+     46            
+     47              securityAddToAddressCache(source, sourceEui);        // If the following message has APS Encryption, our node will need to know
+     48                                                                   // the IEEE Address of the source in order to properly decrypt.
+     49          }
+     50          
+     51          
+     52          
+     53          void emberAppendSourceRouteHandler ( EmberNodeId destination, EmberMessageBuffer header )
+     54          {
+     55              int8u foundIndex   = sourceRouteFindIndex(destination);
+     56              int8u relayCount   = 0x00;
+     57              int8u bufferLength = emberMessageBufferLength(header);
+     58              int8u i;
+     59          
+     60              if (foundIndex == NULL_INDEX) 
+     61                  return;
+     62          
+     63              i = foundIndex;             // Find out what the relay count is.
+     64              while (sourceRouteTable[i].closerIndex != NULL_INDEX) 
+     65              {
+     66                  i = sourceRouteTable[i].closerIndex;
+     67                  relayCount++;
+     68              }
+     69          
+     70              // Make room for relay count (1 byte), relay index (1 byte), relay list (2 bytes per relay).
+     71              if (emberSetLinkedBuffersLength(header, bufferLength + 0x02 + (relayCount << 0x01)) != EMBER_SUCCESS) 
+     72                  return;
+     73          
+     74              emberSetLinkedBuffersByte(header, bufferLength, relayCount);  // Set the relay count and relay index.
+     75              emberSetLinkedBuffersByte(header, bufferLength + 1, (relayCount > 0 ? relayCount - 1 : 0));
+     76          
+     77              relayCount = 0x00;    // Fill in the relay list. The first relay in the list is the closest to the destination (furthest from the gateway).
+     78              i = foundIndex;
+     79              while (sourceRouteTable[i].closerIndex != NULL_INDEX) 
+     80              {
+     81                  i = sourceRouteTable[i].closerIndex;
+     82                  emberSetLinkedBuffersLowHighInt16u(header, bufferLength + 2 + (relayCount << 1), sourceRouteTable[i].destination);
+     83                  relayCount++;
+     84              }
+     85          
+     86              // Per Ember Case 10096, we need to protect against oversized source routes that will overflow the PHY packet length 
+     87              // (127).  Since the worst-case packet overhead is the APS-encrypted, NWK-encrypted, tunneled key delivery sent by 
+     88              // the Trust Center during authentication of new devices, and this leaves enough only room for an 11-hop source route 
+     89              // frame, we abort our route-appending operation if the resulting source route contains more than 11 relays. Unless 
+     90              // a route already exists to the destination, this will likely result in the stack not sending the packet at all, but
+     91              // this is better than forcing too much data into the packet (which, as of this writing, will trigger an assert 
+     92              // in mac.c and cause a reset).
+     93              if ( relayCount > MAX_RELAY_COUNT) // Setting the buffer length back to its value at the start of this callback effectively chops off the appended source route data.
+     94                  emberSetLinkedBuffersLength(header, bufferLength);
+     95          }
+     96          #endif // ZA_NO_SOURCE_ROUTING
+     97          
+     98          #endif // SINK_APP
+
+
+ 
+
+ 
+
+
+Errors: none
+Warnings: none

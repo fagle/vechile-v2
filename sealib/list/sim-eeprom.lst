@@ -1,0 +1,202 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:34
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\hal\sim-eeprom.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\hal\sim-eeprom.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\sim-eeprom.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\sim-eeprom.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\hal\sim-eeprom.c
+      1          #include "config.h"
+      2          #include "ember.h"
+      3          #include "error.h"
+      4          #include "hal.h"
+      5          #include "sim-eeprom.h"
+      6          
+      7          #ifdef CORTEXM3
+      8            //On the Cortex-M3 chips we define a variable that holds the actual
+      9            //SimEE storage and then place this storage at the proper location
+     10            //in the linker.
+
+   \                                 In section SIMEE, align 4, root
+     11            __root __no_init int8u simulatedEepromStorage[SIMEE_SIZE_B] @ __SIMEE__;
+   \                     simulatedEepromStorage:
+   \   00000000                      DS8 8192
+     12            //sim-eeprom-internal.c uses a set of defines that parameterize its behavior.
+     13            //Since the -internal file is precompiled, we must externally define the
+     14            //parameters (as constants) so an application build can alter them.
+
+   \                                 In section .rodata, align 1, keep-with-next
+     15            const int8u VIRTUAL_PAGES = ((SIMEE_SIZE_HW / FLASH_PAGE_SIZE_HW) / 2);
+   \                     VIRTUAL_PAGES:
+   \   00000000   0x04               DC8 4
+
+   \                                 In section .rodata, align 2, keep-with-next
+     16            const int16u LEFT_BASE = SIMEE_BASE_ADDR_HW;
+   \                     LEFT_BASE:
+   \   00000000   0x0100             DC16 256
+
+   \                                 In section .rodata, align 2, keep-with-next
+     17            const int16u LEFT_TOP = ((SIMEE_BASE_ADDR_HW + (FLASH_PAGE_SIZE_HW *
+   \                     LEFT_TOP:
+   \   00000000   0x08FF             DC16 2303
+     18                                    ((SIMEE_SIZE_HW / FLASH_PAGE_SIZE_HW) / 2))) - 1);
+
+   \                                 In section .rodata, align 2, keep-with-next
+     19            const int16u RIGHT_BASE = (SIMEE_BASE_ADDR_HW + (FLASH_PAGE_SIZE_HW *
+   \                     RIGHT_BASE:
+   \   00000000   0x0900             DC16 2304
+     20                                      ((SIMEE_SIZE_HW / FLASH_PAGE_SIZE_HW) / 2)));
+
+   \                                 In section .rodata, align 2, keep-with-next
+     21            const int16u RIGHT_TOP = (SIMEE_BASE_ADDR_HW + (SIMEE_SIZE_HW - 1));
+   \                     RIGHT_TOP:
+   \   00000000   0x10FF             DC16 4351
+
+   \                                 In section .rodata, align 2, keep-with-next
+     22            const int16u ERASE_CRITICAL_THRESHOLD = (SIMEE_SIZE_HW / 4);
+   \                     ERASE_CRITICAL_THRESHOLD:
+   \   00000000   0x0400             DC16 1024
+     23          #endif //CORTEXM3
+     24          
+
+   \                                 In section .rodata, align 2, keep-with-next
+     25          const int16u ID_COUNT = TOKEN_COUNT;
+   \                     ID_COUNT:
+   \   00000000   0x0010             DC16 16
+     26          
+     27          #define DEFINETOKENS
+     28          //Manufacturing tokens do not exist in the SimEEPROM -define to nothing
+     29          #define TOKEN_MFG(name,creator,iscnt,isidx,type,arraysize,...)
+     30          
+     31          //If the arraysize is exactly 1, we need only a single entry in the ptrCache
+     32          //to hold this entry.  If the arraysize is not 1, we need +1 to hold
+     33          //the redirection entry in the Primary Table and then arraysize entries in
+     34          //the indexed table.  This works for all values of arraysize.
+     35          #define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+     36            + arraysize + ((arraysize==1) ? 0 : 1)
+     37            //value of all index counts added together
+
+   \                                 In section .rodata, align 2, keep-with-next
+     38            const int16u PTR_CACHE_SIZE = 0
+   \                     PTR_CACHE_SIZE:
+   \   00000000   0x0026             DC16 38
+     39              #include "token-stack.h"
+     40            ;
+     41            //the ptrCache definition - used to provide efficient access, based upon
+     42            //ID and index, to the freshest data in the Simulated EEPROM.
+
+   \                                 In section .bss, align 4
+     43            int16u ptrCache[
+   \                     ptrCache:
+   \   00000000                      DS8 76
+     44              #include "token-stack.h"
+     45            ];
+     46          #undef TOKEN_DEF
+     47          
+     48          //The Size Cache definition.  Links the token to its size for efficient
+     49          //calculations.  Indexed by compile ID.  Size is in words.  This Cache should
+     50          //be used for all size calculations.  halInternalSimEeInit will guarantee that
+     51          //the compiled sizes defining this cache match the stored sizes.
+
+   \                                 In section .rodata, align 4, keep-with-next
+     52          const int8u sizeCache[] = {
+   \                     sizeCache:
+   \   00000000   0x02 0x01          DC8 2, 1, 27, 9, 26, 27, 1, 9, 8, 13, 13, 4, 7, 6, 13, 46
+   \              0x1B 0x09    
+   \              0x1A 0x1B    
+   \              0x01 0x09    
+   \              0x08 0x0D    
+   \              0x0D 0x04    
+   \              0x07 0x06    
+   \              0x0D 0x2E    
+     53          #define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+     54            (BYTES_TO_WORDS(sizeof(type))                                        \
+     55               + (iscnt ? BYTES_TO_WORDS(COUNTER_TOKEN_PAD) : 0)),
+     56              #include "token-stack.h"
+     57           };
+     58          #undef TOKEN_DEF
+     59          
+     60          #undef TOKEN_MFG
+     61          #undef DEFINETOKENS
+     62          
+     63          EmberStatus halInternalSimEeStartupCore(boolean forceRebuildAll, 
+     64                                                  int8u *lookupCache);
+     65          
+     66          
+
+   \                                 In section .text, align 2, keep-with-next
+     67          EmberStatus halInternalSimEeStartup(boolean forceRebuildAll)
+     68          {
+   \                     halInternalSimEeStartup: (+1)
+   \   00000000   0xB500             PUSH     {LR}
+   \   00000002   0xB085             SUB      SP,SP,#+20
+     69            // lookupCache must be declared here, outside the library so that it can
+     70            //  be appropriately sized based on the number of tokens the application
+     71            //  uses.
+     72            int8u lookupCache[TOKEN_COUNT];
+     73            return halInternalSimEeStartupCore(forceRebuildAll, lookupCache);
+   \   00000004   0xA900             ADD      R1,SP,#+0
+   \   00000006   0x.... 0x....      BL       halInternalSimEeStartupCore
+   \   0000000A   0xB005             ADD      SP,SP,#+20
+   \   0000000C   0xBD00             POP      {PC}             ;; return
+     74          }
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      24   halInternalSimEeStartup
+        24   -> halInternalSimEeStartupCore
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       2  ERASE_CRITICAL_THRESHOLD
+       2  ID_COUNT
+       2  LEFT_BASE
+       2  LEFT_TOP
+       2  PTR_CACHE_SIZE
+       2  RIGHT_BASE
+       2  RIGHT_TOP
+       1  VIRTUAL_PAGES
+      14  halInternalSimEeStartup
+      76  ptrCache
+    8192  simulatedEepromStorage
+      16  sizeCache
+
+ 
+    76 bytes in section .bss
+    31 bytes in section .rodata
+    14 bytes in section .text
+ 8 192 bytes in section SIMEE
+ 
+    14 bytes of CODE  memory
+    31 bytes of CONST memory
+ 8 268 bytes of DATA  memory
+
+Errors: none
+Warnings: none

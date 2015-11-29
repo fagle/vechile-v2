@@ -1,0 +1,147 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:24
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\hal\crc.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\hal\crc.c -D ENABLE_GATEWAY
+#        -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\crc.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\crc.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\hal\crc.c
+      1          
+      2          #include "config.h"
+      3          #include "crc.h"
+      4          
+      5          /*
+      6            16bit CRC notes:
+      7            "CRC-CCITT"
+      8              poly is g(X) = X^16 + X^12 + X^5 + 1  (0x1021)
+      9              used in the FPGA (green boards and 15.4)
+     10              initial remainder should be 0xFFFF
+     11          */
+     12          
+     13          //[[
+     14          // This CRC seems to take about the same amount of time as the table driven CRC
+     15          // which was timed at 34 cycles on the mega128 (8.5us @4MHz) and it utilizes
+     16          // much less flash.  
+     17          //]]
+
+   \                                 In section .text, align 2, keep-with-next
+     18          int16u halCommonCrc16( int8u byte, int16u crc  )
+     19          {
+     20            crc = (crc >> 8) | (crc << 8);
+     21            crc ^= byte;
+   \                     halCommonCrc16: (+1)
+   \   00000000   0x020A             LSLS     R2,R1,#+8
+   \   00000002   0xEA42 0x2111      ORR      R1,R2,R1, LSR #+8
+   \   00000006   0x4048             EORS     R0,R0,R1
+     22            crc ^= (crc & 0xff) >> 4;
+   \   00000008   0xF3C0 0x1103      UBFX     R1,R0,#+4,#+4
+   \   0000000C   0x4048             EORS     R0,R1,R0
+     23            crc ^= (crc << 8) << 4;
+   \   0000000E   0xEA80 0x3000      EOR      R0,R0,R0, LSL #+12
+     24          
+     25            //[[ What I wanted is the following function:
+     26            // crc ^= ((crc & 0xff) << 4) << 1;
+     27            // Unfortunately the compiler does this in 46 cycles.  The next line of code
+     28            // does the same thing, but the compiler uses only 10 cycles to implement it.
+     29            //]]
+     30            crc ^= ( (int8u) ( (int8u) ( (int8u) (crc & 0xff) ) << 5)) |
+     31              ((int16u) ( (int8u) ( (int8u) (crc & 0xff)) >> 3) << 8);
+     32          
+     33            return crc;
+   \   00000012   0x0141             LSLS     R1,R0,#+5
+   \   00000014   0x0602             LSLS     R2,R0,#+24
+   \   00000016   0xB2C9             UXTB     R1,R1
+   \   00000018   0x0ED2             LSRS     R2,R2,#+27
+   \   0000001A   0xEA41 0x2102      ORR      R1,R1,R2, LSL #+8
+   \   0000001E   0x4048             EORS     R0,R1,R0
+   \   00000020   0xB280             UXTH     R0,R0
+   \   00000022   0x4770             BX       LR               ;; return
+     34          }
+     35          
+     36          //--------------------------------------------------------------
+     37          // CRC-32 
+     38          #define POLYNOMIAL              (0xEDB88320L)
+     39          
+
+   \                                 In section .text, align 2, keep-with-next
+     40          int32u halCommonCrc32(int8u data, int32u accumulator)
+     41          {
+     42            int8u jj;
+     43            int32u previous;
+     44            int32u oper;
+     45          
+     46            previous = (accumulator >> 8) & 0x00FFFFFF;
+   \                     halCommonCrc32: (+1)
+   \   00000000   0x0A0A             LSRS     R2,R1,#+8
+     47            oper = (accumulator ^ data) & 0xFF;
+   \   00000002   0x4048             EORS     R0,R0,R1
+   \   00000004   0xB2C0             UXTB     R0,R0
+     48            for (jj = 0; jj < 8; jj++) {
+   \   00000006   0x2108             MOVS     R1,#+8
+     49              oper = ((oper & 0x01)
+     50                          ? ((oper >> 1) ^ POLYNOMIAL)
+     51                          : (oper >> 1));
+   \                     ??halCommonCrc32_0: (+1)
+   \   00000008   0x0843             LSRS     R3,R0,#+1
+   \   0000000A   0x07C0             LSLS     R0,R0,#+31
+   \   0000000C   0xBF46             ITTE     MI 
+   \   0000000E   0x....             LDRMI.N  R0,??DataTable0  ;; 0xedb88320
+   \   00000010   0x4058             EORMI    R0,R0,R3
+   \   00000012   0x4618             MOVPL    R0,R3
+     52            }
+   \   00000014   0x1E49             SUBS     R1,R1,#+1
+   \   00000016   0xD1F7             BNE.N    ??halCommonCrc32_0
+     53          
+     54            return (previous ^ oper);
+   \   00000018   0x4050             EORS     R0,R0,R2
+   \   0000001A   0x4770             BX       LR               ;; return
+     55          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable0:
+   \   00000000   0xEDB88320         DC32     0xedb88320
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   halCommonCrc16
+       0   halCommonCrc32
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable0
+      36  halCommonCrc16
+      28  halCommonCrc32
+
+ 
+ 68 bytes in section .text
+ 
+ 68 bytes of CODE memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,124 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:35
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\source-route-common.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\source-route-common.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\source-route-common.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\source-route-common.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\util\source-route-common.c
+      1          
+      2          #include "config.h"
+      3          
+      4          #ifdef SINK_APP
+      5          
+      6          #include "ember-types.h"
+      7          #include "source-route-common.h"
+      8          
+      9          /////////////////////////////////////////////////////////////////////////////////////////////
+     10          // AppBuilder includes this file and uses the define below to turn off source
+     11          // routing. This doesnt affect non-AppBuilder applications.
+     12          #ifndef ZA_NO_SOURCE_ROUTING
+     13          
+     14          /////////////////////////////////////////////////////////////////////////////////////////////
+     15          // The number of entries in use.
+     16          static int8u entryCount = 0;
+     17          
+     18          /////////////////////////////////////////////////////////////////////////////////////////////
+     19          // The index of the most recently added entry.
+     20          static int8u newestIndex = NULL_INDEX;
+     21          
+     22          /////////////////////////////////////////////////////////////////////////////////////////////
+     23          // Return the index of the entry with the specified destination.
+     24          int8u sourceRouteFindIndex ( EmberNodeId id )
+     25          {
+     26              int8u i;
+     27              for (i = 0x00; i < entryCount; i ++) 
+     28              {
+     29                  if (sourceRouteTable[i].destination == id)
+     30                      return i;
+     31              }
+     32              return NULL_INDEX;
+     33          }
+     34          
+     35          /////////////////////////////////////////////////////////////////////////////////////////////
+     36          // Create an entry with the given id or update an existing entry. furtherIndex
+     37          // is the entry one hop further from the gateway.
+     38          int8u sourceRouteAddEntry ( EmberNodeId id, int8u furtherIndex )
+     39          {
+     40              int8u index = sourceRouteFindIndex(id);  // See if the id already exists in the table.
+     41              int8u i;
+     42          
+     43              if (index == NULL_INDEX) 
+     44              {
+     45                  if (entryCount < sourceRouteTableSize)    // No existing entry. Table is not full. Add new entry.
+     46                  {
+     47                      index = entryCount;
+     48                      entryCount += 0x01;
+     49                  } 
+     50                  else                                      // No existing entry. Table is full. Replace oldest entry.
+     51                  {
+     52                      index = newestIndex;
+     53                      while (sourceRouteTable[index].olderIndex != NULL_INDEX) 
+     54                          index = sourceRouteTable[index].olderIndex;
+     55                  }
+     56              }
+     57          
+     58              if (index != newestIndex)                     // Update the pointers (only) if something has changed.
+     59              {
+     60                  for (i = 0x00; i < entryCount; i ++) 
+     61                  {
+     62                      if (sourceRouteTable[i].olderIndex == index) 
+     63                      {
+     64                          sourceRouteTable[i].olderIndex = sourceRouteTable[index].olderIndex;
+     65                          break;
+     66                      }
+     67                  }
+     68                  sourceRouteTable[index].olderIndex = newestIndex;
+     69                  newestIndex = index;
+     70              }
+     71          
+     72              sourceRouteTable[index].destination = id;    // Add the entry.
+     73              sourceRouteTable[index].closerIndex = NULL_INDEX;
+     74          
+     75              if (furtherIndex != NULL_INDEX)              // The current index is one hop closer to the gateway than furtherIndex.
+     76                  sourceRouteTable[furtherIndex].closerIndex = index;
+     77          
+     78              return index;                                // Return the current index to save the caller having to look it up. 
+     79          }  
+     80          
+     81          #endif //ZA_NO_SOURCE_ROUTING
+     82          
+     83          #endif //#ifdef SINK_APP
+
+
+ 
+
+ 
+
+
+Errors: none
+Warnings: none

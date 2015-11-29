@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\sealib.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>sink2</name>
+      <member>
+        <project>sink</project>
+        <configuration>MB851</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+

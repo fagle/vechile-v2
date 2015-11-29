@@ -1,0 +1,843 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:34
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\lamp\serial.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\lamp\serial.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\serial.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\serial.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\lamp\serial.c
+      1          // *******************************************************************
+      2          //  serial.c
+      3          // *******************************************************************
+      4          #include <stdarg.h>
+      5          #include "config.h"
+      6          #include "ember-types.h"
+      7          #include "error.h"
+      8          #include "hal.h"
+      9          #include "serial.h"
+     10          #include "frame.h"
+     11          #include "network.h"
+     12          
+     13          ////////////////////////////////////////////////////////////////////////
+     14          // constants and globals
+     15          extern uart_t  serial_info; 
+     16          
+     17          ////////////////////////////////////////////////////////////////////////
+     18          // public functions
+     19          /*******************************************************************************
+     20          * Function Name  : u8 sea_uartgetbyte ( puart_t uart )
+     21          * Description    : get ch from uart_t ring.
+     22          * Input          : None
+     23          * Output         : key value
+     24          * Return         : None
+     25          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     26          static u8 sea_uartgetbyte ( puart_t uart )  
+     27          {
+     28              u8  ch;
+     29             
+     30              if (uart == NULL)
+   \                     sea_uartgetbyte: (+1)
+   \   00000000   0x2800             CMP      R0,#+0
+   \   00000002   0xBF1E             ITTT     NE 
+   \   00000004   0x7881             LDRBNE   R1,[R0, #+2]
+   \   00000006   0x7842             LDRBNE   R2,[R0, #+1]
+   \   00000008   0x4291             CMPNE    R1,R2
+     31                  return 0x00;
+     32              
+     33              if(uart->out != uart->in)    
+   \   0000000A   0xD00A             BEQ.N    ??sea_uartgetbyte_0
+     34              {
+     35                  ch = uart->buffer[uart->out ++];
+   \   0000000C   0x1C4A             ADDS     R2,R1,#+1
+   \   0000000E   0x1809             ADDS     R1,R1,R0
+   \   00000010   0x7082             STRB     R2,[R0, #+2]
+     36                  if (uart->out >= UARTBUFSIZE)
+   \   00000012   0xB2D2             UXTB     R2,R2
+   \   00000014   0x78C9             LDRB     R1,[R1, #+3]
+   \   00000016   0x2A40             CMP      R2,#+64
+   \   00000018   0xBFA4             ITT      GE 
+   \   0000001A   0x2200             MOVGE    R2,#+0
+   \   0000001C   0x7082             STRBGE   R2,[R0, #+2]
+     37                      uart->out = 0x00;
+     38                  return ch;
+   \   0000001E   0x4608             MOV      R0,R1
+   \   00000020   0x4770             BX       LR
+     39              }
+     40              return 0x00;
+   \                     ??sea_uartgetbyte_0: (+1)
+   \   00000022   0x2000             MOVS     R0,#+0
+   \   00000024   0x4770             BX       LR               ;; return
+     41          }
+     42          
+     43          /*******************************************************************************
+     44          * Function Name  : bool sea_uartisempty ( puart_t uart ) 
+     45          * Description    : is empty of ring.
+     46          * Input          : puart_t uart
+     47          * Output         : true/flase
+     48          * Return         : None
+     49          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     50          static u8  sea_uartisempty ( puart_t uart )  
+     51          {
+     52              if (uart == NULL)
+   \                     sea_uartisempty: (+1)
+   \   00000000   0x2800             CMP      R0,#+0
+   \   00000002   0xBF1E             ITTT     NE 
+   \   00000004   0x7881             LDRBNE   R1,[R0, #+2]
+   \   00000006   0x7840             LDRBNE   R0,[R0, #+1]
+   \   00000008   0x4281             CMPNE    R1,R0
+     53                  return 0x01;
+     54              //return (uart->cnt == 0x00);
+     55              return (uart->out == uart->in);
+   \   0000000A   0xD101             BNE.N    ??sea_uartisempty_0
+   \   0000000C   0x2001             MOVS     R0,#+1
+   \   0000000E   0x4770             BX       LR
+   \                     ??sea_uartisempty_0: (+1)
+   \   00000010   0x2000             MOVS     R0,#+0
+   \   00000012   0x4770             BX       LR               ;; return
+     56          }
+     57          
+     58          /*******************************************************************************
+     59          * Function Name  : void sea_uartputbyte ( puart_t uart, u8 ch )
+     60          * Description    : Inserts ch in ring.
+     61          * Input          : puart_t uart, u8 ch
+     62          * Output         : None
+     63          * Return         : None
+     64          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     65          static void sea_uartputbyte ( puart_t uart, u8 ch )
+     66          {
+     67              if (uart == NULL)
+   \                     sea_uartputbyte: (+1)
+   \   00000000   0xB148             CBZ.N    R0,??sea_uartputbyte_0
+     68                  return;
+     69                  
+     70              uart->buffer[uart->in ++] = ch;
+   \   00000002   0x7842             LDRB     R2,[R0, #+1]
+   \   00000004   0x1C53             ADDS     R3,R2,#+1
+   \   00000006   0x1812             ADDS     R2,R2,R0
+   \   00000008   0x7043             STRB     R3,[R0, #+1]
+   \   0000000A   0x70D1             STRB     R1,[R2, #+3]
+     71              if (uart->in >= UARTBUFSIZE)
+   \   0000000C   0x7841             LDRB     R1,[R0, #+1]
+   \   0000000E   0x2940             CMP      R1,#+64
+   \   00000010   0xBFA4             ITT      GE 
+   \   00000012   0x2100             MOVGE    R1,#+0
+   \   00000014   0x7041             STRBGE   R1,[R0, #+1]
+     72                  uart->in = 0x00;
+     73          }
+   \                     ??sea_uartputbyte_0: (+1)
+   \   00000016   0x4770             BX       LR               ;; return
+     74          
+     75          /*******************************************************************************
+     76          * Function Name  : void sea_uartputbyte ( puart_t uart )
+     77          * Description    : Inserts ch in ring.
+     78          * Input          : puart_t uart
+     79          * Output         : None
+     80          * Return         : None
+     81          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     82          static void sea_uartclear ( puart_t uart )
+     83          {
+     84              if (uart == NULL)
+   \                     sea_uartclear: (+1)
+   \   00000000   0xB110             CBZ.N    R0,??sea_uartclear_0
+     85                  return;
+     86              
+     87              uart->out = uart->in = 0x00;
+   \   00000002   0x2100             MOVS     R1,#+0
+   \   00000004   0x7041             STRB     R1,[R0, #+1]
+   \   00000006   0x7081             STRB     R1,[R0, #+2]
+     88          }
+   \                     ??sea_uartclear_0: (+1)
+   \   00000008   0x4770             BX       LR               ;; return
+     89          
+     90          #if 0
+     91          /*******************************************************************************
+     92          * Function Name  : u8 sea_readbyte ( void )
+     93          * Description    : get ch from serial_info ring.
+     94          * Input          : None
+     95          * Output         : key value
+     96          * Return         : None
+     97          *******************************************************************************/
+     98          u8 sea_readbyte ( void )  
+     99          {
+    100              return serial_info.get(&serial_info);
+    101          }
+    102          
+    103          /*******************************************************************************
+    104          * Function Name  : bool sea_isempty ( void ) 
+    105          * Description    : is empty of ring.
+    106          * Input          : None
+    107          * Output         : boolean
+    108          * Return         : None
+    109          *******************************************************************************/
+    110          bool sea_isempty ( void )  
+    111          {
+    112              return (bool)serial_info.ept(&serial_info);
+    113          }
+    114          #endif
+    115          
+    116          ////////////////////////////////////////////////////////////////////////////////
+    117          //轮询模式
+    118          /*******************************************************************************
+    119          * Function Name  : void sea_uartsendbyte ( u8 ch )
+    120          * Description    : send a byte to uart 
+    121          * Input          : u8 ch 
+    122          * Output         : None
+    123          * Return         : None
+    124          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    125          u8 sea_uartsendbyte ( u8 ch )
+    126          {
+   \                     sea_uartsendbyte: (+1)
+   \   00000000   0xB081             SUB      SP,SP,#+4
+    127              vu32 timeout = UARTTIMEOUT;
+   \   00000002   0xF44F 0x3140      MOV      R1,#+196608
+   \   00000006   0x9100             STR      R1,[SP, #+0]
+   \   00000008   0x....             LDR.N    R1,??DataTable2  ;; 0x4000c83c
+    128              
+    129              while ((SC1_UARTSTAT & SC_UARTTXFREE) != SC_UARTTXFREE && timeout --)  ;   
+   \                     ??sea_uartsendbyte_0: (+1)
+   \   0000000A   0x68CA             LDR      R2,[R1, #+12]
+   \   0000000C   0x0752             LSLS     R2,R2,#+29
+   \   0000000E   0xD404             BMI.N    ??sea_uartsendbyte_1
+   \   00000010   0x9A00             LDR      R2,[SP, #+0]
+   \   00000012   0x1E53             SUBS     R3,R2,#+1
+   \   00000014   0x2A00             CMP      R2,#+0
+   \   00000016   0x9300             STR      R3,[SP, #+0]
+   \   00000018   0xD1F7             BNE.N    ??sea_uartsendbyte_0
+    130              if (timeout)
+   \                     ??sea_uartsendbyte_1: (+1)
+   \   0000001A   0x9A00             LDR      R2,[SP, #+0]
+   \   0000001C   0x2A00             CMP      R2,#+0
+   \   0000001E   0xBF1A             ITTE     NE 
+   \   00000020   0x6008             STRNE    R0,[R1, #+0]
+   \   00000022   0x2001             MOVNE    R0,#+1
+   \   00000024   0x2000             MOVEQ    R0,#+0
+    131              {
+    132                  SC1_DATA = ch;
+    133                  return 0x01;
+    134              }
+    135              return 0x00;
+   \   00000026   0xB001             ADD      SP,SP,#+4
+   \   00000028   0x4770             BX       LR               ;; return
+    136          }
+    137          
+    138          /*******************************************************************************
+    139          * Function Name  : void sea_uartsendstring ( const u8 * str )
+    140          * Description    : print a string to the uart
+    141          * Input          : str为发送数据的地址
+    142          * Output         : None
+    143          * Return         : None
+    144          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    145          void sea_uartsendstring ( const u8 * str )
+    146          {
+   \                     sea_uartsendstring: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x4604             MOV      R4,R0
+    147              u8 * ptr = (u8 *)str;
+   \   00000004   0xE003             B.N      ??sea_uartsendstring_0
+    148              
+    149              while (*ptr)
+    150                  sea_uartsendbyte(*ptr ++);
+   \                     ??sea_uartsendstring_1: (+1)
+   \   00000006   0xF814 0x0B01      LDRB     R0,[R4], #+1
+   \   0000000A   0x.... 0x....      BL       sea_uartsendbyte
+   \                     ??sea_uartsendstring_0: (+1)
+   \   0000000E   0x7820             LDRB     R0,[R4, #+0]
+   \   00000010   0x2800             CMP      R0,#+0
+   \   00000012   0xD1F8             BNE.N    ??sea_uartsendstring_1
+    151          }
+   \   00000014   0xBD10             POP      {R4,PC}          ;; return
+    152          
+    153          /*******************************************************************************
+    154          * Function Name  : void UartSendByte(u8 ch )
+    155          * Description    : send a byte to uart 
+    156          * Input          : USART_TypeDef * uart, u8 ch 
+    157          * Output         : None
+    158          * Return         : None
+    159          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    160          void UartSendByte ( u8 ch )
+    161          {
+    162              sea_uartsendbyte(ch);
+   \                     UartSendByte: (+1)
+   \   00000000   0x....             B.N      sea_uartsendbyte
+    163          }
+    164          
+    165          /*******************************************************************************
+    166          * Function Name  : void UartSendString ( u8 * str )
+    167          * Description    : print a string to the uart
+    168          * Input          : str为发送数据的地址
+    169          * Output         : None
+    170          * Return         : None
+    171          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+    172          void UartSendString (const u8 * str )
+    173          {
+    174              sea_uartsendstring(str);
+   \                     UartSendString: (+1)
+   \   00000000   0x....             B.N      sea_uartsendstring
+    175          }
+    176          
+    177          /////////////////////////////////////////////////////////////////////////////////////////////
+    178          //
+    179          //* 函数名      : void print_0nx ( char ch2, s32 l )
+    180          //* 功能        : 打印十六进制数据 8
+    181          //* 输入参数    : char ch2, s32 l
+    182          //* 输出参数    : 无
+    183          //* 修改记录    : 无
+    184          //* 备注        : 无
+    185          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    186          void print0nx ( char ch2, s32 l )
+    187          {
+   \                     print0nx: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+    188              char ch;
+    189              int i;
+    190          
+    191              ch2 = ch2 - 0x30;
+    192              for (i = ch2 - 0x01; i >= 0x00; i --) 
+   \   00000002   0x3830             SUBS     R0,R0,#+48
+   \   00000004   0xB2C0             UXTB     R0,R0
+   \   00000006   0x460C             MOV      R4,R1
+   \   00000008   0x1E45             SUBS     R5,R0,#+1
+   \   0000000A   0xE003             B.N      ??print0nx_0
+   \                     ??print0nx_1: (+1)
+   \   0000000C   0xB2C0             UXTB     R0,R0
+   \   0000000E   0x.... 0x....      BL       sea_uartsendbyte
+    193              {
+    194          	ch = (l >> (i * 4)) & 0x0f;
+    195          	if (ch < 10)
+    196          	    UartSendByte(ch + 0x30);
+    197          	else
+    198          	    UartSendByte(ch - 10 + 'a');
+   \   00000012   0x1E6D             SUBS     R5,R5,#+1
+   \                     ??print0nx_0: (+1)
+   \   00000014   0x2D00             CMP      R5,#+0
+   \   00000016   0xD409             BMI.N    ??print0nx_2
+   \   00000018   0x00A8             LSLS     R0,R5,#+2
+   \   0000001A   0xFA44 0xF100      ASR      R1,R4,R0
+   \   0000001E   0xF001 0x000F      AND      R0,R1,#0xF
+   \   00000022   0x280A             CMP      R0,#+10
+   \   00000024   0xBFB4             ITE      LT 
+   \   00000026   0x3030             ADDLT    R0,R0,#+48
+   \   00000028   0x3057             ADDGE    R0,R0,#+87
+   \   0000002A   0xE7EF             B.N      ??print0nx_1
+    199              }
+    200          }
+   \                     ??print0nx_2: (+1)
+   \   0000002C   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+    201          
+    202          /////////////////////////////////////////////////////////////////////////////////////////////
+    203          //
+    204          //* 函数名      : void printd32 ( int32 l )
+    205          //* 功能        : 打印十进制数据 
+    206          //* 输入参数    : int32 l
+    207          //* 输出参数    : 无
+    208          //* 修改记录    : 无
+    209          //* 备注        : 无
+    210          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    211          void printd32 ( s32 l )
+    212          {
+   \                     printd32: (+1)
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+    213              s32 prod, t;
+    214              int    flag;
+    215              char   ch;
+    216              int      i, j;
+    217          
+    218              if (l == 0x00)
+   \   00000004   0xD100             BNE.N    ??printd32_0
+    219              {
+    220          	UartSendByte('0');
+   \   00000006   0x....             B.N      ?Subroutine0
+    221          	return;
+    222              }
+    223              else if (l < 0x00)
+   \                     ??printd32_0: (+1)
+   \   00000008   0xD503             BPL.N    ??printd32_1
+    224              {
+    225          	UartSendByte('-');
+   \   0000000A   0x202D             MOVS     R0,#+45
+   \   0000000C   0x.... 0x....      BL       sea_uartsendbyte
+    226          	l = -l;
+   \   00000010   0x4264             RSBS     R4,R4,#+0
+    227              }
+    228          
+    229              for (flag = 0x00, i = 15; i >= 0x00; i --) 
+   \                     ??printd32_1: (+1)
+   \   00000012   0x2000             MOVS     R0,#+0
+   \   00000014   0x250F             MOVS     R5,#+15
+   \   00000016   0x260A             MOVS     R6,#+10
+    230              {
+    231          	prod = 0x01;
+   \                     ??printd32_2: (+1)
+   \   00000018   0x2101             MOVS     R1,#+1
+    232          	t = l;
+   \   0000001A   0x4622             MOV      R2,R4
+    233          	for (j = 0x00; j < i; j ++) 
+   \   0000001C   0x2300             MOVS     R3,#+0
+   \   0000001E   0xE003             B.N      ??printd32_3
+    234          	{
+    235          	    prod = prod * 10;
+   \                     ??printd32_4: (+1)
+   \   00000020   0x4371             MULS     R1,R6,R1
+    236          	    t = t / 10;
+   \   00000022   0xFB92 0xF2F6      SDIV     R2,R2,R6
+    237          	}
+   \   00000026   0x1C5B             ADDS     R3,R3,#+1
+   \                     ??printd32_3: (+1)
+   \   00000028   0x42AB             CMP      R3,R5
+   \   0000002A   0xDBF9             BLT.N    ??printd32_4
+    238          	ch = t;
+    239          	l -= prod * t;
+   \   0000002C   0x.... 0x....      BL       ?Subroutine1
+    240          	if (ch == 0x00 && flag == 0x00)
+   \                     ??CrossCallReturnLabel_0: (+1)
+   \   00000030   0xD008             BEQ.N    ??printd32_5
+    241          	    continue;
+    242          
+    243          	if (ch < 10)
+   \   00000032   0x2B0A             CMP      R3,#+10
+   \   00000034   0xBFBA             ITTE     LT 
+   \   00000036   0xF103 0x0030      ADDLT    R0,R3,#+48
+   \   0000003A   0xB2C0             UXTBLT   R0,R0
+   \   0000003C   0x203F             MOVGE    R0,#+63
+    244          	    UartSendByte(ch + 0x30);
+    245          	else
+    246          	    UartSendByte('?');
+   \   0000003E   0x.... 0x....      BL       sea_uartsendbyte
+    247          
+    248          	flag = 0x01;
+   \   00000042   0x2001             MOVS     R0,#+1
+    249              }
+   \                     ??printd32_5: (+1)
+   \   00000044   0x1E6D             SUBS     R5,R5,#+1
+   \   00000046   0xD5E7             BPL.N    ??printd32_2
+    250          }
+   \   00000048   0xBD70             POP      {R4-R6,PC}       ;; return
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine1: (+1)
+   \   00000000   0xFB02 0x4411      MLS      R4,R2,R1,R4
+   \   00000004   0xB2D3             UXTB     R3,R2
+   \   00000006   0xEA50 0x0203      ORRS     R2,R0,R3
+   \   0000000A   0x4770             BX       LR
+    251          
+    252          /////////////////////////////////////////////////////////////////////////////////////////////
+    253          //
+    254          //* 函数名      : void print_d ( int16 l )
+    255          //* 功能        : 打印十进制数据 
+    256          //* 输入参数    : int16 l
+    257          //* 输出参数    : 无
+    258          //* 修改记录    : 无
+    259          //* 备注        : 无
+    260          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    261          void printd ( s16 l )
+    262          {
+   \                     printd: (+1)
+   \   00000000   0xB570             PUSH     {R4-R6,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+    263              u16 prod, t;
+    264              int    flag;
+    265              char   ch;
+    266              int    i, j;
+    267          
+    268              if (l == 0x00)
+   \   00000004   0xD100             BNE.N    ??printd_0
+    269              {
+    270                  UartSendByte('0');
+   \   00000006   0x....             B.N      ?Subroutine0
+    271          	return;
+    272              }
+    273              else if (l < 0x00)
+   \                     ??printd_0: (+1)
+   \   00000008   0xD503             BPL.N    ??printd_1
+    274              {
+    275          	UartSendByte( '-');
+   \   0000000A   0x202D             MOVS     R0,#+45
+   \   0000000C   0x.... 0x....      BL       sea_uartsendbyte
+    276          	l *= -1;
+   \   00000010   0x4264             RSBS     R4,R4,#+0
+    277              }
+    278          
+    279              for (flag = 0x00, i = 0x08; i >= 0x00; i --) 
+   \                     ??printd_1: (+1)
+   \   00000012   0x2000             MOVS     R0,#+0
+   \   00000014   0x2508             MOVS     R5,#+8
+   \   00000016   0x260A             MOVS     R6,#+10
+    280              {
+    281          	prod = 0x01;
+   \                     ??printd_2: (+1)
+   \   00000018   0x2101             MOVS     R1,#+1
+    282          	t = l;
+   \   0000001A   0xB2A2             UXTH     R2,R4
+    283          	for (j = 0x00; j < i; j ++) 
+   \   0000001C   0x2300             MOVS     R3,#+0
+   \   0000001E   0xE005             B.N      ??printd_3
+    284          	{
+    285          	    prod = prod * 10;
+   \                     ??printd_4: (+1)
+   \   00000020   0x4371             MULS     R1,R6,R1
+    286          	    t = t / 10;
+   \   00000022   0xFB92 0xF2F6      SDIV     R2,R2,R6
+   \   00000026   0xB289             UXTH     R1,R1
+   \   00000028   0xB292             UXTH     R2,R2
+    287          	}
+   \   0000002A   0x1C5B             ADDS     R3,R3,#+1
+   \                     ??printd_3: (+1)
+   \   0000002C   0x42AB             CMP      R3,R5
+   \   0000002E   0xDBF7             BLT.N    ??printd_4
+    288          	ch = t;
+    289          	l -= prod * t;
+   \   00000030   0xB224             SXTH     R4,R4
+   \   00000032   0x.... 0x....      BL       ?Subroutine1
+    290          
+    291          	if (ch == 0x00 && flag == 0x00)
+   \                     ??CrossCallReturnLabel_1: (+1)
+   \   00000036   0xD008             BEQ.N    ??printd_5
+    292          	    continue;
+    293          
+    294          	if (ch < 10)
+   \   00000038   0x2B0A             CMP      R3,#+10
+   \   0000003A   0xBFBA             ITTE     LT 
+   \   0000003C   0xF103 0x0030      ADDLT    R0,R3,#+48
+   \   00000040   0xB2C0             UXTBLT   R0,R0
+   \   00000042   0x203F             MOVGE    R0,#+63
+    295          	    UartSendByte(ch + 0x30);
+    296          	else
+    297          	    UartSendByte('?');
+   \   00000044   0x.... 0x....      BL       sea_uartsendbyte
+    298          
+    299          	flag = 0x01;
+   \   00000048   0x2001             MOVS     R0,#+1
+    300              }
+   \                     ??printd_5: (+1)
+   \   0000004A   0x1E6D             SUBS     R5,R5,#+1
+   \   0000004C   0xD5E4             BPL.N    ??printd_2
+    301          }
+   \   0000004E   0xBD70             POP      {R4-R6,PC}       ;; return
+    302          
+    303          
+    304          ////////////////////////////////////////////////////////////////////////////////////////////
+    305          //
+    306          //* 函数名      : void sea_printf ( const char * format, ... )
+    307          //* 功能        : 格式化输出数据
+    308          //* 输入参数    : const char * format, ...
+    309          //* 输出参数    : 无
+    310          //* 修改记录    : 无
+    311          //* 备注        : 无
+    312          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    313          void sea_printf ( const char * format, ... )
+    314          { 
+   \                     sea_printf: (+1)
+   \   00000000   0xB40E             PUSH     {R1-R3}
+   \   00000002   0xB530             PUSH     {R4,R5,LR}
+   \   00000004   0x4604             MOV      R4,R0
+    315          #ifdef FRPRINTBUF
+    316              va_list v_list;
+    317              u8   *  ptr;
+    318              
+    319              if (!serial_info.enable)
+   \   00000006   0x....             LDR.N    R0,??DataTable2_1
+   \   00000008   0x7800             LDRB     R0,[R0, #+0]
+   \   0000000A   0xB1B8             CBZ.N    R0,??sea_printf_0
+    320                  return;
+    321              
+    322              memset(uartfrm.buf, 0x00, FRPRINTBUF);
+   \   0000000C   0x....             LDR.N    R5,??DataTable2_2
+   \   0000000E   0x2180             MOVS     R1,#+128
+   \   00000010   0x1D28             ADDS     R0,R5,#+4
+   \   00000012   0x.... 0x....      BL       __aeabi_memclr4
+    323              va_start(v_list, format);     
+   \   00000016   0xAA03             ADD      R2,SP,#+12
+    324              vsprintf((char *)uartfrm.buf, format, v_list); 
+   \   00000018   0x4621             MOV      R1,R4
+   \   0000001A   0x1D28             ADDS     R0,R5,#+4
+   \   0000001C   0x.... 0x....      BL       vsprintf
+    325              va_end(v_list);
+    326              
+    327              ptr = uartfrm.buf;
+   \   00000020   0x1D2C             ADDS     R4,R5,#+4
+   \   00000022   0xE008             B.N      ??sea_printf_1
+    328              while (*ptr)
+    329              {
+    330                  if (*ptr == '\n')
+   \                     ??sea_printf_2: (+1)
+   \   00000024   0x280A             CMP      R0,#+10
+   \   00000026   0xBF04             ITT      EQ 
+    331                      sea_uartsendbyte('\r');
+   \   00000028   0x200D             MOVEQ    R0,#+13
+   \   0000002A   0x.... 0x....      BLEQ     sea_uartsendbyte
+    332                  sea_uartsendbyte(*ptr);
+   \   0000002E   0xF814 0x0B01      LDRB     R0,[R4], #+1
+   \   00000032   0x.... 0x....      BL       sea_uartsendbyte
+    333                  ptr ++;
+    334              }
+   \                     ??sea_printf_1: (+1)
+   \   00000036   0x7820             LDRB     R0,[R4, #+0]
+   \   00000038   0x2800             CMP      R0,#+0
+   \   0000003A   0xD1F3             BNE.N    ??sea_printf_2
+    335          #else  
+    336              va_list ap;
+    337              u32     arg;
+    338              char *  str;
+    339              char    ch1, ch2;
+    340          
+    341              if (!serial_info.enable)
+    342                  return;
+    343              
+    344              va_start(ap, format);
+    345              while (*format) 
+    346              {
+    347          	if (*format == '%') 
+    348          	{
+    349          	    format ++;
+    350          	    ch1 = *format ++;//ch1 = x表示16进制
+    351          	    switch (ch1)
+    352          	    {
+    353          		case 's': 
+    354          		    str = va_arg(ap, char *);
+    355          		    UartSendString((u8 *)str);
+    356          		    break; 
+    357          	        case 'c': 
+    358          		    ch2 = va_arg(ap, char);
+    359          		    UartSendByte(ch2);
+    360          		    break; 
+    361          		case 'd': 
+    362          		    arg = va_arg(ap, s16);
+    363          		    printd(arg);
+    364          		    break;
+    365          		case 'l':
+    366          		    arg = va_arg(ap, s32);
+    367          		    printd32(arg);
+    368          	            break;
+    369                          default: 
+    370          		    if (ch1 == 'x')
+    371          		        ch2 = 0x34;          // print 4 char for data 
+    372          		    else 
+    373          		    {
+    374          		        ch2 = *format ++;
+    375          		        if (ch1 == 0x30)
+    376          		            format ++;
+    377          		        else
+    378          		            ch2 = ch1;
+    379          	            }
+    380          		    ch2 = ch2 > 0x38 ? 0x38 : ch2;
+    381          		    arg = va_arg(ap, s32); 
+    382          		    print0nx(ch2, arg);
+    383          		    break;
+    384          	    }
+    385          	} 
+    386          	else
+    387          	{
+    388          	    if (*format == '\n')
+    389          	        UartSendByte( '\r');
+    390          	    UartSendByte(*format ++);
+    391          	}
+    392              }
+    393              va_end(ap);   
+    394          #endif    
+    395          }
+   \                     ??sea_printf_0: (+1)
+   \   0000003C   0xBC30             POP      {R4,R5}
+   \   0000003E   0xF85D 0xFB10      LDR      PC,[SP], #+16    ;; return
+    396          
+    397          /////////////////////////////////////////////////////////////////////////////////////////////
+    398          //
+    399          //* 函数名      : u8 SerialInit ( int8u port, u32 rate, u8 parity, u8 stopBits )
+    400          //* 功能        : serial初始化
+    401          //* 输入参数    : int8u port, u32 rate, u8 parity, u8 stopBits
+    402          //* 输出参数    : 无
+    403          //* 修改记录    : 无
+    404          //* 备注        : port无必要！
+    405          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    406          u8 SerialInit ( int8u port, u32 rate, u8 parity, u8 stopBits )
+    407          {  
+   \                     SerialInit: (+1)
+   \   00000000   0xE92D 0x41F0      PUSH     {R4-R8,LR}
+   \   00000004   0x4604             MOV      R4,R0
+    408              if (port > MAXUSART)
+   \   00000006   0x2C02             CMP      R4,#+2
+   \   00000008   0x460D             MOV      R5,R1
+   \   0000000A   0x4616             MOV      R6,R2
+   \   0000000C   0x4698             MOV      R8,R3
+   \   0000000E   0xBFA8             IT       GE 
+   \   00000010   0x2000             MOVGE    R0,#+0
+    409                  return 0x00;
+   \   00000012   0xDA15             BGE.N    ??SerialInit_0
+    410              
+    411              sea_memset(&serial_info, 0x00, sizeof(uart_t));
+   \   00000014   0x....             LDR.N    R7,??DataTable2_1
+   \   00000016   0x2254             MOVS     R2,#+84
+   \   00000018   0x2100             MOVS     R1,#+0
+   \   0000001A   0x4638             MOV      R0,R7
+   \   0000001C   0x.... 0x....      BL       sea_memset
+    412              serial_info.ept    = sea_uartisempty;
+   \   00000020   0x....             LDR.N    R0,??DataTable2_3
+   \   00000022   0x64F8             STR      R0,[R7, #+76]
+    413              serial_info.get    = sea_uartgetbyte;
+    414              serial_info.put    = sea_uartputbyte;
+    415              serial_info.clr    = sea_uartclear;
+    416              
+    417              return halInternalUartInit(port, rate, parity, stopBits);
+   \   00000024   0x4643             MOV      R3,R8
+   \   00000026   0x....             LDR.N    R0,??DataTable2_4
+   \   00000028   0x64B8             STR      R0,[R7, #+72]
+   \   0000002A   0x4632             MOV      R2,R6
+   \   0000002C   0x....             LDR.N    R0,??DataTable2_5
+   \   0000002E   0x6478             STR      R0,[R7, #+68]
+   \   00000030   0xB2E9             UXTB     R1,R5
+   \   00000032   0x....             LDR.N    R0,??DataTable2_6
+   \   00000034   0x6538             STR      R0,[R7, #+80]
+   \   00000036   0x4620             MOV      R0,R4
+   \   00000038   0xE8BD 0x41F0      POP      {R4-R8,LR}
+   \   0000003C   0x.... 0x....      B.W      halInternalUartInit
+   \                     ??SerialInit_0: (+1)
+   \   00000040   0xE8BD 0x81F0      POP      {R4-R8,PC}       ;; return
+    418          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine0: (+1)
+   \   00000000   0xE8BD 0x4070      POP      {R4-R6,LR}
+   \   00000004   0x2030             MOVS     R0,#+48
+   \   00000006   0x....             B.N      sea_uartsendbyte
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2:
+   \   00000000   0x4000C83C         DC32     0x4000c83c
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_1:
+   \   00000000   0x........         DC32     serial_info
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_2:
+   \   00000000   0x........         DC32     uartfrm
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_3:
+   \   00000000   0x........         DC32     sea_uartisempty
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_4:
+   \   00000000   0x........         DC32     sea_uartgetbyte
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_5:
+   \   00000000   0x........         DC32     sea_uartputbyte
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable2_6:
+   \   00000000   0x........         DC32     sea_uartclear
+    419          //////////////////////////////////////////////////////////////////////////////////////////
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      24   SerialInit
+        24   -> sea_memset
+       0   UartSendByte
+         0   -> sea_uartsendbyte
+       0   UartSendString
+         0   -> sea_uartsendstring
+      16   print0nx
+        16   -> sea_uartsendbyte
+      16   printd
+         0   -> sea_uartsendbyte
+        16   -> sea_uartsendbyte
+      16   printd32
+         0   -> sea_uartsendbyte
+        16   -> sea_uartsendbyte
+      24   sea_printf
+        24   -> __aeabi_memclr4
+        24   -> sea_uartsendbyte
+        24   -> vsprintf
+       0   sea_uartclear
+       0   sea_uartgetbyte
+       0   sea_uartisempty
+       0   sea_uartputbyte
+       4   sea_uartsendbyte
+       8   sea_uartsendstring
+         8   -> sea_uartsendbyte
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable2
+       4  ??DataTable2_1
+       4  ??DataTable2_2
+       4  ??DataTable2_3
+       4  ??DataTable2_4
+       4  ??DataTable2_5
+       4  ??DataTable2_6
+       8  ?Subroutine0
+      12  ?Subroutine1
+      68  SerialInit
+       2  UartSendByte
+       2  UartSendString
+      46  print0nx
+      80  printd
+      74  printd32
+      66  sea_printf
+      10  sea_uartclear
+      38  sea_uartgetbyte
+      20  sea_uartisempty
+      24  sea_uartputbyte
+      42  sea_uartsendbyte
+      22  sea_uartsendstring
+
+ 
+ 542 bytes in section .text
+ 
+ 542 bytes of CODE memory
+
+Errors: none
+Warnings: none
