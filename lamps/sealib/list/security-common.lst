@@ -1,0 +1,60 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:34
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\security-common.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\security-common.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\security-common.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\security-common.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\util\security-common.c
+      1          
+      2          #include "config.h"
+      3          #include "ember.h"
+      4          
+      5          #if defined EZSP_HOST
+      6          boolean emberHaveLinkKey(EmberEUI64 remoteDevice)
+      7          {
+      8            EmberKeyStruct keyStruct;
+      9          
+     10            // Check and see if the Trust Center is the remote device first.
+     11            if (EMBER_SUCCESS == emberGetKey(EMBER_TRUST_CENTER_LINK_KEY, &keyStruct)) {
+     12              if (0 == MEMCOMPARE(keyStruct.partnerEUI64, remoteDevice, EUI64_SIZE)) {
+     13                return TRUE;
+     14              }
+     15            }
+     16          
+     17            return (0xFF != emberFindKeyTableEntry(remoteDevice, TRUE));        // look for link keys?
+     18          }
+     19          #endif
+
+
+ 
+
+ 
+
+
+Errors: none
+Warnings: none

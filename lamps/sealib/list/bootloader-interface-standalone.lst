@@ -1,0 +1,112 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:22
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\arch\bootloader-interface-standalone.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\arch\bootloader-interface-standalone.c
+#        -D ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\bootloader-interface-standalone.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\bootloader-interface-standalone.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\arch\bootloader-interface-standalone.c
+      1          
+      2          #include "config.h"
+      3          #include "ember-types.h"
+      4          #include "error.h"
+      5          #include "hal.h"
+      6          #include "memmap.h"
+      7          
+
+   \                                 In section .text, align 2, keep-with-next
+      8          EmberStatus halLaunchStandaloneBootloader(int8u mode)
+      9          {
+   \                     halLaunchStandaloneBootloader: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+     10            if(BOOTLOADER_BASE_TYPE(halBootloaderAddressTable.bootloaderType) 
+     11               == BL_TYPE_STANDALONE) {
+   \   00000002   0x....             LDR.N    R0,??DataTable1
+   \   00000004   0x8B00             LDRH     R0,[R0, #+24]
+   \   00000006   0x0A00             LSRS     R0,R0,#+8
+   \   00000008   0x2801             CMP      R0,#+1
+   \   0000000A   0xBF04             ITT      EQ 
+     12              // should never return
+     13              halInternalSysReset(RESET_BOOTLOADER_BOOTLOAD);
+   \   0000000C   0xF240 0x2002      MOVWEQ   R0,#+514
+   \   00000010   0x.... 0x....      BLEQ     halInternalSysReset
+     14            }
+     15            return EMBER_ERR_FATAL;
+   \   00000014   0x2001             MOVS     R0,#+1
+   \   00000016   0xBD02             POP      {R1,PC}          ;; return
+     16          }
+     17          
+
+   \                                 In section .text, align 2, keep-with-next
+     18          int16u halGetStandaloneBootloaderVersion(void)
+     19          {
+     20            if(BOOTLOADER_BASE_TYPE(halBootloaderAddressTable.bootloaderType) 
+     21               == BL_TYPE_STANDALONE) {
+   \                     halGetStandaloneBootloaderVersion: (+1)
+   \   00000000   0x....             LDR.N    R0,??DataTable1
+   \   00000002   0x8B00             LDRH     R0,[R0, #+24]
+   \   00000004   0x0A00             LSRS     R0,R0,#+8
+   \   00000006   0x2801             CMP      R0,#+1
+   \   00000008   0xBF08             IT       EQ 
+     22              return halGetBootloaderVersion();
+   \   0000000A   0x.... 0x....      BEQ.W    halGetBootloaderVersion
+     23            } else {
+     24              return BOOTLOADER_INVALID_VERSION;
+   \   0000000E   0xF64F 0x70FF      MOVW     R0,#+65535
+   \   00000012   0x4770             BX       LR               ;; return
+     25            }
+     26          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1:
+   \   00000000   0x........         DC32     halBootloaderAddressTable
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   halGetStandaloneBootloaderVersion
+         0   -> halGetBootloaderVersion
+       8   halLaunchStandaloneBootloader
+         8   -> halInternalSysReset
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable1
+      20  halGetStandaloneBootloaderVersion
+      24  halLaunchStandaloneBootloader
+
+ 
+ 48 bytes in section .text
+ 
+ 48 bytes of CODE memory
+
+Errors: none
+Warnings: none

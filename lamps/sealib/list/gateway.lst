@@ -1,0 +1,1557 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.41.0.51741/W32 for ARM     25/Jun/2012  18:29:19 #
+# Copyright (C) 1999-2009 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  E:\Workshops\ledlamp\lamps\common\gateway.c              #
+#    Command line =  E:\Workshops\ledlamp\lamps\common\gateway.c -D           #
+#                    ENABLE_GATEWAY -lC E:\Workshops\ledlamp\lamps\sealib\lis #
+#                    t\ --diag_suppress Pa050 -o                              #
+#                    E:\Workshops\ledlamp\lamps\sealib\obj\ --debug           #
+#                    --endian=little --cpu=Cortex-M3 -e --fpu=None            #
+#                    --dlib_config "D:\Program Files\IAR Systems\Embedded     #
+#                    Workbench 5.4\arm\INC\DLib_Config_Normal.h" -I           #
+#                    E:\Workshops\ledlamp\lamps\sealib\..\inc\ -I             #
+#                    E:\Workshops\ledlamp\lamps\sealib\..\inc\hal\ -I         #
+#                    E:\Workshops\ledlamp\lamps\sealib\..\inc\hal\cortexm3\   #
+#                    -I E:\Workshops\ledlamp\lamps\sealib\..\inc\stack\ -I    #
+#                    E:\Workshops\ledlamp\lamps\sealib\..\inc\util\ -I        #
+#                    "D:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\" -Ohz                                       #
+#    List file    =  E:\Workshops\ledlamp\lamps\sealib\list\gateway.lst       #
+#    Object file  =  E:\Workshops\ledlamp\lamps\sealib\obj\gateway.o          #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+E:\Workshops\ledlamp\lamps\common\gateway.c
+      1          // *******************************************************************
+      2          //  gateway.c
+      3          // *******************************************************************
+      4          #include "gateway.h"
+      5          #include "common.h"
+      6          #include "serial.h"
+      7          #include "network.h"
+      8          
+      9          //#ifdef ENABLE_GATEWAY
+     10          
+     11          ////////////////////////////////////////////////////////////////////////
+     12          // constants, static and globals
+
+   \                                 In section .rodata, align 4
+     13          const  gw_frame_t  tframe1 = { ICHP_GW_TEST, 0x05, GWMAXCNT, TRUE, 0x01, 0xff, 0xfe, 0x04, 0x05, };
+   \                     tframe1:
+   \   00000000   8405FF0101FF       DC8 132, 5, 255, 1, 1, 255, 254, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0
+   \              FE0405000000
+   \              0000000000  
+   \   00000011   000000000000       DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              000000000000
+   \              00000000    
+   \   00000021   000000000000       DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              000000000000
+   \              00000000    
+   \   00000031   000000000000       DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              000000000000
+   \              00000000    
+   \   00000041   000000000000       DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              000000000000
+   \              00000000    
+   \   00000051   000000000000       DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              000000000000
+   \              00000000    
+   \   00000061   000000000000       DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              000000000000
+   \              00000000    
+   \   00000071   000000000000       DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              000000000000
+   \              000000000000
+   \              00          
+     14          
+
+   \                                 In section .bss, align 4
+     15          static gw_link_t  gw_link;
+   \                     gw_link:
+   \   00000000                      DS8 136
+
+   \                                 In section .bss, align 4
+     16          static gw_frame_t  rframe;
+   \                     rframe:
+   \   00000000                      DS8 132
+     17          gw_frame_t       gw_frame;
+     18          gw_info_t         gw_info;
+   \                     gw_info:
+   \   00000084                      DS8 16
+
+   \                                 In section .bss, align 4
+   \                     gw_frame:
+   \   00000000                      DS8 132
+     19          
+     20          #if 0
+     21          /////////////////////////////////////////////////////////////////////////////////////////////
+     22          //
+     23          //* 函数名      : pgw_list_t sea_getgwlist ( void )
+     24          //* 功能        : get the pointer of structure gw_list_t
+     25          //* 输入参数    : u8 which
+     26          //* 输出参数    :  pointer of gw_list_t
+     27          //* 修改记录    : 无
+     28          //* 备注        : 无
+     29          //*------------------------------------------------*/
+     30          pgw_list_t sea_getgwlist ( u8 which )
+     31          {
+     32              return &gw_list1[which & 0x01];
+     33          }
+     34          
+     35          /////////////////////////////////////////////////////////////////////////////////////////////
+     36          //
+     37          //* 函数名      : pgw_frame_t sea_getcurrecvframe ( u8 which )
+     38          //* 功能        : get current recv and send body of frame pointer
+     39          //* 输入参数    : u8 which
+     40          //* 输出参数    : pointer of frame_t
+     41          //* 修改记录    : 无
+     42          //* 备注        : 无
+     43          //*------------------------------------------------*/
+     44          pgw_frame_t sea_getcurrentframe ( u8 which )  
+     45          {
+     46              pgw_frame_t ptr = NULL;
+     47              
+     48              if (which == RECVLIST)
+     49                  ptr = &rframe1[sea_getgwlist(which)->in];
+     50              else if (which == SENDLIST)
+     51                  ptr = &sframe1[sea_getgwlist(which)->in];
+     52              else
+     53                  return NULL;
+     54              
+     55              sea_gwreleaseframe(ptr);
+     56              return ptr;
+     57          }
+     58          
+     59          /////////////////////////////////////////////////////////////////////////////////////////////
+     60          //
+     61          //* 函数名      : pgw_frame_t sea_getframelist ( u8 which )
+     62          //* 功能        : get body of frame pointer
+     63          //* 输入参数    : u8 which
+     64          //* 输出参数    : pointer of frame_t
+     65          //* 修改记录    : 无
+     66          //* 备注        : 无
+     67          //*------------------------------------------------*/
+     68          pgw_frame_t sea_getframelist ( u8 which )  
+     69          {
+     70              pgw_list_t  ptr = sea_getgwlist(which);
+     71              pgw_frame_t frm;
+     72          
+     73              if (!ptr->count || !ptr->frame[ptr->out]->state)
+     74                  return NULL;
+     75              
+     76          //    sea_printf("\n[gw] get recv count %d, send count %d", sea_getgwlist(RECVLIST)->count, sea_getgwlist(SENDLIST)->count);
+     77              ptr->count --;
+     78              frm = ptr->frame[ptr->out];
+     79              ptr->out ++;
+     80              if (ptr->out >= GWMAXLIST)
+     81                  ptr->out = 0x00;
+     82              return frm;
+     83          }
+     84          
+     85          /////////////////////////////////////////////////////////////////////////////////////////////
+     86          //
+     87          //* 函数名      : bool sea_framelistisempty ( u8 which )
+     88          //* 功能        : is empty of list.
+     89          //* 输入参数    : u8 which
+     90          //* 输出参数    : boolean
+     91          //* 修改记录    : 无
+     92          //* 备注        : 无
+     93          //*------------------------------------------------*/
+     94          bool sea_framelistisempty ( u8 which )  
+     95          {
+     96              return (bool)(sea_getgwlist(which)->count == 0x00);
+     97          }
+     98          
+     99          /////////////////////////////////////////////////////////////////////////////////////////////
+    100          //
+    101          //* 函数名      : void sea_putframelist ( u8 which )
+    102          //* 功能        : put body of frame pointer
+    103          //* 输入参数    : u8 which, pgw_frame_t ptr
+    104          //* 输出参数    : 无
+    105          //* 修改记录    : 无
+    106          //* 备注        : 无
+    107          //*------------------------------------------------*/
+    108          void sea_putframelist ( u8 which, pgw_frame_t frm )
+    109          {
+    110              pgw_list_t ptr = sea_getgwlist(which);
+    111          
+    112          //    if (!frm->state)   return;
+    113              if (frm->state && ptr->count < GWMAXLIST)
+    114              {
+    115          //        sea_printf("\n[gw] put recv count %d, send count %d", sea_getgwlist(RECVLIST)->count, sea_getgwlist(SENDLIST)->count);
+    116                  ptr->frame[ptr->in] = frm;
+    117                  ptr->count ++;
+    118                  ptr->in ++;
+    119                  if (ptr->in >= GWMAXLIST)
+    120                      ptr->in = 0x00;
+    121              }
+    122          }
+    123          #endif
+    124          
+    125          /////////////////////////////////////////////////////////////////////////////////////////////
+    126          //
+    127          //* 函数名      : u8 sea_gwislinkempty ( void )
+    128          //* 功能        : is empty of link_t
+    129          //* 输入参数    : 无
+    130          //* 输出参数    : true/false
+    131          //* 修改记录    : 无
+    132          //* 备注        : 无
+    133          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    134          u8 sea_gwislinkempty ( void )  
+    135          {
+    136              return gw_link.count == 0x00;
+   \                     sea_gwislinkempty:
+   \   00000000   ....               LDR.N    R0,??DataTable6  ;; gw_link
+   \   00000002   0178               LDRB     R1,[R0, #+0]
+   \   00000004   481E               SUBS     R0,R1,#+1
+   \   00000006   8041               SBCS     R0,R0,R0
+   \   00000008   C00F               LSRS     R0,R0,#+31
+   \   0000000A   7047               BX       LR               ;; return
+    137          }
+    138          
+    139          /////////////////////////////////////////////////////////////////////////////////////////////
+    140          //
+    141          //* 函数名      : u8 sea_gwgetlink ( void )
+    142          //* 功能        : get ch from link_t
+    143          //* 输入参数    : 无
+    144          //* 输出参数    : char
+    145          //* 修改记录    : 无
+    146          //* 备注        : 无
+    147          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    148          u8 sea_gwgetlink ( void )  
+    149          {
+    150              u8  ch;
+    151              
+    152              gw_link.count --;
+   \                     sea_gwgetlink:
+   \   00000000   ....               LDR.N    R1,??DataTable6  ;; gw_link
+   \   00000002   0878               LDRB     R0,[R1, #+0]
+   \   00000004   401E               SUBS     R0,R0,#+1
+   \   00000006   0870               STRB     R0,[R1, #+0]
+    153              ch = gw_link.body[gw_link.out];
+   \   00000008   8A78               LDRB     R2,[R1, #+2]
+   \   0000000A   5018               ADDS     R0,R2,R1
+   \   0000000C   C078               LDRB     R0,[R0, #+3]
+    154              gw_link.out ++;
+   \   0000000E   521C               ADDS     R2,R2,#+1
+   \   00000010   8A70               STRB     R2,[R1, #+2]
+    155              if (gw_link.out >= GWLINKSIZE)
+   \   00000012   D2B2               UXTB     R2,R2
+   \   00000014   822A               CMP      R2,#+130
+   \   00000016   24BF               ITT      CS 
+   \   00000018   0022               MOVCS    R2,#+0
+   \   0000001A   8A70               STRBCS   R2,[R1, #+2]
+    156                  gw_link.out = 0x00;
+    157              return ch;
+   \   0000001C   7047               BX       LR               ;; return
+    158          }
+    159          
+    160          /////////////////////////////////////////////////////////////////////////////////////////////
+    161          //
+    162          //* 函数名      : void sea_gwputlink ( u8 ch )
+    163          //* 功能        : put ch to link_t
+    164          //* 输入参数    : u8 ch
+    165          //* 输出参数    : 无
+    166          //* 修改记录    : 无
+    167          //* 备注        : 无
+    168          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    169          void sea_gwputlink ( u8 ch )
+    170          {
+    171              gw_link.body[gw_link.in] = ch;
+   \                     sea_gwputlink:
+   \   00000000   ....               LDR.N    R1,??DataTable6  ;; gw_link
+   \   00000002   4A78               LDRB     R2,[R1, #+1]
+   \   00000004   5218               ADDS     R2,R2,R1
+   \   00000006   D070               STRB     R0,[R2, #+3]
+    172              gw_link.count ++;
+   \   00000008   0878               LDRB     R0,[R1, #+0]
+   \   0000000A   401C               ADDS     R0,R0,#+1
+   \   0000000C   0870               STRB     R0,[R1, #+0]
+    173              gw_link.in ++;
+   \   0000000E   4878               LDRB     R0,[R1, #+1]
+   \   00000010   401C               ADDS     R0,R0,#+1
+   \   00000012   4870               STRB     R0,[R1, #+1]
+    174              if (gw_link.in >= GWLINKSIZE)
+   \   00000014   C0B2               UXTB     R0,R0
+   \   00000016   8228               CMP      R0,#+130
+   \   00000018   24BF               ITT      CS 
+   \   0000001A   0020               MOVCS    R0,#+0
+   \   0000001C   4870               STRBCS   R0,[R1, #+1]
+    175                  gw_link.in = 0x00;
+    176          }
+   \   0000001E   7047               BX       LR               ;; return
+    177          
+    178          /////////////////////////////////////////////////////////////////////////////////////////////
+    179          //
+    180          //* 函数名      : void sea_gwreleaseframe ( pgw_frame_t ptr )
+    181          //* 功能        : release receiving frame 
+    182          //* 输入参数    : pgw_frame_t ptr
+    183          //* 输出参数    : 无
+    184          //* 修改记录    : 无
+    185          //* 备注        : 无
+    186          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    187          void sea_gwreleaseframe ( pgw_frame_t ptr )
+    188          {
+    189              ptr->state = FALSE;      // initial flag of receiving frame
+   \                     sea_gwreleaseframe:
+   \   00000000   0021               MOVS     R1,#+0
+   \   00000002   C170               STRB     R1,[R0, #+3]
+    190              ptr->cnt   = GWMAXCNT;   // initial counter of receiving frame
+   \   00000004   FF21               MOVS     R1,#+255
+   \   00000006   8170               STRB     R1,[R0, #+2]
+    191          }
+   \   00000008   7047               BX       LR               ;; return
+    192          
+    193          #if 0
+    194          /////////////////////////////////////////////////////////////////////////////////////////////
+    195          //
+    196          //* 函数名      : void sea_gwreleaseframe ( pgw_frame_t ptr )
+    197          //* 功能        : release receiving frame 
+    198          //* 输入参数    : pgw_frame_t ptr
+    199          //* 输出参数    : 无
+    200          //* 修改记录    : 无
+    201          //* 备注        : 无
+    202          //*------------------------------------------------*/
+    203          void sea_gwframeready ( pgw_frame_t ptr )
+    204          {
+    205              ptr->cnt   = GWMAXCNT;
+    206              ptr->state = TRUE;
+    207          }
+    208          #endif
+    209          
+    210          /////////////////////////////////////////////////////////////////////////////////////////////
+    211          //
+    212          //* 函数名      : void GWY_Configuration ( void )
+    213          //* 功能        : initialize gateway information
+    214          //* 输入参数    : 无
+    215          //* 输出参数    : 无
+    216          //* 修改记录    : 无
+    217          //* 备注        : 无
+    218          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    219          void GWY_Configuration ( void )
+    220          {
+   \                     GWY_Configuration:
+   \   00000000   10B5               PUSH     {R4,LR}
+    221          #if 0  
+    222              for (u8 i = 0x00; i < GWMAXLIST; i ++)
+    223              {
+    224                  sea_memset(&rframe1[i], 0x00, sizeof(gw_frame_t)); 
+    225                  sea_gwreleaseframe(&rframe1[i]);
+    226              
+    227                  sea_memset(&sframe1[i], 0x00, sizeof(gw_frame_t)); 
+    228                  sea_gwreleaseframe(&sframe1[i]);
+    229              }
+    230          //    sfrm = rfrm = NULL;
+    231              sea_memset(gw_list1, 0x00, sizeof(gw_list_t) * 0x02);
+    232          #endif    
+    233              sea_memset(&gw_info, 0x00, sizeof(gw_info_t));
+   \   00000002   ....               LDR.N    R4,??DataTable6_1  ;; rframe
+   \   00000004   1022               MOVS     R2,#+16
+   \   00000006   0021               MOVS     R1,#+0
+   \   00000008   04F18400           ADD      R0,R4,#+132
+   \   0000000C   ........           BL       sea_memset
+    234              sea_memset(&gw_link, 0x00, sizeof(gw_link_t));
+   \   00000010   8522               MOVS     R2,#+133
+   \   00000012   0021               MOVS     R1,#+0
+   \   00000014   ....               LDR.N    R0,??DataTable6  ;; gw_link
+   \   00000016   ........           BL       sea_memset
+    235              sea_gwreleaseframe(&rframe);
+   \   0000001A   2046               MOV      R0,R4
+   \   0000001C   BDE81040           POP      {R4,LR}
+   \   00000020   ....               B.N      sea_gwreleaseframe
+    236          }
+    237          
+    238          /////////////////////////////////////////////////////////////////////////////////////////////
+    239          //
+    240          //* 函数名      : static void sea_gwparseframe ( pgw_frame_t ptr )
+    241          //* 功能        : parse received frame
+    242          //* 输入参数    : pgw_frame_t ptr
+    243          //* 输出参数    : 无
+    244          //* 修改记录    : 无
+    245          //* 备注        : 无
+    246          //*------------------------------------------------*/
+    247          static void sea_gwparseframe ( pgw_frame_t ptr )
+    248          {
+    249              if (ptr == NULL)
+    250                  return;
+    251              
+    252              if (ptr->state)
+    253              {
+    254                  sea_gwmessagehandler(ptr);
+    255                  sea_gwreleaseframe(ptr);
+    256              }
+    257          }
+    258          
+    259          #if 0
+    260          /////////////////////////////////////////////////////////////////////////////////////////////
+    261          //
+    262          //* 函数名      : static void sea_verifyrecvframe ( pgw_frame_t ptr )
+    263          //* 功能        : verify received frame
+    264          //* 输入参数    : pgw_frame_t ptr
+    265          //* 输出参数    : 无
+    266          //* 修改记录    : 无
+    267          //* 备注        : 无
+    268          //*------------------------------------------------*/
+    269          static void sea_gwverifyrecvframe ( pgw_frame_t ptr )
+    270          {
+    271              gw_frame_t frm;
+    272              u8 i, j;
+    273              
+    274              sea_memcpy(&frm, ptr, sizeof(gw_frame_t));
+    275              for (j = i = 0x00; i < ptr->len; i ++, j ++)
+    276              {
+    277                  if (ptr->body[i] == SPECIALCHAR && ptr->body[i + 0x01] == SPECIALCHAR)
+    278                  {
+    279                      frm.body[j] = SPIEMPTY;
+    280                      frm.len --;
+    281                      i ++;
+    282                  }
+    283                  else
+    284                      frm.body[j] = ptr->body[i];
+    285              }
+    286              sea_memcpy(ptr, &frm, sizeof(gw_frame_t));
+    287          }
+    288          
+    289          /////////////////////////////////////////////////////////////////////////////////////////////
+    290          //
+    291          //* 函数名      : static void sea_gwmakeframe ( pgw_frame_t ptr )
+    292          //* 功能        : make a send frame with spi
+    293          //* 输入参数    : pgw_frame_t ptr
+    294          //* 输出参数    : 无
+    295          //* 修改记录    : 无
+    296          //* 备注        : 无
+    297          //*------------------------------------------------*/
+    298          static void sea_gwverifysendframe ( pgw_frame_t ptr )
+    299          {
+    300              gw_frame_t frm;
+    301              u8 i, j;
+    302              
+    303              sea_memcpy(&frm, ptr, sizeof(gw_frame_t));
+    304              for (j = i = 0x00; i < ptr->len; i ++, j ++)
+    305              {
+    306                  if (ptr->body[i] == SPIEMPTY)
+    307                  {
+    308                      frm.body[j ++] = SPECIALCHAR;
+    309                      frm.body[j]    = SPECIALCHAR;
+    310                      frm.len ++;
+    311                  }
+    312                  else
+    313                      frm.body[j] = ptr->body[i];
+    314              }
+    315              sea_memcpy(ptr, &frm, sizeof(gw_frame_t));
+    316          }
+    317          #endif
+    318          
+    319          /////////////////////////////////////////////////////////////////////////////////////////////
+    320          //
+    321          //* 函数名      : void sea_gwmsendframe ( u8 id, u8 len, u8 * value )
+    322          //* 功能        : send a frame with spi
+    323          //* 输入参数    : u8 id, u8 len, u8 * value
+    324          //* 输出参数    : 无
+    325          //* 修改记录    : 无
+    326          //* 备注        : 无
+    327          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    328          void sea_gwmsendframe ( u8 id, u8 len, u8 * value )
+    329          {
+   \                     sea_gwmsendframe:
+   \   00000000   70B5               PUSH     {R4-R6,LR}
+   \   00000002   0446               MOV      R4,R0
+   \   00000004   0D46               MOV      R5,R1
+   \   00000006   1646               MOV      R6,R2
+    330          #if 0  
+    331              pgw_frame_t frm = sea_getcurrentframe(SENDLIST);
+    332              
+    333              sea_memset(frm, 0x00, sizeof(gw_frame_t));
+    334              frm->cmd = id;
+    335              frm->len = len;
+    336              for (u8 i = 0x00; i < len; i ++)
+    337                  frm->body[i] = value[i];
+    338              sea_gwverifysendframe(frm);
+    339              sea_putframelist(SENDLIST, frm); 
+    340          #else
+    341              sea_gwputlink(PREFIX);
+   \   00000008   6820               MOVS     R0,#+104
+   \   0000000A   ........           BL       sea_gwputlink
+    342              sea_gwputlink(id);
+   \   0000000E   2046               MOV      R0,R4
+   \   00000010   ........           BL       sea_gwputlink
+    343              sea_gwputlink(len);
+   \   00000014   2846               MOV      R0,R5
+   \   00000016   ........           BL       sea_gwputlink
+    344              for (u8 i = 0x00; i < len; i ++)
+   \   0000001A   0024               MOVS     R4,#+0
+   \   0000001C   02E0               B.N      ??sea_gwmsendframe_0
+    345              {
+    346                  if (value[i] == SPIEMPTY)
+    347                  {
+    348                      sea_gwputlink(SPECIALCHAR);
+    349                      sea_gwputlink(SPECIALCHAR);
+    350                  }
+    351                  else
+    352                      sea_gwputlink(value[i]);
+   \                     ??sea_gwmsendframe_1:
+   \   0000001E   ........           BL       sea_gwputlink
+   \   00000022   641C               ADDS     R4,R4,#+1
+   \                     ??sea_gwmsendframe_0:
+   \   00000024   AC42               CMP      R4,R5
+   \   00000026   07DA               BGE.N    ??sea_gwmsendframe_2
+   \   00000028   A05D               LDRB     R0,[R4, R6]
+   \   0000002A   FF28               CMP      R0,#+255
+   \   0000002C   F7D1               BNE.N    ??sea_gwmsendframe_1
+   \   0000002E   FE20               MOVS     R0,#+254
+   \   00000030   ........           BL       sea_gwputlink
+   \   00000034   FE20               MOVS     R0,#+254
+   \   00000036   F2E7               B.N      ??sea_gwmsendframe_1
+    353              }
+    354          #endif    
+    355          }
+   \                     ??sea_gwmsendframe_2:
+   \   00000038   70BD               POP      {R4-R6,PC}       ;; return
+    356          
+    357          /////////////////////////////////////////////////////////////////////////////////////////////
+    358          //
+    359          //* 函数名      : static void gwputframebyte ( u8 ch )
+    360          //* 功能        : send and receive a char by spi
+    361          //* 输入参数    : u8 ch
+    362          //* 输出参数    : 无
+    363          //* 修改记录    : 无
+    364          //* 备注        : 无
+    365          //*------------------------------------------------*/
+    366          static void gwputframebyte ( u8 ch )
+    367          {
+    368              if (rframe.state)
+    369                  return;
+    370              
+    371              if (ch == PREFIX && rframe.cnt == GWMAXCNT)
+    372                  rframe.cnt = 0x00;
+    373              else if (rframe.cnt == 0x00)
+    374              {
+    375                  rframe.cmd = ch;
+    376                  rframe.cnt ++;
+    377              }
+    378              else if (rframe.cnt == 0x01)
+    379              {
+    380                  rframe.len = ch > GWDATASIZE ? GWDATASIZE : ch;
+    381                  rframe.cnt ++;
+    382              }
+    383              else // if (rfrm->cnt >= 0x02 && rfrm->cnt <= DATASIZE + 0x02)
+    384              {
+    385                  if (rframe.cnt > 0x02)
+    386                  {
+    387                      if (ch == SPECIALCHAR && rframe.body[rframe.cnt - 0x03] == SPECIALCHAR)
+    388                      {
+    389                          rframe.cnt --;
+    390                          ch = SPIEMPTY;
+    391                      }
+    392                  }
+    393                  rframe.body[rframe.cnt - 0x02] = ch;
+    394                  if (rframe.cnt ++ > rframe.len)
+    395                  {
+    396          //            sea_gwverifyrecvframe(&rframe);
+    397                      rframe.state = TRUE;
+    398                  }
+    399              }
+    400          }
+    401          
+    402          /////////////////////////////////////////////////////////////////////////////////////////////
+    403          //
+    404          //* 函数名      : static void sea_gwsendrecvframe ( void )
+    405          //* 功能        : send and receive a char by spi
+    406          //* 输入参数    : 无
+    407          //* 输出参数    : 无
+    408          //* 修改记录    : 无
+    409          //* 备注        : 无
+    410          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    411          static void sea_gwsendrecvframe ( void )
+    412          {
+   \                     sea_gwsendrecvframe:
+   \   00000000   10B5               PUSH     {R4,LR}
+    413          #if 0  
+    414              u8 temp;
+    415              
+    416              if (rfrm == NULL)
+    417                  rfrm = sea_getcurrentframe(RECVLIST);
+    418              if (sfrm == NULL)
+    419                  sfrm = sea_getframelist(SENDLIST);
+    420              
+    421              if (sfrm)
+    422              {
+    423                  if (sfrm->cnt == GWMAXCNT)
+    424                  {
+    425                      temp = spi_readwrite(PREFIX);
+    426                      sfrm->cnt = 0x00;
+    427                  }
+    428                  else if (sfrm->cnt == 0x00)
+    429                  {
+    430                      temp = spi_readwrite(sfrm->cmd);
+    431                      sfrm->cnt ++;
+    432                  }
+    433                  else if (sfrm->cnt == 0x01)
+    434                  {
+    435                      temp = spi_readwrite(sfrm->len);
+    436                      sfrm->cnt ++;
+    437                  }
+    438                  else
+    439                  {
+    440                      if (sfrm->cnt - 0x02 >= sfrm->len)
+    441                      {
+    442                          sea_gwreleaseframe(sfrm);
+    443                          sfrm = NULL;
+    444                      }
+    445                      else
+    446                      {
+    447                          temp = spi_readwrite(sfrm->body[sfrm->cnt - 0x02]);
+    448                          sfrm->cnt ++;
+    449                      }
+    450                  }
+    451              }
+    452              else
+    453                  temp = spi_readwrite(SPIEMPTY);
+    454              
+    455              if (temp != SPIEMPTY && rfrm->state == FALSE)
+    456              { 
+    457                  if (temp == PREFIX && rfrm->cnt == GWMAXCNT)
+    458                      rfrm->cnt = 0x00;
+    459                  else if (rfrm->cnt == 0x00)
+    460                  {
+    461                      rfrm->cmd = temp;
+    462                      rfrm->cnt ++;
+    463                  }
+    464                  else if (rfrm->cnt == 0x01)
+    465                  {
+    466                      rfrm->len = temp > GWDATASIZE ? GWDATASIZE : temp;
+    467                      rfrm->cnt ++;
+    468                  }
+    469                  else // if (rfrm->cnt >= 0x02 && rfrm->cnt <= DATASIZE + 0x02)
+    470                  {
+    471                      if (rfrm->cnt - 0x02 >= rfrm->len)
+    472                      {
+    473                          sea_printf("\n[gw] recv frame id %02x, body:", rfrm->cmd);
+    474                          for (u8 i = 0x00; i < rfrm->len; i ++)
+    475                              sea_printf(" %02x", rfrm->body[i]);
+    476                          sea_gwverifyrecvframe(rfrm);
+    477                          rfrm->state = TRUE;
+    478                          sea_putframelist(RECVLIST, rfrm); 
+    479                          rfrm        = NULL;
+    480                      }
+    481                      else
+    482                      {
+    483                          rfrm->body[rfrm->cnt - 0x02] = temp;
+    484                          rfrm->cnt ++;
+    485                      }
+    486                  }
+    487              }
+    488          #else
+    489              u8  temp = 0x00;
+   \   00000002   ....               LDR.N    R4,??DataTable6_1  ;; rframe
+    490          
+    491              while (temp != SPIEMPTY)
+    492              {
+    493                  temp = sea_gwislinkempty() ? (spi_readwrite(SPIEMPTY)) : (spi_readwrite(sea_gwgetlink()));
+   \                     ??sea_gwsendrecvframe_0:
+   \   00000004   ........           BL       sea_gwislinkempty
+   \   00000008   0028               CMP      R0,#+0
+   \   0000000A   14BF               ITE      NE 
+   \   0000000C   FF20               MOVNE    R0,#+255
+   \   0000000E   ........           BLEQ     sea_gwgetlink
+   \   00000012   ........           BL       spi_readwrite
+    494                  if (temp != SPIEMPTY)
+   \   00000016   FF28               CMP      R0,#+255
+   \   00000018   2ED0               BEQ.N    ??sea_gwsendrecvframe_1
+    495                      gwputframebyte(temp);  
+   \   0000001A   0146               MOV      R1,R0
+   \   0000001C   E278               LDRB     R2,[R4, #+3]
+   \   0000001E   5ABB               CBNZ     R2,??sea_gwsendrecvframe_1
+   \   00000020   A278               LDRB     R2,[R4, #+2]
+   \   00000022   6829               CMP      R1,#+104
+   \   00000024   04D1               BNE.N    ??sea_gwsendrecvframe_2
+   \   00000026   FF2A               CMP      R2,#+255
+   \   00000028   02D1               BNE.N    ??sea_gwsendrecvframe_2
+   \   0000002A   0020               MOVS     R0,#+0
+   \                     ??sea_gwsendrecvframe_3:
+   \   0000002C   A070               STRB     R0,[R4, #+2]
+   \   0000002E   E9E7               B.N      ??sea_gwsendrecvframe_0
+   \                     ??sea_gwsendrecvframe_2:
+   \   00000030   12B9               CBNZ     R2,??sea_gwsendrecvframe_4
+   \   00000032   2170               STRB     R1,[R4, #+0]
+   \   00000034   0120               MOVS     R0,#+1
+   \   00000036   F9E7               B.N      ??sea_gwsendrecvframe_3
+   \                     ??sea_gwsendrecvframe_4:
+   \   00000038   012A               CMP      R2,#+1
+   \   0000003A   05D1               BNE.N    ??sea_gwsendrecvframe_5
+   \   0000003C   7F29               CMP      R1,#+127
+   \   0000003E   28BF               IT       CS 
+   \   00000040   7E21               MOVCS    R1,#+126
+   \   00000042   6170               STRB     R1,[R4, #+1]
+   \   00000044   0220               MOVS     R0,#+2
+   \   00000046   F1E7               B.N      ??sea_gwsendrecvframe_3
+   \                     ??sea_gwsendrecvframe_5:
+   \   00000048   032A               CMP      R2,#+3
+   \   0000004A   09D3               BCC.N    ??sea_gwsendrecvframe_6
+   \   0000004C   FE29               CMP      R1,#+254
+   \   0000004E   07D1               BNE.N    ??sea_gwsendrecvframe_6
+   \   00000050   1219               ADDS     R2,R2,R4
+   \   00000052   5278               LDRB     R2,[R2, #+1]
+   \   00000054   FE2A               CMP      R2,#+254
+   \   00000056   03D1               BNE.N    ??sea_gwsendrecvframe_6
+   \   00000058   A178               LDRB     R1,[R4, #+2]
+   \   0000005A   491E               SUBS     R1,R1,#+1
+   \   0000005C   A170               STRB     R1,[R4, #+2]
+   \   0000005E   FF21               MOVS     R1,#+255
+   \                     ??sea_gwsendrecvframe_6:
+   \   00000060   A278               LDRB     R2,[R4, #+2]
+   \   00000062   1219               ADDS     R2,R2,R4
+   \   00000064   9170               STRB     R1,[R2, #+2]
+   \   00000066   A178               LDRB     R1,[R4, #+2]
+   \   00000068   4A1C               ADDS     R2,R1,#+1
+   \   0000006A   A270               STRB     R2,[R4, #+2]
+   \   0000006C   6278               LDRB     R2,[R4, #+1]
+   \   0000006E   8A42               CMP      R2,R1
+   \   00000070   02D2               BCS.N    ??sea_gwsendrecvframe_1
+   \   00000072   0120               MOVS     R0,#+1
+   \   00000074   E070               STRB     R0,[R4, #+3]
+   \   00000076   10BD               POP      {R4,PC}
+    496                  if (rframe.state == TRUE)
+   \                     ??sea_gwsendrecvframe_1:
+   \   00000078   E178               LDRB     R1,[R4, #+3]
+   \   0000007A   0129               CMP      R1,#+1
+   \   0000007C   18BF               IT       NE 
+   \   0000007E   FF28               CMPNE    R0,#+255
+    497                      break;
+    498              }
+   \   00000080   C0D1               BNE.N    ??sea_gwsendrecvframe_0
+    499                  
+    500          #endif    
+    501          }
+   \   00000082   10BD               POP      {R4,PC}          ;; return
+    502          
+    503          /////////////////////////////////////////////////////////////////////////////////////////////
+    504          //
+    505          //* 函数名      : sea_gwsendtestframe ( void )
+    506          //* 功能        : send a test frame with spi
+    507          //* 输入参数    : 无
+    508          //* 输出参数    : 无
+    509          //* 修改记录    : 无
+    510          //* 备注        : 无
+    511          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    512          void sea_gwsendtestframe ( void )
+    513          {
+    514          #if 0  // test version
+    515              pgw_frame_t ptr = sea_getcurrentframe(SENDLIST);
+    516          
+    517              sea_memcpy(ptr, (void *)&tframe1, sizeof(gw_frame_t));
+    518              sea_gwverifysendframe(ptr);
+    519              sea_putframelist(SENDLIST, ptr); 
+    520          #else
+    521              sea_gwmsendframe(tframe1.cmd, tframe1.len, (u8 *)tframe1.body);
+   \                     sea_gwsendtestframe:
+   \   00000000   ....               LDR.N    R2,??DataTable6_2  ;; tframe1 + 4
+   \   00000002   0521               MOVS     R1,#+5
+   \   00000004   8420               MOVS     R0,#+132
+   \   00000006   ....               B.N      sea_gwmsendframe
+    522          #endif    
+    523          }
+    524          
+    525          /////////////////////////////////////////////////////////////////////////////////////////////
+    526          //
+    527          //* 函数名      : void gatewayTickHandler ( void )
+    528          //* 功能        : coordinatior and router tick handler in gateway
+    529          //* 输入参数    : 无
+    530          //* 输出参数    : 无
+    531          //* 修改记录    : 无
+    532          //* 备注        : 无
+    533          //*------------------------------------------------*/
+
+   \                                 In section .text, align 2, keep-with-next
+    534          void gatewayTickHandler ( void )
+    535          {
+   \                     gatewayTickHandler:
+   \   00000000   10B5               PUSH     {R4,LR}
+   \   00000002   ....               LDR.N    R0,??DataTable6_3  ;; network_info
+   \   00000004   807B               LDRB     R0,[R0, #+14]
+   \   00000006   0128               CMP      R0,#+1
+   \   00000008   09D1               BNE.N    ??gatewayTickHandler_0
+    536              if (network_info.type == EMBER_COORDINATOR)
+    537              {
+    538                  ATOMIC
+    539                  (
+    540                      spi_start();
+    541                      sea_gwsendrecvframe();
+    542                      spi_end();
+    543                  )
+   \   0000000A   ........           BL       _disableBasePri
+   \   0000000E   0446               MOV      R4,R0
+   \   00000010   ........           BL       spi_start
+   \   00000014   ........           BL       sea_gwsendrecvframe
+   \   00000018   ........           BL       spi_end
+   \   0000001C   09E0               B.N      ??gatewayTickHandler_1
+    544              }
+    545              else if (network_info.type == EMBER_ROUTER)
+   \                     ??gatewayTickHandler_0:
+   \   0000001E   0228               CMP      R0,#+2
+   \   00000020   0AD1               BNE.N    ??gatewayTickHandler_2
+    546              {
+    547                  if (spi_isnotempty())
+   \   00000022   ........           BL       spi_isnotempty
+   \   00000026   38B1               CBZ      R0,??gatewayTickHandler_2
+    548                      ATOMIC(sea_gwsendrecvframe();)
+   \   00000028   ........           BL       _disableBasePri
+   \   0000002C   0446               MOV      R4,R0
+   \   0000002E   ........           BL       sea_gwsendrecvframe
+   \                     ??gatewayTickHandler_1:
+   \   00000032   2046               MOV      R0,R4
+   \   00000034   ........           BL       _writeBasePri
+    549              }
+    550          
+    551          #if 0    
+    552              if (!sea_gwislinkempty(RECVLIST))
+    553                  sea_printf(" %02x", sea_gwgetlink(RECVLIST));
+    554                
+    555              if (!sea_framelistisempty(RECVLIST))
+    556                  sea_gwparseframe(sea_getframelist(RECVLIST));
+    557              
+    558              while (!sea_gwislinkempty(RECVLIST))
+    559              {
+    560                  u8 ch = sea_gwgetlink(RECVLIST);
+    561                  sea_printf(" %02x", ch);
+    562                  gwputframebyte(ch);  // sea_gwgetlink(RECVLIST));  
+    563              }
+    564          #endif
+    565              
+    566              if (rframe.state)
+   \                     ??gatewayTickHandler_2:
+   \   00000038   ....               LDR.N    R4,??DataTable6_1  ;; rframe
+   \   0000003A   E078               LDRB     R0,[R4, #+3]
+   \   0000003C   40B1               CBZ      R0,??gatewayTickHandler_3
+    567              {
+    568          #if 0    
+    569                  sea_printf("\n[gw] recv frame id %02x, body:", rframe.cmd);
+    570                  for (u8 i = 0x00; i < rframe.len; i ++)
+    571                      sea_printf(" %02x", rframe.body[i]);
+    572          #endif        
+    573                  sea_gwparseframe(&rframe);
+   \   0000003E   2046               MOV      R0,R4
+   \   00000040   ........           BL       sea_gwmessagehandler
+   \   00000044   2046               MOV      R0,R4
+   \   00000046   ........           BL       sea_gwreleaseframe
+    574                  sea_gwreleaseframe(&rframe);
+   \   0000004A   2046               MOV      R0,R4
+   \   0000004C   ........           BL       sea_gwreleaseframe
+    575              }
+    576          }
+   \                     ??gatewayTickHandler_3:
+   \   00000050   10BD               POP      {R4,PC}          ;; return
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6:
+   \   00000000   ........           DC32     gw_link
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_1:
+   \   00000000   ........           DC32     rframe
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_2:
+   \   00000000   ........           DC32     tframe1 + 4
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable6_3:
+   \   00000000   ........           DC32     network_info
+    577          ///////////////////////////////////////////////////////////////////////////
+    578          //#endif  // ENABLE_GATEWAY
+    579          
+    580          
+    581          
+    582          ///////////////////////////////////////////////////////////////////////////
+    583          // the following lines wrote by guo tailei
+    584          #if 0   // removed by renyu 2011/09/23
+    585          ////////////////////////////////////////////////////////////////////////
+    586          // constants and globals
+    587          cmd_pkg_info_t  cmdpkg_info;
+    588          lamp_pkg_info_t lamppkg_info;
+    589          
+    590          ////////////////////////////////////////////////////////////////////////
+    591          // static decalaretion functions
+    592          static void CmdPkgHanlder(void);
+    593          static void LampPkgHanlder(void);
+    594          
+    595          #if defined(SINK_APP) && defined(ENABLE_GATEWAY) 
+    596            static void GateWay_CO_Init(void);
+    597            static bool isCmdPkgSet(void);
+    598            static void parseCmdPkg( void );
+    599          #elif defined(SENSOR_APP) && defined(ENABLE_GATEWAY) 
+    600            static void GateWay_RT_Init(void);
+    601            static void gwPollForLampData(void);
+    602            static void forwardLampPkg( void );
+    603          #endif
+    604          
+    605          /////////////////////////////////////////////////////////////////////////////////////////////
+    606          //
+    607          //* 函数名      : void GWY_Configuration ( void )
+    608          //* 功能        : initialize gateway information
+    609          //* 输入参数    : 无
+    610          //* 输出参数    : 无
+    611          //* 修改记录    : 无
+    612          //* 备注        : 无
+    613          //*------------------------------------------------*/
+    614          void GWY_Configuration ( void )
+    615          {
+    616              sea_memset(&cmdpkg_info,  0x00, sizeof(cmd_pkg_info_t));
+    617              sea_memset(&lamppkg_info, 0x00, sizeof(lamp_pkg_info_t));
+    618            
+    619              sea_memset(&rframe, 0x00, sizeof(frame_t)); 
+    620              sea_gwreleaseframe(&rframe);
+    621              
+    622              sea_memset(&sframe, 0x00, sizeof(frame_t)); 
+    623              sea_gwreleaseframe(&sframe);
+    624          
+    625          #if defined(SINK_APP) && defined(ENABLE_GATEWAY)
+    626              GateWay_CO_Init();
+    627          #elif defined(SENSOR_APP) && defined(ENABLE_GATEWAY)
+    628              sea_printf("\nsample frame id %02x, len %02x, cnt %02x, state %02x, body ", tframe.cmd, tframe.len, tframe.cnt, tframe.state);
+    629              for (u8 i = 0x00; i < tframe.len; i ++)
+    630                  sea_printf("%02x ", tframe.body[i]);
+    631              GateWay_RT_Init();
+    632          #endif  
+    633          }
+    634          
+    635          /////////////////////////////////////////////////////////////////////////////////////////////
+    636          //
+    637          //* 函数名      : void CmdPkgHanlder(void)
+    638          //* 功能        : 网关CO，需要根据情况转发，重组cmd_pkg；
+    639          //*             : 而对于网关ZR,仅需要填充本pkg就可，置BUSY位；
+    640          //* 输入参数    : 无
+    641          //* 输出参数    : 无
+    642          //* 修改记录    : 无
+    643          //* 备注        : 无
+    644          //*------------------------------------------------*/
+    645          static void CmdPkgHanlder ( void )
+    646          {
+    647              if (cmdpkg_info.status == BUSY)
+    648              {
+    649          #if defined(SINK_APP) && defined(ENABLE_GATEWAY)     // 解析，然后广播出去
+    650                  parseCmdPkg(); 
+    651                  printGwPkg();
+    652              
+    653                  sea_memset(&cmdpkg_info.cmd_pkg,0x00,sizeof(cmd_format_t));
+    654                  sea_printf("\n->cmdpkg_info reset");
+    655              
+    656          #elif defined(SENSOR_APP) && defined(ENABLE_GATEWAY)
+    657              //do nothing
+    658          #endif 
+    659              
+    660                  cmdpkg_info.status = IDLE;
+    661              }
+    662          
+    663          #if defined(SINK_APP) && defined(ENABLE_GATEWAY)    // 主重发
+    664              if (cmdpkg_info.status == ERR && cmdpkg_info.retry <= GWTIMEOUT)
+    665              {
+    666                  gwQueryCmd();
+    667                  cmdpkg_info.retry++;
+    668                  sea_printf("\ngwQeryCmd() retry again!");
+    669              }
+    670          #endif
+    671          }
+    672          
+    673          /////////////////////////////////////////////////////////////////////////////////////////////
+    674          //
+    675          //* 函数名      : void LampPkgHanlder(void)
+    676          //* 功能        : 网关CO，是自己的，则从list[]里复制过来；若不是（转发的），写入该区域；
+    677          //*             : 网关ZR，将该区域通过zigbee发给自身所在PAN的协调器；
+    678          //* 输入参数    : 无
+    679          //* 输出参数    : 无
+    680          //* 修改记录    : 无
+    681          //* 备注        : 无
+    682          //*------------------------------------------------*/
+    683          static void LampPkgHanlder ( void )
+    684          {
+    685              if (lamppkg_info.status == BUSY)
+    686              {    
+    687          #if defined(SINK_APP) && defined(ENABLE_GATEWAY)                      //ZC    
+    688                  printGwPkg();
+    689                  gwSendLampData();
+    690              
+    691          #elif defined(SENSOR_APP) && defined(ENABLE_GATEWAY)                    //ZR
+    692                  sea_printf("\n->RX a lamp pkg,print then forward unicast");
+    693                  printGwPkg();
+    694                  forwardLampPkg();    //unicast to 0x0000
+    695          #endif
+    696              
+    697                  lamppkg_info.status = IDLE;
+    698           
+    699                  sea_memset(&lamppkg_info, 0x00, sizeof(lamp_pkg_info_t));
+    700                  sea_printf("\n->lamppkg_info reset");
+    701              }
+    702          }
+    703          
+    704          /////////////////////////////////////////////////////////////////////////////////////////////
+    705          //
+    706          //* 函数名      : void printGwPkg(void)
+    707          //* 功能        : 
+    708          //* 输入参数    : 无
+    709          //* 输出参数    : 无
+    710          //* 修改记录    : 无
+    711          //* 备注        : 无
+    712          //*------------------------------------------------*/
+    713          void printGwPkg  ( void )
+    714          {
+    715          #if 1   
+    716              int i;
+    717          
+    718              sea_printf("\n------------cmdpkg_info------------");
+    719              sea_printf("\ncmdpkg_info.status  = %02x", cmdpkg_info.status);
+    720              sea_printf("\ncmdpkg_info.count   = %02x", cmdpkg_info.count);
+    721              sea_printf("\ncmdpkg_info.cmd_pkg:\n");
+    722              for(i = 0x00; i < CMDNUM + 0x01; i ++)
+    723                  sea_printf("%02x ",*( (u8 *)(&cmdpkg_info.cmd_pkg) + i) );
+    724            
+    725              sea_printf("\n\n------------lamppkg_info-----------");
+    726              sea_printf("\nlamppkg_info.status = %02x", lamppkg_info.status);
+    727              sea_printf("\nlamppkg_info.count  = %02x", lamppkg_info.count);
+    728              sea_printf("\nlamppkg_info.lamp_pkg:\n");
+    729              for (i = 0x00; i < PKGSIZE; i ++)
+    730                  sea_printf("%02x ", lamppkg_info.lamp_pkg[i]);
+    731            
+    732              // sea_printf("\nPA3(SPI SSEL):GPIO_PAOUT is %x", GPIO_PAOUT_REG);
+    733              // sea_printf("\nPA3: GPIO_PAIN is %x", GPIO_PAIN);
+    734          #ifdef  GateWay_ZR
+    735              sea_printf("\nchoice: %d", choice);
+    736          #endif
+    737              sea_printf("\n------------end----------------------");
+    738          #endif
+    739          }
+    740          
+    741          /////////////////////////////////////////////////////////////////////////////////////////////
+    742          //网关协调器部分
+    743          /////////////////////////////////////////////////////////////////////////////////////////////
+    744          #if defined(SINK_APP) && defined(ENABLE_GATEWAY)
+    745          /////////////////////////////////////////////////////////////////////////////////////////////
+    746          //
+    747          //* 函数名      : void GateWay_CO_Init(void)
+    748          //* 功能        : 
+    749          //* 输入参数    : 无
+    750          //* 输出参数    : 无
+    751          //* 修改记录    : 无
+    752          //* 备注        : 无
+    753          //*------------------------------------------------*/
+    754          static void GateWay_CO_Init(void)
+    755          {
+    756            //初始化
+    757            lamppkg_info.status = IDLE;
+    758            lamppkg_info.count = 0;                               //lamppkg_info.count是spi传输计数时用；
+    759            sea_memset(lamppkg_info.lamp_pkg,0x07,PKGSIZE);
+    760          }
+    761          
+    762          /////////////////////////////////////////////////////////////////////////////////////////////
+    763          //
+    764          //* 函数名      : void gwSendLampData(void)
+    765          //* 功能        : 
+    766          //* 输入参数    : 无
+    767          //* 输出参数    : 无
+    768          //* 修改记录    : 无
+    769          //* 备注        : 当lamppkg_info.status == BUSY 时，调用本函数
+    770          //*------------------------------------------------*/
+    771          void gwSendLampData( void )
+    772          {  
+    773            spi_start();
+    774            sea_printf("\n->gwSendLampData()");
+    775            
+    776            spi_writebyte(DATA);
+    777            while(lamppkg_info.count < PKGSIZE)
+    778            {
+    779              spi_writebyte(lamppkg_info.lamp_pkg[lamppkg_info.count++]);
+    780            }
+    781            //delay(0xff);
+    782            spi_end();
+    783            lamppkg_info.count = 0;
+    784          }
+    785          
+    786          /////////////////////////////////////////////////////////////////////////////////////////////
+    787          //
+    788          //* 函数名      : bool isCmdPkgSet(void)
+    789          //* 功能        : 
+    790          //* 输入参数    : 无
+    791          //* 输出参数    : 无
+    792          //* 修改记录    : 无
+    793          //* 备注        : 无
+    794          //*------------------------------------------------*/
+    795          bool isCmdPkgSet ( void )
+    796          {
+    797              for (u8 i = 0x00; i < sizeof(cmd_format_t); i ++)
+    798              {
+    799                  if (*( (u8 *)(&cmdpkg_info.cmd_pkg) + i) != 0x00)
+    800                      return (bool)TRUE;
+    801              }
+    802              return (bool)FALSE;
+    803          }
+    804          
+    805          /////////////////////////////////////////////////////////////////////////////////////////////
+    806          //
+    807          //* 函数名      : void gwQueryCmd(void)
+    808          //* 功能        : 
+    809          //* 输入参数    : 无
+    810          //* 输出参数    : 无
+    811          //* 修改记录    : 无
+    812          //* 备注        : 定时查询ZigBee_ZR有无命令
+    813          //*------------------------------------------------*/
+    814          void gwQueryCmd ( void )
+    815          {
+    816              u8 temp;
+    817            
+    818              sea_printf("\ngwCmd :");
+    819              cmdpkg_info.count = 0x00;
+    820              
+    821              spi_start();
+    822              spi_writebyte(QUARY);
+    823              while (cmdpkg_info.count < (sizeof(cmd_format_t)))
+    824              {
+    825                  temp = spi_readwrite (FILL);
+    826                  if (temp != 0xff)
+    827                  {
+    828                      *((u8 *)(&cmdpkg_info.cmd_pkg) + cmdpkg_info.count ++ ) = temp;
+    829                      sea_printf(" %02x", temp);
+    830                  }
+    831              }
+    832              spi_end();
+    833            
+    834              if (isCmdPkgSet())
+    835              {
+    836                  cmdpkg_info.status = BUSY;
+    837                  sea_printf("  :query a busy cmdpkg,parse and forward...");
+    838              }
+    839          }
+    840          #endif
+    841          
+    842          /////////////////////////////////////////////////////////////////////////////////////////////
+    843          //
+    844          //* 函数名      : void fillLampPkg(void)
+    845          //* 功能        : 
+    846          //* 输入参数    : 无
+    847          //* 输出参数    : 无
+    848          //* 修改记录    : 无
+    849          //* 备注        : 
+    850          //*------------------------------------------------*/
+    851          void fillLampPkg( void )
+    852          {
+    853            sea_printf("->fill LampPkg");
+    854            if (lamppkg_info.status == IDLE)
+    855            {
+    856              extern road_t  road_info; 
+    857              lamppkg_info.lamp_pkg[PREFIX_INDEX] = 0x68;
+    858              lamppkg_info.lamp_pkg[ROADID_INDEX] = ROADID;
+    859              lamppkg_info.lamp_pkg[SUFFIX_INDEX] = 0x43;
+    860              
+    861              //sea_memcpy((u8 *)(lamppkg_info.lamp_pkg)+2,(u8 *)(road_info.head),CURRENTLAMPS * sizeof(lamp_t));
+    862              lamppkg_info.status = BUSY;
+    863            }
+    864          }
+    865          
+    866          
+    867          /////////////////////////////////////////////////////////////////////////////////////////////
+    868          //网关路由部分
+    869          /////////////////////////////////////////////////////////////////////////////////////////////
+    870          
+    871          #if defined(SENSOR_APP) && defined(ENABLE_GATEWAY) 
+    872          /////////////////////////////////////////////////////////////////////////////////////////////
+    873          //
+    874          //* 函数名      : void GateWay_RT_Init(void)
+    875          //* 功能        : 
+    876          //* 输入参数    : 无
+    877          //* 输出参数    : 无
+    878          //* 修改记录    : 无
+    879          //* 备注        : 无
+    880          //*------------------------------------------------*/
+    881          static void GateWay_RT_Init(void)
+    882          {
+    883            cmdpkg_info.status = IDLE;
+    884            cmdpkg_info.count  = 0;                                   //cmdpkg_info.count是spi传输计数时用；  
+    885            cmdpkg_info.retry  = 0;   
+    886            //sea_memset(&cmdpkg_info.cmd_pkg,0x08,sizeof(cmd_format_t));
+    887          }
+    888          
+    889          static u8 choice = 0;
+    890          /////////////////////////////////////////////////////////////////////////////////////////////
+    891          //
+    892          //* 函数名      : void gwPollForLampData(void)
+    893          //* 功能        : 
+    894          //* 输入参数    : 无
+    895          //* 输出参数    : 无
+    896          //* 修改记录    : 无
+    897          //* 备注        : 无
+    898          //*------------------------------------------------*/
+    899          static void gwPollForLampData ( void )
+    900          {
+    901              u8 temp;
+    902            
+    903              while (spi_isnotempty())
+    904              {
+    905                  switch (choice)
+    906                  {
+    907                      case 0: //选择
+    908                          temp = spi_readbyte();
+    909                          if (temp == QUARY)
+    910                              choice = 1;
+    911                          else if (temp == DATA)
+    912                              choice = 2;
+    913                          else
+    914                          {                                                           //SPI传输速度差异导致，一般多出三个，丢掉即可
+    915          //                  sea_printf("\n[rx] an unknown feature.choice = 0");
+    916          //                  sea_printf("\n temp = %d",temp);         // do nothing temporary
+    917                          }
+    918                          break;
+    919                      case 1: // 发送 cmd
+    920                          spi_readwrite(*((u8 *)(&cmdpkg_info.cmd_pkg) + cmdpkg_info.count ++ ));
+    921                          if (cmdpkg_info.count == sizeof(cmd_format_t) + 0x01)
+    922                          {
+    923                              cmdpkg_info.status = IDLE;                                    //发送完之后，清空。
+    924                              sea_memset(&cmdpkg_info.cmd_pkg, 0x05, sizeof(cmd_format_t));
+    925                              cmdpkg_info.cmd_pkg.all_status  = 0x00;
+    926                              cmdpkg_info.cmd_pkg.all_persent = 0x00;
+    927                              cmdpkg_info.count = 0;
+    928                              choice = 0;
+    929                              sea_printf("\nfinish [QUARY] cmdpkg pass back..reset choice flag");
+    930                          }
+    931                          break;
+    932                      case 2:  // 接收lamp data
+    933                          temp = spi_readbyte();
+    934                          if (temp != 0xFF)
+    935                              lamppkg_info.lamp_pkg[lamppkg_info.count++] = temp;
+    936                          if (lamppkg_info.count == 0x82)
+    937                          {
+    938                              lamppkg_info.status = BUSY;
+    939                              choice = 0;
+    940                              sea_printf("\nfinish [DATA] Rx..reset choice flag");
+    941                              //printGwPkg();
+    942                          }
+    943                          break;
+    944                      default:
+    945                          sea_printf("\nerror...choice is :%d",choice);
+    946                          break;
+    947                  } // switch
+    948              }  // while
+    949          }
+    950          
+    951          /////////////////////////////////////////////////////////////////////////////////////////////
+    952          //
+    953          //* 函数名      : void forwardLampPkg(void)
+    954          //* 功能        : 
+    955          //* 输入参数    : 无
+    956          //* 输出参数    : 无
+    957          //* 修改记录    : 无
+    958          //* 备注        : 网管ZR把网管ZC的信息发送给自己网内的ZC
+    959          //*------------------------------------------------*/
+    960          static void forwardLampPkg( void )
+    961          {
+    962            if (lamppkg_info.status == BUSY)
+    963            {
+    964              sea_printf("\n->forward LampPkg to ZC");
+    965              //unicasts to ZC
+    966              
+    967              lamppkg_info.status = IDLE;
+    968              lamppkg_info.count  = 0;
+    969              sea_memset(lamppkg_info.lamp_pkg,0x00,PKGSIZE);
+    970                    
+    971            }
+    972          }
+    973          
+    974          /////////////////////////////////////////////////////////////////////////////////////////////
+    975          #endif
+    976          
+    977          
+    978          
+    979          
+    980          
+    981          /////////////////////////////////////////////////////////////////////////////////////////////
+    982          //暂时未用，备份
+    983          #if 0
+    984          void gwPollForLampData()
+    985          {
+    986          #if 0  
+    987            if (( (SC2_SPISTAT & SC_SPIRXVAL_MASK) >> SC_SPIRXVAL_BIT == 1))
+    988            {
+    989                temp = spi_readbyte();
+    990                switch (temp)
+    991                {
+    992                case QUARY://发送cmd
+    993                  sea_printf("\nrx a QUARY Feature");
+    994                  while( (SC2_SPISTAT & SC_SPIRXVAL_MASK) >> SC_SPIRXVAL_BIT == 1)
+    995                  {
+    996                    spi_readwrite(*((u8 *)(&cmdpkg_info.cmd_pkg) + cmdpkg_info.count++ ));
+    997                    //if ((SC2_SPISTAT & SC_SPIRXVAL_MASK) >> SC_SPIRXVAL_BIT == 0)
+    998                      //delay(0x07);
+    999                  }
+   1000                  cmdpkg_info.status = IDLE;
+   1001                  break;
+   1002                
+   1003                case DATA://接收lamp data
+   1004                  sea_printf("\nrx a DATA Feature");
+   1005                  while( (SC2_SPISTAT & SC_SPIRXVAL_MASK) >> SC_SPIRXVAL_BIT == 1)
+   1006                  {
+   1007                    temp = spi_readbyte();
+   1008                    if(temp != 0xFF && temp!= DATA)
+   1009                      lamppkg_info.lamp_pkg[lamppkg_info.count++] = temp; 
+   1010                    //if ((SC2_SPISTAT & SC_SPIRXVAL_MASK) >> SC_SPIRXVAL_BIT == 0)
+   1011                      //delay(0x07);
+   1012                  }
+   1013                  lamppkg_info.status = BUSY;
+   1014                  break;
+   1015                
+   1016                default:
+   1017                  sea_printf("\n rx an unknown spi cmd");
+   1018                }
+   1019                sea_printf("\ncall poll");
+   1020            }
+   1021          #endif
+   1022            
+   1023          //SwapData
+   1024          #if 0     
+   1025              if (cmdpkg_info.count < sizeof(cmd_format_t))
+   1026              {
+   1027                temp = spi_readwrite(*( (u8 *)(&cmdpkg_info.cmd_pkg) + cmdpkg_info.count++ ));
+   1028                lamppkg_info.lamp_pkg[lamppkg_info.count++] = temp;
+   1029              }
+   1030              else
+   1031              {
+   1032                temp = spi_readbyte();
+   1033                lamppkg_info.lamp_pkg[lamppkg_info.count++] = temp;
+   1034              }
+   1035          #endif
+   1036          }
+   1037          
+   1038          /////////////////////////////////////////////////////////////////////////////////////////////
+   1039          //
+   1040          //* 函数名      : void gwSwapData(void)
+   1041          //* 功能        : 
+   1042          //* 输入参数    : 无
+   1043          //* 输出参数    : 无
+   1044          //* 修改记录    : 无
+   1045          //* 备注        : 当lamppkg_info.status == BUSY 时，调用本函数
+   1046          //*------------------------------------------------*/
+   1047          void gwSwapData(void)
+   1048          {
+   1049            u8 temp;
+   1050              
+   1051            while(lamppkg_info.count < PKGSIZE)
+   1052            {
+   1053              //spi_writebyte(lamppkg_info.lamp_pkg[lamppkg_info.count++]);
+   1054              temp = spi_readwrite (lamppkg_info.lamp_pkg[lamppkg_info.count++]);
+   1055              if ((cmdpkg_info.count < sizeof(cmd_format_t)) && temp != 0xff)
+   1056                *( (u8 *)(&cmdpkg_info.cmd_pkg) + cmdpkg_info.count++ ) = temp;    
+   1057            }
+   1058            
+   1059            //delay(0xff);
+   1060            spi_end();
+   1061            
+   1062            if ( cmdpkg_info.status == IDLE )
+   1063               cmdpkg_info.status = BUSY;
+   1064            
+   1065            //任务完成，清零
+   1066            sea_memset(&lamppkg_info,0, sizeof(lamp_pkg_info_t));
+   1067          }
+   1068          
+   1069          #endif
+   1070          
+   1071          /////////////////////////////////////////////////////////////////////////////////////////////
+   1072          //
+   1073          //* 函数名      : static void sea_gwsendrecvframe ( void )
+   1074          //* 功能        : send and receive a char by spi
+   1075          //* 输入参数    : 无
+   1076          //* 输出参数    : 无
+   1077          //* 修改记录    : 无
+   1078          //* 备注        : backup the function, commented by renyu 2011/10/18
+   1079          //*------------------------------------------------*/
+   1080          static void sea_gwsendrecvframe ( void )
+   1081          {
+   1082          #if 0   // test version
+   1083              u8 temp;
+   1084                  
+   1085              if (sframe.state)
+   1086              {
+   1087                  if (sframe.cnt == GWMAXCNT)
+   1088                  {
+   1089                      temp = spi_readwrite(PREFIX);
+   1090                      sframe.cnt = 0x00;
+   1091                  }
+   1092                  else if (sframe.cnt == 0x00)
+   1093                  {
+   1094                      temp = spi_readwrite(sframe.cmd);
+   1095                      sframe.cnt ++;
+   1096                  }
+   1097                  else if (sframe.cnt == 0x01)
+   1098                  {
+   1099                      temp = spi_readwrite(sframe.len);
+   1100                      sframe.cnt ++;
+   1101                  }
+   1102                  else
+   1103                  {
+   1104                      temp = spi_readwrite(sframe.body[sframe.cnt - 0x02]);
+   1105                      if (sframe.cnt ++ > sframe.len)
+   1106                          sea_gwreleaseframe(&sframe);
+   1107                  }
+   1108              }
+   1109              else
+   1110                  temp = spi_readwrite(SPIEMPTY);
+   1111              if (temp != SPIEMPTY && rframe.state == FALSE)
+   1112              { 
+   1113                  if (temp == PREFIX && rframe.cnt == GWMAXCNT)
+   1114                      rframe.cnt = 0x00;
+   1115                  else if (rframe.cnt == 0x00)
+   1116                  {
+   1117                      rframe.cmd = temp;
+   1118                      rframe.cnt ++;
+   1119                  }
+   1120                  else if (rframe.cnt == 0x01)
+   1121                  {
+   1122                      rframe.len = temp > DATASIZE ? (DATASIZE) : (temp);
+   1123                      rframe.cnt ++;
+   1124                  }
+   1125                  else
+   1126                  {
+   1127                      rframe.body[rframe.cnt - 0x02] = temp;
+   1128                      if (rframe.cnt ++ > rframe.len)
+   1129                      {
+   1130                          sea_gwverifyrecvframe(&rframe);
+   1131                          rframe.state = TRUE;
+   1132                      }
+   1133                  }               
+   1134              }
+   1135          #else
+   1136              u8 temp;
+   1137              
+   1138              if (rfrm == NULL)
+   1139                  rfrm = sea_getcurrentframe(RECVLIST);
+   1140              if (sfrm == NULL)
+   1141                  sfrm = sea_getframelist(SENDLIST);
+   1142              
+   1143              if (sfrm)
+   1144              {
+   1145                  if (sfrm->cnt == GWMAXCNT)
+   1146                  {
+   1147                      temp = spi_readwrite(PREFIX);
+   1148                      sfrm->cnt = 0x00;
+   1149                  }
+   1150                  else if (sfrm->cnt == 0x00)
+   1151                  {
+   1152                      temp = spi_readwrite(sfrm->cmd);
+   1153                      sfrm->cnt ++;
+   1154                  }
+   1155                  else if (sfrm->cnt == 0x01)
+   1156                  {
+   1157                      temp = spi_readwrite(sfrm->len);
+   1158                      sfrm->cnt ++;
+   1159                  }
+   1160                  else
+   1161                  {
+   1162                      temp = spi_readwrite(sfrm->body[sfrm->cnt - 0x02]);
+   1163                      if (sfrm->cnt ++ > sfrm->len)
+   1164                      {
+   1165                          sea_gwreleaseframe(sfrm);
+   1166                          sfrm = NULL;
+   1167                      }
+   1168                  }
+   1169              }
+   1170              else
+   1171                  temp = spi_readwrite(SPIEMPTY);
+   1172              
+   1173              if (temp != SPIEMPTY && rfrm->state == FALSE)
+   1174              { 
+   1175                  if (temp == PREFIX && rfrm->cnt == GWMAXCNT)
+   1176                      rfrm->cnt = 0x00;
+   1177                  else if (rfrm->cnt == 0x00)
+   1178                  {
+   1179                      rfrm->cmd = temp;
+   1180                      rfrm->cnt ++;
+   1181                  }
+   1182                  else if (rfrm->cnt == 0x01)
+   1183                  {
+   1184                      rfrm->len = temp > DATASIZE ? (DATASIZE) : (temp);
+   1185                      rfrm->cnt ++;
+   1186                  }
+   1187                  else
+   1188                  {
+   1189                      rfrm->body[rfrm->cnt - 0x02] = temp;
+   1190                      if (rfrm->cnt ++ > rfrm->len)
+   1191                      {
+   1192                          sea_gwverifyrecvframe(rfrm);
+   1193                          rfrm->state = TRUE;
+   1194                          sea_putframelist(RECVLIST, rfrm); 
+   1195                          rfrm        = NULL;
+   1196                      }
+   1197                  }               
+   1198              }
+   1199          #endif    
+   1200          }
+   1201          
+   1202          /////////////////////////////////////////////////////////////////////////////////////////////
+   1203          #endif   // removed by renyu 2011/09/23
+
+   Maximum stack usage in bytes:
+
+     Function            .cstack
+     --------            -------
+     GWY_Configuration        8
+     gatewayTickHandler       8
+     sea_gwgetlink            0
+     sea_gwislinkempty        0
+     sea_gwmsendframe        16
+     sea_gwputlink            0
+     sea_gwreleaseframe       0
+     sea_gwsendrecvframe      8
+     sea_gwsendtestframe      8
+
+
+   Section sizes:
+
+     Function/Label      Bytes
+     --------------      -----
+     tframe1              132
+     gw_link              136
+     rframe               148
+     gw_info
+     gw_frame             132
+     sea_gwislinkempty     12
+     sea_gwgetlink         30
+     sea_gwputlink         32
+     sea_gwreleaseframe    10
+     GWY_Configuration     34
+     sea_gwmsendframe      58
+     sea_gwsendrecvframe  132
+     sea_gwsendtestframe    8
+     gatewayTickHandler    82
+     ??DataTable6           4
+     ??DataTable6_1         4
+     ??DataTable6_2         4
+     ??DataTable6_3         4
+
+ 
+ 416 bytes in section .bss
+ 132 bytes in section .rodata
+ 414 bytes in section .text
+ 
+ 414 bytes of CODE  memory
+ 132 bytes of CONST memory
+ 416 bytes of DATA  memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,372 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:39
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\trust-center.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\trust-center.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\trust-center.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\trust-center.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\util\trust-center.c
+      1          #include "config.h"
+      2          #include "ember.h"
+      3          #include "mem.h"
+      4          #include "hal.h"
+      5          #include "serial.h"
+      6          #include "security.h"
+      7          
+      8          /////////////////////////////////////////////////////////////////////////////////////////////
+      9          // GLOBALS
+
+   \                                 In section .data, align 1
+     10          static boolean trustCenterAllowJoins = FALSE;
+   \                     trustCenterAllowJoins:
+   \   00000000   0x00               DC8 0
+   \   00000001   0x01               DC8 1
+     11          static boolean trustCenterUsePreconfiguredKey = TRUE;
+     12          
+     13          #if defined EZSP_HOST
+     14            static boolean generateRandomKey(EmberKeyData* result);
+     15          #else
+     16            #define generateRandomKey(result) \
+     17              (EMBER_SUCCESS == emberGenerateRandomKey(result))
+     18          #endif
+     19          
+     20          /////////////////////////////////////////////////////////////////////////////////////////////
+     21          // FUNCTIONS
+     22          
+     23          static EmberStatus permitRequestingTrustCenterLinkKey(boolean allow);
+     24          
+     25          /////////////////////////////////////////////////////////////////////////////////////////////
+     26          //
+
+   \                                 In section .text, align 2, keep-with-next
+     27          boolean trustCenterInit ( EmberKeyData* preconfiguredKey, EmberKeyData* networkKey )
+     28          {
+     29              EmberInitialSecurityState state;
+     30          
+     31              trustCenterUsePreconfiguredKey = (preconfiguredKey != NULL);
+   \                     trustCenterInit: (+1)
+   \   00000000   0x2800             CMP      R0,#+0
+   \   00000002   0x....             LDR.N    R2,??DataTable4
+   \   00000004   0xB510             PUSH     {R4,LR}
+   \   00000006   0x460C             MOV      R4,R1
+   \   00000008   0xBF14             ITE      NE 
+   \   0000000A   0x2101             MOVNE    R1,#+1
+   \   0000000C   0x2100             MOVEQ    R1,#+0
+   \   0000000E   0x7051             STRB     R1,[R2, #+1]
+   \   00000010   0xB08C             SUB      SP,SP,#+48
+     32          
+     33              if (trustCenterUsePreconfiguredKey ) 
+   \   00000012   0x7851             LDRB     R1,[R2, #+1]
+   \   00000014   0xB151             CBZ.N    R1,??trustCenterInit_0
+     34              {
+     35                  sea_memcpy(emberKeyContents(&state.preconfiguredKey), preconfiguredKey, EMBER_ENCRYPTION_KEY_SIZE);
+   \   00000016   0x4601             MOV      R1,R0
+   \   00000018   0x2210             MOVS     R2,#+16
+   \   0000001A   0xF10D 0x0002      ADD      R0,SP,#+2
+   \   0000001E   0x.... 0x....      BL       sea_memcpy
+     36                  // When using pre-configured TC link keys, devices are not allowed to request TC link keys. Otherwise it exposes a security hole.
+     37                  if (EMBER_SUCCESS != permitRequestingTrustCenterLinkKey(FALSE)) 
+   \   00000022   0x2000             MOVS     R0,#+0
+   \   00000024   0x.... 0x....      BL       permitRequestingTrustCenterLinkKey
+   \   00000028   0xB958             CBNZ.N   R0,??trustCenterInit_1
+   \   0000002A   0xE004             B.N      ??trustCenterInit_2
+     38                  {
+     39                      Debug( "\nFailed to set policy for requesting TC link keys.");
+     40                      return FALSE;
+     41                  }
+     42              } 
+     43              else 
+     44              {
+     45                  if (!generateRandomKey(&(state.preconfiguredKey))) 
+   \                     ??trustCenterInit_0: (+1)
+   \   0000002C   0xF10D 0x0002      ADD      R0,SP,#+2
+   \   00000030   0x.... 0x....      BL       emberGenerateRandomKey
+   \   00000034   0xB928             CBNZ.N   R0,??trustCenterInit_1
+     46                  {
+     47                      Debug( "\nFailed to generate random link key.");
+     48                      return FALSE;
+     49                  }
+     50              }
+     51          
+     52              // The network key should be randomly generated to minimize the risk
+     53              // where a network key obtained from one network can be used in another.
+     54              // This library supports setting a particular (not random) network key.
+     55              if (networkKey == NULL) 
+   \                     ??trustCenterInit_2: (+1)
+   \   00000036   0xB934             CBNZ.N   R4,??trustCenterInit_3
+     56              {
+     57                  if (!generateRandomKey(&(state.networkKey))) 
+   \   00000038   0xF10D 0x0012      ADD      R0,SP,#+18
+   \   0000003C   0x.... 0x....      BL       emberGenerateRandomKey
+   \   00000040   0xB138             CBZ.N    R0,??trustCenterInit_4
+     58                  {
+     59                      Debug("\r\nFailed to generate random NWK key.");
+     60                      return FALSE;
+   \                     ??trustCenterInit_1: (+1)
+   \   00000042   0x2000             MOVS     R0,#+0
+   \   00000044   0xE012             B.N      ??trustCenterInit_5
+     61                  }
+     62              } 
+     63              else 
+     64              {
+     65                  sea_memcpy(emberKeyContents(&state.networkKey), networkKey, EMBER_ENCRYPTION_KEY_SIZE);
+   \                     ??trustCenterInit_3: (+1)
+   \   00000046   0x2210             MOVS     R2,#+16
+   \   00000048   0x4621             MOV      R1,R4
+   \   0000004A   0xF10D 0x0012      ADD      R0,SP,#+18
+   \   0000004E   0x.... 0x....      BL       sea_memcpy
+     66              }
+     67              // EMBER_HAVE_PRECONFIGURED_KEY is always set on the TC regardless of whether
+     68              // the Trust Center is expecting the device to have a preconfigured key.
+     69              // This is the value for the Trust Center Link Key.
+     70              state.bitmask = ( EMBER_HAVE_PRECONFIGURED_KEY  
+     71                              | EMBER_STANDARD_SECURITY_MODE
+     72                              | EMBER_GLOBAL_LINK_KEY
+     73                              | EMBER_HAVE_NETWORK_KEY );
+   \                     ??trustCenterInit_4: (+1)
+   \   00000052   0xF44F 0x7041      MOV      R0,#+772
+   \   00000056   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+     74              state.networkKeySequenceNumber = 0;
+   \   0000005A   0x2000             MOVS     R0,#+0
+   \   0000005C   0xF88D 0x0022      STRB     R0,[SP, #+34]
+     75          
+     76              return (EMBER_SUCCESS == emberSetInitialSecurityState(&state));
+   \   00000060   0xA800             ADD      R0,SP,#+0
+   \   00000062   0x.... 0x....      BL       emberSetInitialSecurityState
+   \   00000066   0x1E40             SUBS     R0,R0,#+1
+   \   00000068   0x4180             SBCS     R0,R0,R0
+   \   0000006A   0x0FC0             LSRS     R0,R0,#+31
+   \                     ??trustCenterInit_5: (+1)
+   \   0000006C   0xB00C             ADD      SP,SP,#+48
+   \   0000006E   0xBD10             POP      {R4,PC}          ;; return
+     77          }
+     78          
+     79          /////////////////////////////////////////////////////////////////////////////////////////////
+     80          //
+
+   \                                 In section .text, align 2, keep-with-next
+     81          void trustCenterPermitJoins ( boolean allow )
+     82          {
+     83              trustCenterAllowJoins = allow;
+   \                     trustCenterPermitJoins: (+1)
+   \   00000000   0x....             LDR.N    R1,??DataTable4
+   \   00000002   0x7008             STRB     R0,[R1, #+0]
+     84           
+     85          #if defined EZSP_HOST
+     86              ezspSetPolicy(EZSP_TRUST_CENTER_POLICY, (allow ? (trustCenterUsePreconfiguredKey
+     87                                                             ? EZSP_ALLOW_PRECONFIGURED_KEY_JOINS
+     88                                                             : EZSP_ALLOW_JOINS) : EZSP_ALLOW_REJOINS_ONLY));
+     89          #endif
+     90          
+     91              if (!trustCenterUsePreconfiguredKey) 
+   \   00000004   0x7849             LDRB     R1,[R1, #+1]
+   \   00000006   0x2900             CMP      R1,#+0
+   \   00000008   0xBF08             IT       EQ 
+     92                  permitRequestingTrustCenterLinkKey(allow);
+   \   0000000A   0x.... 0x....      BEQ.W    permitRequestingTrustCenterLinkKey
+     93          
+     94              if (!trustCenterAllowJoins)
+     95                  Debug( "\nTrust Center no longer allowing joins.");
+     96          }
+   \   0000000E   0x4770             BX       LR               ;; return
+     97          
+     98          //------------------------------------------------------------------------------
+     99          
+
+   \                                 In section .text, align 2, keep-with-next
+    100          boolean trustCenterIsPermittingJoins ( void )
+    101          {
+    102              return trustCenterAllowJoins;
+   \                     trustCenterIsPermittingJoins: (+1)
+   \   00000000   0x....             LDR.N    R0,??DataTable4
+   \   00000002   0x7800             LDRB     R0,[R0, #+0]
+   \   00000004   0x4770             BX       LR               ;; return
+    103          }
+    104          
+    105          /////////////////////////////////////////////////////////////////////////////////////////////
+    106          //
+    107          #if !defined EZSP_HOST
+
+   \                                 In section .text, align 2, keep-with-next
+    108          EmberJoinDecision emberTrustCenterJoinHandler(EmberNodeId newNodeId,
+    109                                                        EmberEUI64 newNodeEui64,
+    110                                                        EmberDeviceUpdate status,
+    111                                                        EmberNodeId parentOfNewNode)
+    112          {
+    113            if ( status == EMBER_DEVICE_LEFT ) {
+   \                     emberTrustCenterJoinHandler: (+1)
+   \   00000000   0x2A02             CMP      R2,#+2
+   \   00000002   0xBF18             IT       NE 
+   \   00000004   0x2A00             CMPNE    R2,#+0
+    114              return EMBER_NO_ACTION;
+    115          
+    116            } else if ( status == EMBER_STANDARD_SECURITY_SECURED_REJOIN ) {
+   \   00000006   0xD101             BNE.N    ??emberTrustCenterJoinHandler_0
+    117              // MAC Encryption is no longer supported by Zigbee.  Therefore this means
+    118              // the device rejoined securely and has the Network Key.  
+    119              
+    120              return EMBER_NO_ACTION;
+   \   00000008   0x2003             MOVS     R0,#+3
+   \   0000000A   0x4770             BX       LR
+    121          
+    122            } else if ( trustCenterAllowJoins ) {
+   \                     ??emberTrustCenterJoinHandler_0: (+1)
+   \   0000000C   0x....             LDR.N    R0,??DataTable4
+   \   0000000E   0x7801             LDRB     R1,[R0, #+0]
+   \   00000010   0xB121             CBZ.N    R1,??emberTrustCenterJoinHandler_1
+    123              // If we are using a preconfigured Link Key the Network Key is sent
+    124              // APS encrypted using the Link Key.
+    125              // If we are not using a preconfigured link key, then both
+    126              // the Link and the Network Key are sent in the clear to the joining device.
+    127              return (trustCenterUsePreconfiguredKey 
+    128                      ? EMBER_USE_PRECONFIGURED_KEY
+    129                      : EMBER_SEND_KEY_IN_THE_CLEAR );
+   \   00000012   0x7841             LDRB     R1,[R0, #+1]
+   \   00000014   0x1E48             SUBS     R0,R1,#+1
+   \   00000016   0x4180             SBCS     R0,R0,R0
+   \   00000018   0x0FC0             LSRS     R0,R0,#+31
+   \   0000001A   0x4770             BX       LR
+    130            }
+    131          
+    132            // Device rejoined insecurely.  Send it the updated Network Key
+    133            // encrypted with the Link Key.
+    134            return EMBER_USE_PRECONFIGURED_KEY;
+   \                     ??emberTrustCenterJoinHandler_1: (+1)
+   \   0000001C   0x2000             MOVS     R0,#+0
+   \   0000001E   0x4770             BX       LR               ;; return
+    135          }
+    136          #endif // !defined EZSP_HOST
+    137          
+    138          /////////////////////////////////////////////////////////////////////////////////////////////
+    139          //
+    140          #if defined EZSP_HOST
+    141          static EmberStatus permitRequestingTrustCenterLinkKey(boolean allow)
+    142          {
+    143            return ezspSetPolicy(EZSP_TC_KEY_REQUEST_POLICY,
+    144                                 (allow
+    145                                  ? EZSP_ALLOW_TC_KEY_REQUESTS
+    146                                  : EZSP_DENY_TC_KEY_REQUESTS));
+    147          }
+    148          
+    149          #else // EM250
+    150          
+
+   \                                 In section .text, align 2, keep-with-next
+    151          static EmberStatus permitRequestingTrustCenterLinkKey(boolean allow)
+    152          {
+    153            emberTrustCenterLinkKeyRequestPolicy = (allow
+    154                                                    ? EMBER_ALLOW_KEY_REQUESTS
+    155                                                    : EMBER_DENY_KEY_REQUESTS);
+   \                     permitRequestingTrustCenterLinkKey: (+1)
+   \   00000000   0x0001             MOVS     R1,R0
+   \   00000002   0x....             LDR.N    R0,??DataTable4_1
+   \   00000004   0xBF18             IT       NE 
+   \   00000006   0x2101             MOVNE    R1,#+1
+   \   00000008   0x7001             STRB     R1,[R0, #+0]
+    156            return EMBER_SUCCESS;
+   \   0000000A   0x2000             MOVS     R0,#+0
+   \   0000000C   0x4770             BX       LR               ;; return
+    157          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable4:
+   \   00000000   0x........         DC32     trustCenterAllowJoins
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable4_1:
+   \   00000000   0x........         DC32     emberTrustCenterLinkKeyRequestPolicy
+    158          
+    159          #endif
+    160          
+    161          /////////////////////////////////////////////////////////////////////////////////////////////
+    162          //
+    163          #if defined EZSP_HOST
+    164          static boolean generateRandomKey(EmberKeyData* result)
+    165          {
+    166            int16u data;
+    167            int8u* keyPtr = emberKeyContents(result);
+    168            int8u i;
+    169          
+    170            // Since our EZSP command only generates a random 16-bit number,
+    171            // we must call it repeatedly to get a 128-bit random number.
+    172          
+    173            for ( i = 0; i < 8; i++ ) {
+    174              EmberStatus status = ezspGetRandomNumber(&data);
+    175          
+    176              if ( status != EMBER_SUCCESS ) {
+    177                return FALSE;
+    178              }
+    179          
+    180              emberStoreLowHighInt16u(keyPtr, data);
+    181              keyPtr+=2;
+    182            }
+    183          
+    184            return TRUE;
+    185          }
+    186          #endif // defined EZSP_HOST
+    187          
+    188          /////////////////////////////////////////////////////////////////////////////////////////////
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   emberTrustCenterJoinHandler
+       0   permitRequestingTrustCenterLinkKey
+      56   trustCenterInit
+        56   -> emberGenerateRandomKey
+        56   -> emberSetInitialSecurityState
+        56   -> permitRequestingTrustCenterLinkKey
+        56   -> sea_memcpy
+       0   trustCenterIsPermittingJoins
+       0   trustCenterPermitJoins
+         0   -> permitRequestingTrustCenterLinkKey
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable4
+       4  ??DataTable4_1
+      32  emberTrustCenterJoinHandler
+      14  permitRequestingTrustCenterLinkKey
+       2  trustCenterAllowJoins
+          trustCenterUsePreconfiguredKey
+     112  trustCenterInit
+       6  trustCenterIsPermittingJoins
+      16  trustCenterPermitJoins
+
+ 
+   2 bytes in section .data
+ 188 bytes in section .text
+ 
+ 188 bytes of CODE memory
+   2 bytes of DATA memory
+
+Errors: none
+Warnings: none

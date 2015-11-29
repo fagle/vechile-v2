@@ -1,0 +1,107 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:32
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\util\node.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\node.c -D ENABLE_GATEWAY
+#        -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\node.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\node.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\util\node.c
+      1          #include "serial.h"
+      2          #include "ember.h"
+      3          #include "mem.h"
+      4          #include "security-common.h"
+      5          
+      6          
+      7          /////////////////////////////////////////////////////////////////////////////////////////////
+      8          //
+
+   \                                 In section .text, align 2, keep-with-next
+      9          boolean nodeSecurityInit ( EmberKeyData * preconfiguredKey )
+     10          {
+   \                     nodeSecurityInit: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0xB08C             SUB      SP,SP,#+48
+   \   00000004   0x4604             MOV      R4,R0
+     11              EmberInitialSecurityState state;
+     12            
+     13              sea_memset(&state, 0x00, sizeof(state));
+   \   00000006   0x222C             MOVS     R2,#+44
+   \   00000008   0x2100             MOVS     R1,#+0
+   \   0000000A   0xA800             ADD      R0,SP,#+0
+   \   0000000C   0x.... 0x....      BL       sea_memset
+     14              if (preconfiguredKey) 
+   \   00000010   0xB144             CBZ.N    R4,??nodeSecurityInit_0
+     15              {
+     16                  sea_memcpy(emberKeyContents(&(state.preconfiguredKey)), emberKeyContents(preconfiguredKey), EMBER_ENCRYPTION_KEY_SIZE);
+   \   00000012   0x2210             MOVS     R2,#+16
+   \   00000014   0x4621             MOV      R1,R4
+   \   00000016   0xF10D 0x0002      ADD      R0,SP,#+2
+   \   0000001A   0x.... 0x....      BL       sea_memcpy
+   \   0000001E   0xF44F 0x6010      MOV      R0,#+2304
+   \   00000022   0xE001             B.N      ??nodeSecurityInit_1
+     17              }
+   \                     ??nodeSecurityInit_0: (+1)
+   \   00000024   0xF44F 0x6080      MOV      R0,#+1024
+   \                     ??nodeSecurityInit_1: (+1)
+   \   00000028   0xF8AD 0x0000      STRH     R0,[SP, #+0]
+     18              state.bitmask = (EMBER_STANDARD_SECURITY_MODE | ( preconfiguredKey ? (EMBER_HAVE_PRECONFIGURED_KEY |
+     19                               EMBER_REQUIRE_ENCRYPTED_KEY) : EMBER_GET_LINK_KEY_WHEN_JOINING));
+     20              //return (EMBER_SUCCESS == emberSetInitialSecurityState(&state));
+     21              
+     22              EmberStatus tempstatus;
+     23              tempstatus = emberSetInitialSecurityState(&state);
+     24              Debug("\r\nemberSetInitialSecurityState is %d",tempstatus);
+     25              return (EMBER_SUCCESS == tempstatus);
+   \   0000002C   0xA800             ADD      R0,SP,#+0
+   \   0000002E   0x.... 0x....      BL       emberSetInitialSecurityState
+   \   00000032   0x1E40             SUBS     R0,R0,#+1
+   \   00000034   0x4180             SBCS     R0,R0,R0
+   \   00000036   0x0FC0             LSRS     R0,R0,#+31
+   \   00000038   0xB00C             ADD      SP,SP,#+48
+   \   0000003A   0xBD10             POP      {R4,PC}          ;; return
+     26          }
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      56   nodeSecurityInit
+        56   -> emberSetInitialSecurityState
+        56   -> sea_memcpy
+        56   -> sea_memset
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      60  nodeSecurityInit
+
+ 
+ 60 bytes in section .text
+ 
+ 60 bytes of CODE memory
+
+Errors: none
+Warnings: none

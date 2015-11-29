@@ -1,0 +1,290 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:31
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\hal\mpu.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\hal\mpu.c -D ENABLE_GATEWAY
+#        -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\mpu.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\mpu.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\hal\mpu.c
+      1          
+      2          #include "config.h"
+      3          #include "mpu.h"
+      4          
+      5          #define FLASH_REGION    (0x08000000 + 0x10)
+      6          #define PERIPH_REGION   (0x40000000 + 0x11)
+      7          #define USERPER_REGION  (0x40008000 + 0x12)
+      8          #define SRAM_REGION     (0x20000000 + 0x13)
+      9          #define SPARE0_REGION   (0x20000000 + 0x14)
+     10          #define SPARE1_REGION   (0x20000000 + 0x15)
+     11          #define SPARE2_REGION   (0x20000000 + 0x16)
+     12          #define SPARE3_REGION   (0x20000000 + 0x17)
+     13          
+     14          //=============================================================================
+     15          // Define the data used to initialize the MPU. Each of the 8 MPU regions
+     16          // has a programmable size and various attributes. A region must be a power of
+     17          // two in size, and its base address must be a multiple of that size. Regions
+     18          // are divided into 8 equal-sized sub-regions that can be individually disabled.
+     19          // A region is defined by what is written to MPU_BASE and MPU_ATTR.
+     20          // MPU_BASE holds the region base address, with some low order bits ignored
+     21          // depending on the region size. If B4 is set, then B3:0 set the region number.
+     22          // The MPU_ATTR fields are:
+     23          // XN (1 bit) - set to disable instruction execution
+     24          // AP (2 bits) - selects Privilege & User access- None, Read-only or Read-Write
+     25          // TEX,S,C,B (6 bits) - configures memory type, write ordering, shareable, ...
+     26          // SRD (8 bits) - a set bit disables the corresponding sub-region
+     27          // SIZE (5 bits) - specifies the region size as a power of two
+     28          // ENABLE (1 bit) - set to enable the region, except any disabled sub-regions
+     29          //=============================================================================
+     30          
+     31          // Define MPU regions - note that the default vector table at address 0 and
+     32          // the ARM PPB peripherals are always accessible in privileged mode.
+
+   \                                 In section .text, align 4, keep-with-next
+     33          static const mpu_t mpuConfig[NUM_MPU_REGIONS] =
+   \                     mpuConfig:
+   \   00000000   0x08000010         DC32 134217744, 101444645, 1073741841, 303042591, 1073774610, 319816477
+   \              0x060BEC25   
+   \              0x40000011   
+   \              0x1210101F   
+   \              0x40008012   
+   \              0x1310031D   
+   \   00000018   0x20000013         DC32 536870931, 319488025, 536870932, 319488018, 536870933, 319488018
+   \              0x130B0019   
+   \              0x20000014   
+   \              0x130B0012   
+   \              0x20000015   
+   \              0x130B0012   
+   \   00000030   0x20000016         DC32 536870934, 319488018, 536870935, 319488018
+   \              0x130B0012   
+   \              0x20000017   
+   \              0x130B0012   
+     34          {
+     35            // Region 0 - Flash, including main, fixed and customer info blocks: 
+     36            //            execute, normal, not shareable
+     37            // Enabled sub-regions: 08000000 - 0801FFFF, 08040000 - 0804FFFF
+     38            { FLASH_REGION,   MATTR(0, PRO_URO, MEM_NORMAL, 0xEC, SIZE_512K, 1) },
+     39          
+     40            // Region 1 - System peripherals: no execute, non-shared device
+     41          //[[
+     42          #ifdef EMBER_EMU_TEST
+     43            // Enabled sub-regions: 40000000 - 4000FFFF
+     44            { PERIPH_REGION,  MATTR(1, PRW_URO, MEM_DEVICE, 0x00, SIZE_64K,  1) },
+     45          #else
+     46          //]]
+     47            // Enabled sub-regions: 40000000 - 40008000, 4000A000 - 4000FFFF
+     48            { PERIPH_REGION,  MATTR(1, PRW_URO, MEM_DEVICE, 0x10, SIZE_64K,  1) },
+     49          //[[
+     50          #endif
+     51          //]]
+     52          
+     53            // Region 2 - User peripherals: no execute, non-shared device
+     54            // Enabled sub-regions: 4000A000 - 4000FFFF
+     55            { USERPER_REGION, MATTR(1, PRW_URW, MEM_DEVICE, 0x03, SIZE_32K,  1) },
+     56          
+     57            // Region 3 - SRAM: no execute, normal, not shareable
+     58            // Enabled sub-regions: 20000000 - 20001FFF
+     59            { SRAM_REGION,    MATTR(1, PRW_URW, MEM_NORMAL, 0x00, SIZE_8K,   1) },
+     60          
+     61            // Regions 4-7 - unused: disabled (otherwise set up for SRAM)
+     62            { SPARE0_REGION,  MATTR(1, PRW_URW, MEM_NORMAL, 0x00, SIZE_1K,   0) },
+     63            { SPARE1_REGION,  MATTR(1, PRW_URW, MEM_NORMAL, 0x00, SIZE_1K,   0) },
+     64            { SPARE2_REGION,  MATTR(1, PRW_URW, MEM_NORMAL, 0x00, SIZE_1K,   0) },
+     65            { SPARE3_REGION,  MATTR(1, PRW_URW, MEM_NORMAL, 0x00, SIZE_1K,   0) }
+     66          };
+     67          
+     68          // Load the base address and attributes of all 8 MPU regions, then enable
+     69          // the MPU. Even though interrupts should be disabled when this function is
+     70          // called, the region loading is performed in an atomic block in case they
+     71          // are not disabled. After the regions have been defined, the MPU is enabled.
+     72          // To be safe, memory barrier instructions are included to make sure that
+     73          // the new MPU setup is in effect before returning to the caller.
+     74          //
+     75          // Note that the PRIVDEFENA bit is not set in the MPU_CTRL register so the 
+     76          // default privileged memory map is not enabled. Disabling the default
+     77          // memory map enables faults on core accesses (other than vector reads) to 
+     78          // the address ranges shown below.
+     79          //
+     80          //  Address range
+     81          //  Flash (ICODE and DCODE)   no access allowed (read, write or execute)
+     82          //    00000000 to 0001FFFF    no access allowed (read, write or execute)
+     83          //    00200000 to 00029FFF    write and execute not allowed
+     84          //    0002A000 to 07FFFFFF    no access allowed (read, write or execute)
+     85          //    08000000 to 081FFFFF    write not allowed
+     86          //    08020000 to 1FFFFFFF    no access allowed (read, write or execute)
+     87          //  SRAM
+     88          //    20000000 to 20001FFF    execute not allowed
+     89          //    20002000 to 3FFFFFFF    no access allowed (read, write or execute)
+     90          //  Peripheral
+     91          //    40010000 to 5FFFFFFF    no access allowed (read, write or execute)
+     92          //  External Device / External RAM
+     93          //    60000000 to DFFFFFFF    no access allowed (read, write or execute)
+     94          
+
+   \                                 In section .text, align 4, keep-with-next
+     95          void halInternalEnableMPU(void)
+     96          {
+     97            halInternalLoadMPU(mpuConfig);
+   \                     halInternalEnableMPU: (+1)
+   \   00000000   0x.... 0x....      ADR.W    R0,mpuConfig
+   \   00000004                      REQUIRE halInternalLoadMPU
+   \   00000004                      ;; // Fall through to label halInternalLoadMPU
+     98          }
+     99          
+
+   \                                 In section .text, align 4, keep-with-next
+    100          void halInternalLoadMPU(mpu_t *mp)
+    101          {
+   \                     halInternalLoadMPU: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x4604             MOV      R4,R0
+    102            int8u i;
+    103          
+    104            ATOMIC (
+    105              MPU_CTRL = 0;       // enable default map while MPU is updated
+    106              for (i = 0; i < NUM_MPU_REGIONS; i++) {
+    107                MPU_BASE = mp->base;
+    108                MPU_ATTR = mp->attr;
+    109                mp++;
+    110              }
+    111              MPU_CTRL = MPU_CTRL_ENABLE;
+    112              asm("DSB");
+    113              asm("ISB");
+    114            )
+   \   00000004   0x.... 0x....      BL       _disableBasePri
+   \   00000008   0x....             LDR.N    R1,??DataTable3  ;; 0xe000ed94
+   \   0000000A   0x2200             MOVS     R2,#+0
+   \   0000000C   0x600A             STR      R2,[R1, #+0]
+   \   0000000E   0x2208             MOVS     R2,#+8
+   \                     ??halInternalLoadMPU_0: (+1)
+   \   00000010   0xF854 0x3B04      LDR      R3,[R4], #+4
+   \   00000014   0x608B             STR      R3,[R1, #+8]
+   \   00000016   0x1E52             SUBS     R2,R2,#+1
+   \   00000018   0xF854 0x3B04      LDR      R3,[R4], #+4
+   \   0000001C   0x60CB             STR      R3,[R1, #+12]
+   \   0000001E   0x2A00             CMP      R2,#+0
+   \   00000020   0xD1F6             BNE.N    ??halInternalLoadMPU_0
+   \   00000022   0x2201             MOVS     R2,#+1
+   \   00000024   0x600A             STR      R2,[R1, #+0]
+   \   00000026   0xF3BF 0x8F4F      DSB
+   \   0000002A   0xF3BF 0x8F6F      ISB
+   \   0000002E   0xE8BD 0x4010      POP      {R4,LR}
+   \   00000032   0x.... 0x....      B.W      _writeBasePri
+    115          
+    116          }
+    117          
+
+   \                                 In section .text, align 4, keep-with-next
+    118          void halInternalDisableMPU(void)
+    119          {
+    120            MPU_CTRL = 0;
+   \                     halInternalDisableMPU: (+1)
+   \   00000000   0x2000             MOVS     R0,#+0
+   \   00000002   0x....             LDR.N    R1,??DataTable3  ;; 0xe000ed94
+   \   00000004   0x6008             STR      R0,[R1, #+0]
+    121            asm("DSB");
+   \   00000006   0xF3BF 0x8F4F      DSB
+    122            asm("ISB");
+   \   0000000A   0xF3BF 0x8F6F      ISB
+    123          }
+   \   0000000E   0x4770             BX       LR               ;; return
+    124          
+    125          //[[
+
+   \                                 In section .text, align 4, keep-with-next
+    126          boolean halInternalIAmAnEmulator(void)
+    127          {
+   \                     halInternalIAmAnEmulator: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    128            boolean retval;
+    129          
+    130            ATOMIC(
+    131              MPU_CTRL = 0;
+    132              asm("DSB");
+    133              asm("ISB");
+    134              retval =  ((I_AM_AN_EMULATOR & 1) == 1);
+    135              MPU_CTRL = MPU_CTRL_ENABLE;
+    136              asm("DSB");
+    137              asm("ISB");
+    138            )
+   \   00000002   0x.... 0x....      BL       _disableBasePri
+   \   00000006   0x....             LDR.N    R1,??DataTable3  ;; 0xe000ed94
+   \   00000008   0x2200             MOVS     R2,#+0
+   \   0000000A   0x600A             STR      R2,[R1, #+0]
+   \   0000000C   0xF3BF 0x8F4F      DSB
+   \   00000010   0x....             LDR.N    R2,??DataTable3_1  ;; 0x40009000
+   \   00000012   0xF3BF 0x8F6F      ISB
+   \   00000016   0x6814             LDR      R4,[R2, #+0]
+   \   00000018   0x2201             MOVS     R2,#+1
+   \   0000001A   0x600A             STR      R2,[R1, #+0]
+   \   0000001C   0xF3BF 0x8F4F      DSB
+   \   00000020   0xF3BF 0x8F6F      ISB
+   \   00000024   0x.... 0x....      BL       _writeBasePri
+    139            return retval;
+   \   00000028   0xF004 0x0001      AND      R0,R4,#0x1
+   \   0000002C   0xBD10             POP      {R4,PC}          ;; return
+    140          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable3:
+   \   00000000   0xE000ED94         DC32     0xe000ed94
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable3_1:
+   \   00000000   0x40009000         DC32     0x40009000
+    141          //]]
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   halInternalDisableMPU
+       0   halInternalEnableMPU
+         0   -> halInternalLoadMPU
+       8   halInternalIAmAnEmulator
+         8   -> _disableBasePri
+         8   -> _writeBasePri
+       8   halInternalLoadMPU
+         8   -> _disableBasePri
+         0   -> _writeBasePri
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable3
+       4  ??DataTable3_1
+      16  halInternalDisableMPU
+       4  halInternalEnableMPU
+      46  halInternalIAmAnEmulator
+      54  halInternalLoadMPU
+      64  mpuConfig
+
+ 
+ 192 bytes in section .text
+ 
+ 192 bytes of CODE memory
+
+Errors: none
+Warnings: none

@@ -1,0 +1,268 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:32
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\lamp\msg.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\lamp\msg.c -D ENABLE_GATEWAY
+#        -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  D:\projects\VehicleV2\trunk\lamps\sealib\list\msg.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\msg.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\lamp\msg.c
+      1          #include <stdio.h>
+      2          #include "msg.h"
+      3          #include "mem.h"
+      4          
+      5          /////////////////////////////////////////////////////////////////////////////////
+      6          // the common data
+      7          
+      8          /*******************************************************************************
+      9          * Function Name  : pmsg_t sea_readmsg ( pmsg_info_t ptr )
+     10          * Description    : get body of msg_t ring.
+     11          * Input          : pmsg_info_t ptr
+     12          * Output         : pointer of msg_t
+     13          * Return         : None
+     14          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     15          pmsg_t sea_readmsg ( pmsg_info_t ptr )       // read message not delete message  
+     16          {
+     17              if (ptr == NULL)
+   \                     sea_readmsg: (+1)
+   \   00000000   0xB168             CBZ.N    R0,??sea_readmsg_0
+     18                  return NULL;
+     19          
+     20              ptr->curmsg = NULL;
+   \   00000002   0x2100             MOVS     R1,#+0
+   \   00000004   0x6081             STR      R1,[R0, #+8]
+     21              if (ptr->out != ptr->in)
+   \   00000006   0x7842             LDRB     R2,[R0, #+1]
+   \   00000008   0x7881             LDRB     R1,[R0, #+2]
+   \   0000000A   0x4291             CMP      R1,R2
+   \   0000000C   0xD001             BEQ.N    ??sea_readmsg_1
+     22                  return ptr->curmsg;
+   \   0000000E   0x2000             MOVS     R0,#+0
+   \   00000010   0x4770             BX       LR
+     23             
+     24              ptr->curmsg = &ptr->list[ptr->out];
+   \                     ??sea_readmsg_1: (+1)
+   \   00000012   0x2226             MOVS     R2,#+38
+   \   00000014   0xFB02 0x0101      MLA      R1,R2,R1,R0
+   \   00000018   0x310C             ADDS     R1,R1,#+12
+   \   0000001A   0x6081             STR      R1,[R0, #+8]
+     25              return ptr->curmsg;
+   \   0000001C   0x4608             MOV      R0,R1
+   \                     ??sea_readmsg_0: (+1)
+   \   0000001E   0x4770             BX       LR               ;; return
+     26          }
+     27          
+     28          /*******************************************************************************
+     29          * Function Name  : bool sea_isempty ( pmsg_info_t ptr  )
+     30          * Description    : is empty of list.
+     31          * Input          : pmsg_info_t ptr 
+     32          * Output         : boolean
+     33          * Return         : None
+     34          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     35          bool sea_msgisempty ( pmsg_info_t ptr  )  
+     36          {
+     37              if (ptr == NULL)
+   \                     sea_msgisempty: (+1)
+   \   00000000   0x2800             CMP      R0,#+0
+   \   00000002   0xBF1E             ITTT     NE 
+   \   00000004   0x7881             LDRBNE   R1,[R0, #+2]
+   \   00000006   0x7840             LDRBNE   R0,[R0, #+1]
+   \   00000008   0x4281             CMPNE    R1,R0
+     38                  return (bool)0x01;
+     39          
+     40              return (bool)(ptr->out == ptr->in);
+   \   0000000A   0xD101             BNE.N    ??sea_msgisempty_0
+   \   0000000C   0x2001             MOVS     R0,#+1
+   \   0000000E   0x4770             BX       LR
+   \                     ??sea_msgisempty_0: (+1)
+   \   00000010   0x2000             MOVS     R0,#+0
+   \   00000012   0x4770             BX       LR               ;; return
+     41          }
+     42          
+     43          /*******************************************************************************
+     44          * Function Name  : pmsg_t sea_getmsg ( pmsg_info_t ptr )
+     45          * Description    : get msg_t body from ring.
+     46          * Input          : pmsg_info_t ptr
+     47          * Output         : pointer of msg_t
+     48          * Return         : None
+     49          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     50          pmsg_t sea_getmsg ( pmsg_info_t ptr )        //get message and delete message
+     51          {
+     52              if (ptr == NULL)
+   \                     sea_getmsg: (+1)
+   \   00000000   0xB190             CBZ.N    R0,??sea_getmsg_0
+     53                  return NULL;
+     54          
+     55              ptr->curmsg = NULL;
+   \   00000002   0x2100             MOVS     R1,#+0
+   \   00000004   0x6081             STR      R1,[R0, #+8]
+     56              if (ptr->out != ptr->in)
+   \   00000006   0x7842             LDRB     R2,[R0, #+1]
+   \   00000008   0x7881             LDRB     R1,[R0, #+2]
+   \   0000000A   0x4291             CMP      R1,R2
+   \   0000000C   0xD00B             BEQ.N    ??sea_getmsg_1
+     57              {
+     58                  ptr->curmsg = &ptr->list[ptr->out];
+   \   0000000E   0x2226             MOVS     R2,#+38
+   \   00000010   0xFB02 0x0201      MLA      R2,R2,R1,R0
+     59                  ptr->out ++;
+   \   00000014   0x1C49             ADDS     R1,R1,#+1
+   \   00000016   0x7081             STRB     R1,[R0, #+2]
+   \   00000018   0x320C             ADDS     R2,R2,#+12
+     60                  if (ptr->out >= MAXMSGSIZE)
+   \   0000001A   0xB2C9             UXTB     R1,R1
+   \   0000001C   0x6082             STR      R2,[R0, #+8]
+   \   0000001E   0x2904             CMP      R1,#+4
+   \   00000020   0xBFA4             ITT      GE 
+   \   00000022   0x2100             MOVGE    R1,#+0
+   \   00000024   0x7081             STRBGE   R1,[R0, #+2]
+     61                      ptr->out = 0x00;
+     62              }
+     63              return ptr->curmsg;
+   \                     ??sea_getmsg_1: (+1)
+   \   00000026   0x6880             LDR      R0,[R0, #+8]
+   \                     ??sea_getmsg_0: (+1)
+   \   00000028   0x4770             BX       LR               ;; return
+     64          }
+     65          
+     66          /*******************************************************************************
+     67          * Function Name  : void sea_sendmsg ( pmsg_info_t ptr, u8 type, u16 dset, u8 id, u8 size, void * msg )
+     68          * Description    : Inserts msg_t body to list.
+     69          * Input          : pmsg_info_t ptr, u8 type, u8 id, u16 dset, u8 size, void * msg 
+     70          * Output         : None
+     71          * Return         : None
+     72          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     73          void sea_sendmsg ( pmsg_info_t ptr, u8 type, u16 dest, u8 id, u8 size, void * msg )          //the message count must <= 10
+     74          {
+   \                     sea_sendmsg: (+1)
+   \   00000000   0xB538             PUSH     {R3-R5,LR}
+   \   00000002   0x0004             MOVS     R4,R0
+     75              if (ptr == NULL)
+   \   00000004   0xD020             BEQ.N    ??sea_sendmsg_0
+     76                  return;
+     77              
+     78              ptr->list[ptr->in].type    = type;        //not use
+   \   00000006   0x7865             LDRB     R5,[R4, #+1]
+   \   00000008   0x2026             MOVS     R0,#+38
+   \   0000000A   0xFB00 0x4505      MLA      R5,R0,R5,R4
+   \   0000000E   0x7329             STRB     R1,[R5, #+12]
+     79              ptr->list[ptr->in].dest    = dest;
+   \   00000010   0x7861             LDRB     R1,[R4, #+1]
+   \   00000012   0xFB00 0x4101      MLA      R1,R0,R1,R4
+   \   00000016   0x820A             STRH     R2,[R1, #+16]
+     80              ptr->list[ptr->in].id      = id;
+   \   00000018   0x7861             LDRB     R1,[R4, #+1]
+   \   0000001A   0xFB00 0x4101      MLA      R1,R0,R1,R4
+   \   0000001E   0x734B             STRB     R3,[R1, #+13]
+     81              ptr->list[ptr->in].size    = size;
+   \   00000020   0x7861             LDRB     R1,[R4, #+1]
+   \   00000022   0x9A04             LDR      R2,[SP, #+16]
+   \   00000024   0xFB00 0x4101      MLA      R1,R0,R1,R4
+   \   00000028   0x738A             STRB     R2,[R1, #+14]
+     82              sea_memcpy(ptr->list[ptr->in].body, msg, size);
+   \   0000002A   0x7863             LDRB     R3,[R4, #+1]
+   \   0000002C   0x9905             LDR      R1,[SP, #+20]
+   \   0000002E   0xFB00 0x4003      MLA      R0,R0,R3,R4
+   \   00000032   0x3012             ADDS     R0,R0,#+18
+   \   00000034   0x.... 0x....      BL       sea_memcpy
+     83              
+     84              ptr->in ++;
+   \   00000038   0x7860             LDRB     R0,[R4, #+1]
+   \   0000003A   0x1C40             ADDS     R0,R0,#+1
+   \   0000003C   0x7060             STRB     R0,[R4, #+1]
+     85              if (ptr->in >= MAXMSGSIZE)
+   \   0000003E   0xB2C0             UXTB     R0,R0
+   \   00000040   0x2804             CMP      R0,#+4
+   \   00000042   0xBFA4             ITT      GE 
+   \   00000044   0x2000             MOVGE    R0,#+0
+   \   00000046   0x7060             STRBGE   R0,[R4, #+1]
+     86                  ptr->in = 0x00;
+     87          }
+   \                     ??sea_sendmsg_0: (+1)
+   \   00000048   0xBD31             POP      {R0,R4,R5,PC}    ;; return
+     88          
+     89          /*******************************************************************************
+     90          * Function Name  : void init_msginfo ( void )
+     91          * Description    : initialize msg_info structure body 
+     92          * Input          : None
+     93          * Output         : None
+     94          * Return         : None
+     95          *******************************************************************************/
+
+   \                                 In section .text, align 2, keep-with-next
+     96          void init_msginfo ( void )
+     97          {
+     98              sea_memset(&send1, 0x00, sizeof(msg_info_t));
+   \                     init_msginfo: (+1)
+   \   00000000   0x22A4             MOVS     R2,#+164
+   \   00000002   0x2100             MOVS     R1,#+0
+   \   00000004   0x....             LDR.N    R0,??DataTable0
+   \   00000006   0x.... 0x....      B.W      sea_memset
+     99          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable0:
+   \   00000000   0x........         DC32     send1
+    100          
+    101          /////////////////////////////////////////////////////////////////////////////////////////////////
+    102          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   init_msginfo
+         0   -> sea_memset
+       0   sea_getmsg
+       0   sea_msgisempty
+       0   sea_readmsg
+      16   sea_sendmsg
+        16   -> sea_memcpy
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable0
+      10  init_msginfo
+      42  sea_getmsg
+      20  sea_msgisempty
+      32  sea_readmsg
+      74  sea_sendmsg
+
+ 
+ 182 bytes in section .text
+ 
+ 182 bytes of CODE memory
+
+Errors: none
+Warnings: none

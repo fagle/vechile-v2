@@ -1,0 +1,398 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:38
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  D:\projects\VehicleV2\trunk\lamps\sealib\hal\token-def.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\hal\token-def.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\token-def.lst
+#    Object file  =  D:\projects\VehicleV2\trunk\lamps\sealib\obj\token-def.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\hal\token-def.c
+      1          
+      2          #include "config.h"
+      3          #include "ember.h"
+      4          
+      5          //-- Build structure defines (these define all the data types of the tokens).
+      6          #define DEFINETYPES
+      7            #include "token-stack.h"
+      8          #undef DEFINETYPES
+      9          
+     10          //-- Build parameter links
+     11          #define DEFINETOKENS
+     12          #define TOKEN_MFG(name,creator,iscnt,isidx,type,arraysize,...)
+     13          
+     14          #define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+     15            creator,
+
+   \                                 In section .rodata, align 4, keep-with-next
+     16            const int16u tokenCreators[] = {
+   \                     tokenCreators:
+   \   00000000   0xD243 0xFF01      DC16 53827, 65281, 57635, 58485, 57955, 58723, 57698, 60281, 61028
+   \              0xE123 0xE475
+   \              0xE263 0xE563
+   \              0xE162 0xEB79
+   \              0xEE64       
+   \   00000012   0xE364 0xE124      DC16 58212, 57636, 57637, 57972, 65293, 58454, 58624
+   \              0xE125 0xE274
+   \              0xFF0D 0xE456
+   \              0xE500       
+     17              #include "token-stack.h"
+     18            };
+     19          #undef TOKEN_DEF
+     20          
+     21          #define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+     22            iscnt,
+
+   \                                 In section .rodata, align 4, keep-with-next
+     23            const boolean tokenIsCnt[] = {
+   \                     tokenIsCnt:
+   \   00000000   0x00 0x00          DC8 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x01 0x00    
+   \              0x01 0x01    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+     24              #include "token-stack.h"
+     25            };
+     26          #undef TOKEN_DEF
+     27          
+     28          #define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+     29            sizeof(type),
+
+   \                                 In section .rodata, align 4, keep-with-next
+     30            const int8u tokenSize[] = {
+   \                     tokenSize:
+   \   00000000   0x04 0x02          DC8 4, 2, 4, 17, 2, 4, 2, 17, 16, 26, 26, 8, 13, 11, 25, 92
+   \              0x04 0x11    
+   \              0x02 0x04    
+   \              0x02 0x11    
+   \              0x10 0x1A    
+   \              0x1A 0x08    
+   \              0x0D 0x0B    
+   \              0x19 0x5C    
+     31              #include "token-stack.h"
+     32            };
+     33          #undef TOKEN_DEF
+     34          
+     35          #define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+     36            arraysize,
+
+   \                                 In section .rodata, align 4, keep-with-next
+     37            const int8u tokenArraySize[] = {
+   \                     tokenArraySize:
+   \   00000000   0x10 0x01          DC8 16, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 6, 0, 0
+   \              0x01 0x01    
+   \              0x01 0x01    
+   \              0x01 0x01    
+   \              0x01 0x01    
+   \              0x01 0x01    
+   \              0x00 0x06    
+   \              0x00 0x00    
+     38              #include "token-stack.h"
+     39            };
+     40          #undef TOKEN_DEF
+     41          
+     42          //These set of DEFAULT token values are only used in the tokenDefaults array
+     43          //below.
+     44          #define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+     45            const type TOKEN_##name##_DEFAULTS = __VA_ARGS__;
+     46            #include "token-stack.h"
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute struct <unnamed> const TOKEN_STACK_CAL_DATA_DEFAULTS
+   \                     TOKEN_STACK_CAL_DATA_DEFAULTS:
+   \   00000000   0xFF 0x80          DC8 255, 128, 128, 128
+   \              0x80 0x80    
+
+   \                                 In section .rodata, align 2, keep-with-next
+   \   __absolute int16u const TOKEN_STACK_NVDATA_VERSION_DEFAULTS
+   \                     TOKEN_STACK_NVDATA_VERSION_DEFAULTS:
+   \   00000000   0x03FC             DC16 1020
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute int32u const TOKEN_STACK_APS_FRAME_COUNTER_DEFAULTS
+   \                     TOKEN_STACK_APS_FRAME_COUNTER_DEFAULTS:
+   \   00000000   0x00000000         DC32 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute tokTypeStackKeys const TOKEN_STACK_ALTERNATE_KEY_DEFAULTS
+   \                     TOKEN_STACK_ALTERNATE_KEY_DEFAULTS:
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 2, keep-with-next
+   \   __absolute int16u const TOKEN_STACK_BOOT_COUNTER_DEFAULTS
+   \                     TOKEN_STACK_BOOT_COUNTER_DEFAULTS:
+   \   00000000   0x0000             DC16 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute int32u const TOKEN_STACK_NONCE_COUNTER_DEFAULTS
+   \                     TOKEN_STACK_NONCE_COUNTER_DEFAULTS:
+   \   00000000   0x00000000         DC32 0
+
+   \                                 In section .rodata, align 2, keep-with-next
+   \   __absolute int16u const TOKEN_STACK_ANALYSIS_REBOOT_DEFAULTS
+   \                     TOKEN_STACK_ANALYSIS_REBOOT_DEFAULTS:
+   \   00000000   0x0000             DC16 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute tokTypeStackKeys const TOKEN_STACK_KEYS_DEFAULTS
+   \                     TOKEN_STACK_KEYS_DEFAULTS:
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute struct <unnamed> const TOKEN_STACK_NODE_DATA_DEFAULTS
+   \                     TOKEN_STACK_NODE_DATA_DEFAULTS:
+   \   00000000   0xFFFF             DC16 65535
+   \   00000002   0xFF 0x00          DC8 -1, 0, 0, 0
+   \              0x00 0x00    
+   \   00000006   0x0000             DC16 0
+   \   00000008   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute struct <unnamed> const TOKEN_STACK_CLASSIC_DATA_DEFAULTS
+   \                     TOKEN_STACK_CLASSIC_DATA_DEFAULTS:
+   \   00000000   0x01 0x00          DC8 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x01    
+   \   00000012   0xFFFF             DC16 65535
+   \   00000014   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute struct <unnamed> const TOKEN_STACK_TRUST_CENTER_DEFAULTS
+   \                     TOKEN_STACK_TRUST_CENTER_DEFAULTS:
+   \   00000000   0x0000             DC16 0
+   \   00000002   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00         
+   \   00000019   0x00 0x00          DC8 0, 0, 0
+   \              0x00         
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute struct <unnamed> const TOKEN_STACK_NETWORK_MANAGEMENT_DEFAULTS
+   \                     TOKEN_STACK_NETWORK_MANAGEMENT_DEFAULTS:
+   \   00000000   0x00000000         DC32 0
+   \   00000004   0xFFFF             DC16 65535
+   \   00000006   0x00 0x00          DC8 0, 0
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute int8u const TOKEN_STACK_BINDING_TABLE_DEFAULTS[13]
+   \                     TOKEN_STACK_BINDING_TABLE_DEFAULTS:
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute int8u const TOKEN_STACK_CHILD_TABLE_DEFAULTS[11]
+   \                     TOKEN_STACK_CHILD_TABLE_DEFAULTS:
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute int8u const TOKEN_STACK_KEY_TABLE_DEFAULTS[25]
+   \                     TOKEN_STACK_KEY_TABLE_DEFAULTS:
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00         
+   \   00000017   0x00 0x00          DC8 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00         
+
+   \                                 In section .rodata, align 4, keep-with-next
+   \   __absolute int8u const TOKEN_STACK_CERTIFICATE_TABLE_DEFAULTS[92]
+   \                     TOKEN_STACK_CERTIFICATE_TABLE_DEFAULTS:
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00         
+   \   00000017   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00         
+   \   0000002E   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00         
+   \   00000045   0x00 0x00          DC8 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00 0x00    
+   \              0x00         
+     47          #undef TOKEN_DEF
+     48          
+     49          #define TOKEN_DEF(name,creator,iscnt,isidx,type,arraysize,...) \
+     50            ((void *)&TOKEN_##name##_DEFAULTS),
+
+   \                                 In section .data, align 4
+     51            const void * tokenDefaults[] = {
+   \                     tokenDefaults:
+   \   00000000   0x........         DC32 TOKEN_STACK_CAL_DATA_DEFAULTS, TOKEN_STACK_NVDATA_VERSION_DEFAULTS
+   \              0x........   
+   \   00000008   0x........         DC32 TOKEN_STACK_APS_FRAME_COUNTER_DEFAULTS
+   \   0000000C   0x........         DC32 TOKEN_STACK_ALTERNATE_KEY_DEFAULTS
+   \   00000010   0x........         DC32 TOKEN_STACK_BOOT_COUNTER_DEFAULTS
+   \   00000014   0x........         DC32 TOKEN_STACK_NONCE_COUNTER_DEFAULTS
+   \   00000018   0x........         DC32 TOKEN_STACK_ANALYSIS_REBOOT_DEFAULTS, TOKEN_STACK_KEYS_DEFAULTS
+   \              0x........   
+   \   00000020   0x........         DC32 TOKEN_STACK_NODE_DATA_DEFAULTS, TOKEN_STACK_CLASSIC_DATA_DEFAULTS
+   \              0x........   
+   \   00000028   0x........         DC32 TOKEN_STACK_TRUST_CENTER_DEFAULTS
+   \   0000002C   0x........         DC32 TOKEN_STACK_NETWORK_MANAGEMENT_DEFAULTS
+   \   00000030   0x........         DC32 TOKEN_STACK_BINDING_TABLE_DEFAULTS
+   \   00000034   0x........         DC32 TOKEN_STACK_CHILD_TABLE_DEFAULTS, TOKEN_STACK_KEY_TABLE_DEFAULTS
+   \              0x........   
+   \   0000003C   0x........         DC32 TOKEN_STACK_CERTIFICATE_TABLE_DEFAULTS
+     52              #include "token-stack.h"
+     53            };
+     54          #undef TOKEN_DEF
+     55          
+     56          #undef DEFINETOKENS
+     57          
+     58          #undef TOKEN_MFG
+     59          
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+      20  TOKEN_STACK_ALTERNATE_KEY_DEFAULTS
+       2  TOKEN_STACK_ANALYSIS_REBOOT_DEFAULTS
+       4  TOKEN_STACK_APS_FRAME_COUNTER_DEFAULTS
+      16  TOKEN_STACK_BINDING_TABLE_DEFAULTS
+       2  TOKEN_STACK_BOOT_COUNTER_DEFAULTS
+       4  TOKEN_STACK_CAL_DATA_DEFAULTS
+      92  TOKEN_STACK_CERTIFICATE_TABLE_DEFAULTS
+      12  TOKEN_STACK_CHILD_TABLE_DEFAULTS
+      28  TOKEN_STACK_CLASSIC_DATA_DEFAULTS
+      20  TOKEN_STACK_KEYS_DEFAULTS
+      28  TOKEN_STACK_KEY_TABLE_DEFAULTS
+       8  TOKEN_STACK_NETWORK_MANAGEMENT_DEFAULTS
+      16  TOKEN_STACK_NODE_DATA_DEFAULTS
+       4  TOKEN_STACK_NONCE_COUNTER_DEFAULTS
+       2  TOKEN_STACK_NVDATA_VERSION_DEFAULTS
+      28  TOKEN_STACK_TRUST_CENTER_DEFAULTS
+      16  tokenArraySize
+      32  tokenCreators
+      64  tokenDefaults
+      16  tokenIsCnt
+      16  tokenSize
+
+ 
+  64 bytes in section .data
+ 366 bytes in section .rodata
+ 
+ 366 bytes of CONST memory
+  64 bytes of DATA  memory
+
+Errors: none
+Warnings: none

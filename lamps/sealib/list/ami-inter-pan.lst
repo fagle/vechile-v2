@@ -1,0 +1,438 @@
+###############################################################################
+#
+# IAR ANSI C/C++ Compiler V7.40.3.8902/W32 for ARM        25/Oct/2015  14:11:21
+# Copyright 1999-2015 IAR Systems AB.
+#
+#    Cpu mode     =  thumb
+#    Endian       =  little
+#    Source file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\ami-inter-pan.c
+#    Command line =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\util\ami-inter-pan.c -D
+#        ENABLE_GATEWAY -D NULL_BTL -D CORTEXM3_EM357 -lC
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ --diag_suppress Pa050
+#        -o D:\projects\VehicleV2\trunk\lamps\sealib\obj\ --debug
+#        --endian=little --cpu=Cortex-M3 -e --fpu=None --dlib_config
+#        "C:\Program Files\IAR Systems\Embedded Workbench
+#        7.2\arm\INC\c\DLib_Config_Normal.h" -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\hal\cortexm3\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\stack\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\util\ -I
+#        D:\projects\VehicleV2\trunk\lamps\sealib\..\inc\car\ -Ohz
+#        --use_c++_inline
+#    List file    =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\list\ami-inter-pan.lst
+#    Object file  =  
+#        D:\projects\VehicleV2\trunk\lamps\sealib\obj\ami-inter-pan.o
+#
+###############################################################################
+
+D:\projects\VehicleV2\trunk\lamps\sealib\util\ami-inter-pan.c
+      1          
+      2          #include "config.h"
+      3          #include "ember.h"
+      4          #include "ami-inter-pan.h"
+      5          
+      6          static int8u* pushInt16u ( int8u *finger, int16u value );
+      7          static int8u* pushEui64  ( int8u *finger, int8u *value );
+      8          
+      9          // Defined in the MAC code.  We use this to keep our sequence numbers
+     10          // in step with other transmissions.
+     11          extern int8u emMacDataSequenceNumber;
+     12          
+     13          #define SHORT_DEST_FRAME_CONTROL   (0xC821)                // The two possible MAC frame controsl.
+     14          #define LONG_DEST_FRAME_CONTROL    (0xCC21)
+     15          #define MAX_INTER_PAN_MAC_SIZE     (2 + 1 + 2 + 8 + 2 + 8) // Frame control, sequence, dest PAN ID, dest, source PAN ID, source.
+     16          #define STUB_NWK_SIZE              (0x02)                  // NWK stub frame has two control bytes.
+     17          #define STUB_NWK_FRAME_CONTROL     (0x000B)
+     18          #define MAX_STUB_APS_SIZE          (1 + 2 + 2 + 2)         // APS frame control, group ID, cluster ID, profile ID
+     19          
+     20          #define MAX_INTER_PAN_HEADER_SIZE  (MAX_INTER_PAN_MAC_SIZE + STUB_NWK_SIZE + MAX_STUB_APS_SIZE)
+     21          
+
+   \                                 In section .text, align 2, keep-with-next
+     22          EmberMessageBuffer makeInterPanMessage ( InterPanHeader *headerData, EmberMessageBuffer payload )
+     23          {
+   \                     makeInterPanMessage: (+1)
+   \   00000000   0xB5F0             PUSH     {R4-R7,LR}
+   \   00000002   0x4604             MOV      R4,R0
+   \   00000004   0xB089             SUB      SP,SP,#+36
+     24              int8u header[MAX_INTER_PAN_HEADER_SIZE];
+     25              int8u *finger = header;
+     26              int16u macFrameControl =  headerData->hasLongAddress ? LONG_DEST_FRAME_CONTROL : SHORT_DEST_FRAME_CONTROL;
+   \   00000006   0x7920             LDRB     R0,[R4, #+4]
+   \   00000008   0x460D             MOV      R5,R1
+   \   0000000A   0x2800             CMP      R0,#+0
+   \   0000000C   0xBF14             ITE      NE 
+   \   0000000E   0xF64C 0x4121      MOVWNE   R1,#+52257
+   \   00000012   0xF64C 0x0121      MOVWEQ   R1,#+51233
+     27          
+     28              finger    = pushInt16u(finger, macFrameControl);
+   \   00000016   0xA801             ADD      R0,SP,#+4
+   \   00000018   0x.... 0x....      BL       pushInt16u
+     29              *finger++ = ++emMacDataSequenceNumber;
+   \   0000001C   0x....             LDR.N    R1,??DataTable1
+   \   0000001E   0x780A             LDRB     R2,[R1, #+0]
+   \   00000020   0x1C52             ADDS     R2,R2,#+1
+   \   00000022   0x700A             STRB     R2,[R1, #+0]
+   \   00000024   0xF800 0x2B01      STRB     R2,[R0], #+1
+     30          
+     31              finger = pushInt16u(finger, headerData->panId);
+   \   00000028   0x8861             LDRH     R1,[R4, #+2]
+   \   0000002A   0x.... 0x....      BL       pushInt16u
+     32              if (headerData->hasLongAddress)
+   \   0000002E   0x7921             LDRB     R1,[R4, #+4]
+   \   00000030   0xB121             CBZ.N    R1,??makeInterPanMessage_0
+     33                  finger = pushEui64(finger, headerData->longAddress);
+   \   00000032   0xF104 0x0108      ADD      R1,R4,#+8
+   \   00000036   0x.... 0x....      BL       pushEui64
+   \   0000003A   0xE002             B.N      ??makeInterPanMessage_1
+     34              else
+     35                  finger = pushInt16u(finger, headerData->shortAddress);
+   \                     ??makeInterPanMessage_0: (+1)
+   \   0000003C   0x88E1             LDRH     R1,[R4, #+6]
+   \   0000003E   0x.... 0x....      BL       pushInt16u
+   \                     ??makeInterPanMessage_1: (+1)
+   \   00000042   0x4606             MOV      R6,R0
+     36          
+     37              finger = pushInt16u(finger, emberGetPanId());
+   \   00000044   0x.... 0x....      BL       emberGetPanId
+   \   00000048   0x4601             MOV      R1,R0
+   \   0000004A   0x4630             MOV      R0,R6
+   \   0000004C   0x.... 0x....      BL       pushInt16u
+     38              finger = pushEui64(finger, emberGetEui64());
+   \   00000050   0x....             LDR.N    R1,??DataTable1_1
+   \   00000052   0x.... 0x....      BL       pushEui64
+     39          
+     40              finger = pushInt16u(finger, STUB_NWK_FRAME_CONTROL);
+   \   00000056   0x210B             MOVS     R1,#+11
+   \   00000058   0x.... 0x....      BL       pushInt16u
+     41          
+     42              *finger++ = headerData->messageType;
+   \   0000005C   0x7821             LDRB     R1,[R4, #+0]
+   \   0000005E   0xF800 0x1B01      STRB     R1,[R0], #+1
+     43              if (headerData->messageType == INTER_PAN_MULTICAST)
+   \   00000062   0x7821             LDRB     R1,[R4, #+0]
+   \   00000064   0x290F             CMP      R1,#+15
+   \   00000066   0xBF04             ITT      EQ 
+     44                  finger = pushInt16u(finger, headerData->groupId);
+   \   00000068   0x8AA1             LDRHEQ   R1,[R4, #+20]
+   \   0000006A   0x.... 0x....      BLEQ     pushInt16u
+     45              finger = pushInt16u(finger, headerData->clusterId);
+   \   0000006E   0x8A61             LDRH     R1,[R4, #+18]
+   \   00000070   0x.... 0x....      BL       pushInt16u
+     46              finger = pushInt16u(finger, headerData->profileId);
+     47          
+     48              {
+     49                  int8u headerLength = finger - header;
+   \   00000074   0x8A21             LDRH     R1,[R4, #+16]
+   \   00000076   0x.... 0x....      BL       pushInt16u
+   \   0000007A   0xA901             ADD      R1,SP,#+4
+   \   0000007C   0x1A44             SUBS     R4,R0,R1
+     50                  int8u payloadLength = emberMessageBufferLength(payload);
+   \   0000007E   0x....             LDR.N    R0,??DataTable1_2
+   \   00000080   0x6800             LDR      R0,[R0, #+0]
+   \   00000082   0x5C2E             LDRB     R6,[R5, R0]
+     51                  EmberMessageBuffer message = emberFillLinkedBuffers(NULL, headerLength + payloadLength);
+   \   00000084   0x1931             ADDS     R1,R6,R4
+   \   00000086   0xB2C9             UXTB     R1,R1
+   \   00000088   0x2000             MOVS     R0,#+0
+   \   0000008A   0x.... 0x....      BL       emberFillLinkedBuffers
+   \   0000008E   0x4607             MOV      R7,R0
+     52                  if (message != EMBER_NULL_MESSAGE_BUFFER) 
+   \   00000090   0x2FFF             CMP      R7,#+255
+   \   00000092   0xD00E             BEQ.N    ??makeInterPanMessage_2
+     53                  {
+     54                      emberCopyToLinkedBuffers(header,  message, 0x00, headerLength);
+   \   00000094   0x2001             MOVS     R0,#+1
+   \   00000096   0x9000             STR      R0,[SP, #+0]
+   \   00000098   0xB2E3             UXTB     R3,R4
+   \   0000009A   0x2200             MOVS     R2,#+0
+   \   0000009C   0x4639             MOV      R1,R7
+   \   0000009E   0xA801             ADD      R0,SP,#+4
+   \   000000A0   0x.... 0x....      BL       emReallyCopyToLinkedBuffers
+     55                      emberCopyBufferBytes(message, headerLength, payload, 0x00, payloadLength);
+   \   000000A4   0x9600             STR      R6,[SP, #+0]
+   \   000000A6   0x2300             MOVS     R3,#+0
+   \   000000A8   0x462A             MOV      R2,R5
+   \   000000AA   0xB2E1             UXTB     R1,R4
+   \   000000AC   0x4638             MOV      R0,R7
+   \   000000AE   0x.... 0x....      BL       emberCopyBufferBytes
+     56                  }
+     57                  return message;
+   \                     ??makeInterPanMessage_2: (+1)
+   \   000000B2   0x4638             MOV      R0,R7
+   \   000000B4   0xB009             ADD      SP,SP,#+36
+   \   000000B6   0xBDF0             POP      {R4-R7,PC}       ;; return
+     58              }
+     59          }                                
+     60          
+     61          // Returns the index of the start of the payload, or zero if the message is not correctly formed.
+
+   \                                 In section .text, align 2, keep-with-next
+     62          int8u parseInterPanMessage ( EmberMessageBuffer message,  int8u startOffset, InterPanHeader *headerData )
+     63          {
+   \                     parseInterPanMessage: (+1)
+   \   00000000   0xB5F0             PUSH     {R4-R7,LR}
+   \   00000002   0x460C             MOV      R4,R1
+     64              int8u header[MAX_INTER_PAN_HEADER_SIZE];
+     65              int8u length = sizeof(header);
+     66              int8u haveBytes = emberMessageBufferLength(message) - startOffset;
+   \   00000004   0x....             LDR.N    R1,??DataTable1_2
+   \   00000006   0x6809             LDR      R1,[R1, #+0]
+   \   00000008   0x5C41             LDRB     R1,[R0, R1]
+   \   0000000A   0x1B09             SUBS     R1,R1,R4
+     67              int8u *finger = header;
+     68              int16u macFrameControl;
+     69          
+     70              if (haveBytes < length)
+   \   0000000C   0xB2C9             UXTB     R1,R1
+   \   0000000E   0x2320             MOVS     R3,#+32
+   \   00000010   0x460E             MOV      R6,R1
+   \   00000012   0x2E20             CMP      R6,#+32
+   \   00000014   0xB089             SUB      SP,SP,#+36
+   \   00000016   0xBFB8             IT       LT 
+   \   00000018   0x460B             MOVLT    R3,R1
+     71                  length = haveBytes;
+     72          
+     73              emberCopyFromLinkedBuffers(message, startOffset, header, length);
+   \   0000001A   0x2100             MOVS     R1,#+0
+   \   0000001C   0x9100             STR      R1,[SP, #+0]
+   \   0000001E   0x4615             MOV      R5,R2
+   \   00000020   0x4601             MOV      R1,R0
+   \   00000022   0x4622             MOV      R2,R4
+   \   00000024   0xA801             ADD      R0,SP,#+4
+   \   00000026   0x.... 0x....      BL       emReallyCopyToLinkedBuffers
+     74            
+     75              macFrameControl = HIGH_LOW_TO_INT(finger[1], finger[0]);
+   \   0000002A   0xF89D 0x0005      LDRB     R0,[SP, #+5]
+   \   0000002E   0xF89D 0x1004      LDRB     R1,[SP, #+4]
+   \   00000032   0xEB01 0x2000      ADD      R0,R1,R0, LSL #+8
+     76          
+     77              // verify the MAC Frame Control - ignore the Ack required bit as the stack changes the value to 0 during processing. 
+     78              // Increment past the FC, seq, dest PAN ID and dest addr
+     79              if ((macFrameControl & 0xFFDF) == (LONG_DEST_FRAME_CONTROL & 0xFFDF)) 
+   \   00000036   0xF64F 0x71DF      MOVW     R1,#+65503
+   \   0000003A   0xEA01 0x0200      AND      R2,R1,R0
+   \   0000003E   0xF64C 0x4301      MOVW     R3,#+52225
+   \   00000042   0x429A             CMP      R2,R3
+   \   00000044   0xD118             BNE.N    ??parseInterPanMessage_0
+     80              {
+     81                  finger += 2 + 1 + 2 + 8;      // control, sequence, dest PAN ID, long dest
+   \   00000046   0xF10D 0x0011      ADD      R0,SP,#+17
+     82              }
+     83              else if ((macFrameControl & 0xFFDF) == (SHORT_DEST_FRAME_CONTROL & 0xFFDF)) 
+     84              {
+     85                  finger += 2 + 1 + 2 + 2;      // control, sequence, dest PAN ID, short dest
+     86              }
+     87              else 
+     88              {
+     89              //fprintf(stderr, "bad MAC frame control %04X\n", macFrameControl);
+     90              //emberSerialPrintf(1, "bad MAC frame control %2x\r\n", macFrameControl);
+     91              return 0;
+     92            }
+     93          
+     94            // after the dest PAN ID and dest addr is the source PAN ID
+     95            headerData->panId = HIGH_LOW_TO_INT(finger[1], finger[0]);
+   \                     ??parseInterPanMessage_1: (+1)
+   \   0000004A   0x7841             LDRB     R1,[R0, #+1]
+   \   0000004C   0x7802             LDRB     R2,[R0, #+0]
+     96            finger += 2;
+   \   0000004E   0x1C87             ADDS     R7,R0,#+2
+   \   00000050   0xEB02 0x2101      ADD      R1,R2,R1, LSL #+8
+     97          
+     98            // after the source PAN ID is the long source address
+     99            headerData->hasLongAddress = TRUE;
+   \   00000054   0x2001             MOVS     R0,#+1
+   \   00000056   0x8069             STRH     R1,[R5, #+2]
+   \   00000058   0x7128             STRB     R0,[R5, #+4]
+    100            MEMCOPY(headerData->longAddress, finger, 8);
+   \   0000005A   0x2208             MOVS     R2,#+8
+   \   0000005C   0x4639             MOV      R1,R7
+   \   0000005E   0xF105 0x0008      ADD      R0,R5,#+8
+   \   00000062   0x.... 0x....      BL       halCommonMemCopy
+    101            finger += 8;
+   \   00000066   0xF107 0x0008      ADD      R0,R7,#+8
+    102          
+    103            // verify the stub network frame control
+    104            if (HIGH_LOW_TO_INT(finger[1], finger[0]) != STUB_NWK_FRAME_CONTROL) {
+   \   0000006A   0x7841             LDRB     R1,[R0, #+1]
+   \   0000006C   0x7802             LDRB     R2,[R0, #+0]
+   \   0000006E   0xEB02 0x2101      ADD      R1,R2,R1, LSL #+8
+   \   00000072   0x290B             CMP      R1,#+11
+   \   00000074   0xD008             BEQ.N    ??parseInterPanMessage_2
+    105              //fprintf(stderr, "bad NWK frame control %02X\n", *(finger - 1));
+    106              //emberSerialPrintf(1, "bad NWK frame control %x%x\r\n", *(finger - 1), *finger);
+    107              return 0;
+   \   00000076   0xE022             B.N      ??parseInterPanMessage_3
+    108            }
+   \                     ??parseInterPanMessage_0: (+1)
+   \   00000078   0x4008             ANDS     R0,R1,R0
+   \   0000007A   0xF64C 0x0101      MOVW     R1,#+51201
+   \   0000007E   0x4288             CMP      R0,R1
+   \   00000080   0xD11D             BNE.N    ??parseInterPanMessage_3
+   \   00000082   0xF10D 0x000B      ADD      R0,SP,#+11
+   \   00000086   0xE7E0             B.N      ??parseInterPanMessage_1
+    109            finger += 2;
+    110            
+    111            // message type - this is the APS frame control
+    112            headerData->messageType = *finger++;
+   \                     ??parseInterPanMessage_2: (+1)
+   \   00000088   0x7881             LDRB     R1,[R0, #+2]
+   \   0000008A   0x7029             STRB     R1,[R5, #+0]
+   \   0000008C   0x1CC0             ADDS     R0,R0,#+3
+    113            
+    114            if (headerData->messageType == INTER_PAN_MULTICAST) {
+   \   0000008E   0x290F             CMP      R1,#+15
+   \   00000090   0xD111             BNE.N    ??parseInterPanMessage_4
+    115              headerData->groupId = HIGH_LOW_TO_INT(finger[1], finger[0]);
+   \   00000092   0x.... 0x....      BL       ?Subroutine0
+   \                     ??CrossCallReturnLabel_0: (+1)
+   \   00000096   0x82A9             STRH     R1,[R5, #+20]
+    116              finger += 2;
+    117            } else if (! (headerData->messageType == INTER_PAN_UNICAST
+    118                          || headerData->messageType == INTER_PAN_BROADCAST)) {
+    119              //fprintf(stderr, "bad APS frame control %02X\n", headerData->messageType);
+    120              //emberSerialPrintf(1, "bad APS frame control %2x\r\n", headerData->messageType);
+    121              return 0;
+    122            }
+    123            
+    124            headerData->clusterId = HIGH_LOW_TO_INT(finger[1], finger[0]);
+   \                     ??parseInterPanMessage_5: (+1)
+   \   00000098   0x.... 0x....      BL       ?Subroutine0
+   \                     ??CrossCallReturnLabel_1: (+1)
+   \   0000009C   0x8269             STRH     R1,[R5, #+18]
+    125            finger += 2;
+    126            headerData->profileId = HIGH_LOW_TO_INT(finger[1], finger[0]);
+   \   0000009E   0x.... 0x....      BL       ?Subroutine0
+   \                     ??CrossCallReturnLabel_2: (+1)
+   \   000000A2   0x8229             STRH     R1,[R5, #+16]
+    127            finger += 2;
+    128          
+    129          //  fprintf(stderr, "[used %d out of %d]\n",
+    130          //          finger - header,
+    131          //          haveBytes);
+    132          
+    133            if (finger - header <= haveBytes) {
+   \   000000A4   0xA901             ADD      R1,SP,#+4
+   \   000000A6   0x1A41             SUBS     R1,R0,R1
+   \   000000A8   0x428E             CMP      R6,R1
+   \   000000AA   0xDB08             BLT.N    ??parseInterPanMessage_3
+    134              //emberSerialPrintf(1, "ret %x\r\n", startOffset + finger - header);
+    135              return startOffset + finger - header;
+   \   000000AC   0x1820             ADDS     R0,R4,R0
+   \   000000AE   0xA901             ADD      R1,SP,#+4
+   \   000000B0   0x1A40             SUBS     R0,R0,R1
+   \   000000B2   0xB2C0             UXTB     R0,R0
+   \   000000B4   0xE004             B.N      ??parseInterPanMessage_6
+    136              
+    137            } else {
+   \                     ??parseInterPanMessage_4: (+1)
+   \   000000B6   0x2903             CMP      R1,#+3
+   \   000000B8   0xBF18             IT       NE 
+   \   000000BA   0x290B             CMPNE    R1,#+11
+   \   000000BC   0xD0EC             BEQ.N    ??parseInterPanMessage_5
+    138              //emberSerialPrintf(1, "ret zero\r\n");
+    139              return 0;
+   \                     ??parseInterPanMessage_3: (+1)
+   \   000000BE   0x2000             MOVS     R0,#+0
+   \                     ??parseInterPanMessage_6: (+1)
+   \   000000C0   0xB009             ADD      SP,SP,#+36
+   \   000000C2   0xBDF0             POP      {R4-R7,PC}       ;; return
+    140            }
+    141          }
+
+   \                                 In section .text, align 2, keep-with-next
+   \                     ?Subroutine0: (+1)
+   \   00000000   0x7841             LDRB     R1,[R0, #+1]
+   \   00000002   0xF810 0x2B02      LDRB     R2,[R0], #+2
+   \   00000006   0xEB02 0x2101      ADD      R1,R2,R1, LSL #+8
+   \   0000000A   0x4770             BX       LR
+    142          
+    143          //----------------------------------------------------------------
+    144          // Utilities
+    145          
+
+   \                                 In section .text, align 2, keep-with-next
+    146          static int8u* pushInt16u(int8u *finger, int16u value)
+    147          {
+    148            *finger++ = LOW_BYTE(value);
+   \                     pushInt16u: (+1)
+   \   00000000   0x7001             STRB     R1,[R0, #+0]
+    149            *finger++ = HIGH_BYTE(value);
+   \   00000002   0x0A09             LSRS     R1,R1,#+8
+   \   00000004   0x7041             STRB     R1,[R0, #+1]
+    150            return finger;
+   \   00000006   0x1C80             ADDS     R0,R0,#+2
+   \   00000008   0x4770             BX       LR               ;; return
+    151          }
+    152          
+
+   \                                 In section .text, align 2, keep-with-next
+    153          static int8u* pushEui64(int8u *finger, int8u *value)
+    154          {
+   \                     pushEui64: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+   \   00000002   0x4604             MOV      R4,R0
+    155            MEMCOPY(finger, value, 8);
+   \   00000004   0x2208             MOVS     R2,#+8
+   \   00000006   0x.... 0x....      BL       halCommonMemCopy
+    156            return finger + 8;
+   \   0000000A   0xF104 0x0008      ADD      R0,R4,#+8
+   \   0000000E   0xBD10             POP      {R4,PC}          ;; return
+    157          }
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1:
+   \   00000000   0x........         DC32     emMacDataSequenceNumber
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_1:
+   \   00000000   0x........         DC32     emLocalEui64
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable1_2:
+   \   00000000   0x........         DC32     emMessageBufferLengths
+    158          
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+      56   makeInterPanMessage
+        56   -> emReallyCopyToLinkedBuffers
+        56   -> emberCopyBufferBytes
+        56   -> emberFillLinkedBuffers
+        56   -> emberGetPanId
+        56   -> pushEui64
+        56   -> pushInt16u
+      56   parseInterPanMessage
+        56   -> emReallyCopyToLinkedBuffers
+        56   -> halCommonMemCopy
+       8   pushEui64
+         8   -> halCommonMemCopy
+       0   pushInt16u
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable1
+       4  ??DataTable1_1
+       4  ??DataTable1_2
+      12  ?Subroutine0
+     184  makeInterPanMessage
+     196  parseInterPanMessage
+      16  pushEui64
+      10  pushInt16u
+
+ 
+ 430 bytes in section .text
+ 
+ 430 bytes of CODE memory
+
+Errors: none
+Warnings: none

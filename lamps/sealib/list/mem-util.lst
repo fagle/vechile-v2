@@ -1,0 +1,44 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V5.41.0.51741/W32 for ARM     12/Dec/2013  19:36:56 #
+# Copyright (C) 1999-2009 IAR Systems AB.                                     #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  G:\Workshops\seavehicle\lamps\sealib\lamp\mem-util.c     #
+#    Command line =  G:\Workshops\seavehicle\lamps\sealib\lamp\mem-util.c -D  #
+#                    ENABLE_GATEWAY -lC G:\Workshops\seavehicle\lamps\sealib\ #
+#                    list\ --diag_suppress Pa050 -o                           #
+#                    G:\Workshops\seavehicle\lamps\sealib\obj\ --debug        #
+#                    --endian=little --cpu=Cortex-M3 -e --fpu=None            #
+#                    --dlib_config "D:\Program Files\IAR Systems\Embedded     #
+#                    Workbench 5.4\arm\INC\DLib_Config_Normal.h" -I           #
+#                    G:\Workshops\seavehicle\lamps\sealib\..\inc\ -I          #
+#                    G:\Workshops\seavehicle\lamps\sealib\..\inc\hal\ -I      #
+#                    G:\Workshops\seavehicle\lamps\sealib\..\inc\hal\cortexm3 #
+#                    \ -I G:\Workshops\seavehicle\lamps\sealib\..\inc\stack\  #
+#                    -I G:\Workshops\seavehicle\lamps\sealib\..\inc\util\ -I  #
+#                    G:\Workshops\seavehicle\lamps\sealib\..\inc\car\ -I      #
+#                    "D:\Program Files\IAR Systems\Embedded Workbench         #
+#                    5.4\arm\INC\" -Ohz                                       #
+#    List file    =  G:\Workshops\seavehicle\lamps\sealib\list\mem-util.lst   #
+#    Object file  =  G:\Workshops\seavehicle\lamps\sealib\obj\mem-util.o      #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+G:\Workshops\seavehicle\lamps\sealib\lamp\mem-util.c
+      1          
+      2          #include "config.h"
+      3          #include "ember-types.h"
+      4          #include "error.h"
+      5          #include "hal.h"
+      6          
+
+
+ 
+ 
+ 0 bytes of memory
+
+Errors: none
+Warnings: none
